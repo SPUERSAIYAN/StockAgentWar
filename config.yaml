@@ -9,6 +9,11 @@ agents:
       include_options: true
       include_edgar: true
       include_a_share_metrics: true
+      candidate_discovery:
+        enabled: true
+        max_candidates: 8
+        scan_limit: 0
+        batch_size: 80
       macro_symbols:
         - SPY
         - QQQ
@@ -27,7 +32,7 @@ agents:
         china_equity:
           enabled: true
           tencent: true
-          mootdx: false
+          mootdx: true
           mootdx_bar_offset: 120
           mootdx_realtime: true
           mootdx_financials: true
@@ -35,6 +40,7 @@ agents:
           mootdx_factory_options:
             market: std
             timeout: 15
+            heartbeat: false
         macro:
           enabled: true
           treasury: true
@@ -94,7 +100,7 @@ agents:
           queries: []
     model:
       provider: openrouter
-      model: qwen/qwen3.5-plus-20260420
+      model: openai/gpt-5.5
       temperature: 0.2
       api_key_env: OPENROUTER_API_KEY
       site_url: http://localhost

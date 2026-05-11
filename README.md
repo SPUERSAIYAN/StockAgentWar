@@ -161,3 +161,31 @@ Provider 已按类别集中在 `collectors/connectors/`：
 
 Agent 初始化时会读取对应 `.md` 文件，运行时再填充 state 变量。修改提示词不需要改 Python 类。
 # StockAgentWar
+
+## Agent terminal trace
+
+The project prints agent interaction logs to the terminal by default. The trace includes:
+
+- each agent's state input summary
+- LLM system/user messages
+- model output
+- information-agent workflow/provider selection
+- data-source task building and provider calls
+- per-source elapsed time, success summaries, exception type/message, and traceback
+- collector source/error summary
+- handoff previews between agents
+
+Controls:
+
+```powershell
+# Disable terminal trace
+$env:AGENT_TRACE="0"
+
+# Re-enable terminal trace
+$env:AGENT_TRACE="1"
+
+# Increase or decrease per-section output length
+$env:AGENT_TRACE_MAX_CHARS="8000"
+```
+
+Logs are written to stderr, so API responses and CLI final output remain on stdout.

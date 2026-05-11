@@ -9,6 +9,7 @@ from agents.bull_agent import BullAgent
 from agents.judge_agent import JudgeAgent
 from agents.risk_agent import RiskAgent
 from agents.information_agent import InformationCollectionAgent
+from agents.trace_logger import log_agent_output, log_agent_start
 from schemas.state import AgentRuntimeConfig, MarketDecisionState
 
 
@@ -71,5 +72,7 @@ def build_stock_graph(
 
 
 def format_output(state: MarketDecisionState) -> dict[str, str]:
+    log_agent_start("format_output", state)
     final_output = state.get("risk_report") or state.get("judge_decision") or "未生成候选股票结果。"
+    log_agent_output("format_output", "final_output", final_output)
     return {"final_output": final_output}

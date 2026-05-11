@@ -2,13 +2,25 @@ from __future__ import annotations
 
 import importlib
 import json
+import math
 import os
 import re
 from dataclasses import dataclass
 from typing import Any, Protocol
 
+from agents import information_workflow
 from agents.prompt_loader import PromptTemplate, load_prompt_text
-from collectors.digital_oracle_collector import collect_market_information, compact_json
+from agents.trace_logger import (
+    log_agent_error,
+    log_agent_messages,
+    log_agent_output,
+    log_agent_start,
+    log_trace,
+)
+from collectors.digital_oracle_collector import (
+    collect_market_information,
+    compact_json,
+)
 from schemas.state import AgentRuntimeConfig, MarketDecisionState, ModelConfig
 
 
@@ -48,31 +60,48 @@ class InformationCollectionAgent:
         self.model = create_chat_model(config.get("model", {}))
         self.prompt_files = (
             "information_agent.md",
-            "references/providers.md",
-            "references/symbols.md",
         )
-        self.instructions = load_prompt_text(
-            self.prompt_files[0],
-            reference_files=self.prompt_files[1:],
-        )
+        self.instructions = load_prompt_text(self.prompt_files[0])
 
     def __call__(self, state: MarketDecisionState) -> dict[str, Any]:
-        workflow = build_information_workflow(state)
-        provider_selection = select_information_providers(state, workflow, self.config)
-        selected_config = apply_provider_selection(self.config, provider_selection)
+        agent_name = self.config.get("name") or "information"
+        state, candidate_discovery = information_workflow.prepare_information_state(state, self.config)
+        log_agent_start(agent_name, state, {"role": self.config.get("role")})
+        workflow = information_workflow.build_information_workflow(state)
+        provider_selection = information_workflow.select_information_providers(state, workflow, self.config)
+        selected_config = information_workflow.apply_provider_selection(self.config, provider_selection)
+        log_trace(
+            agent_name,
+            "WORKFLOW AND PROVIDERS",
+            {
+                "workflow": workflow,
+                "provider_selection": provider_selection,
+            },
+        )
 
         runtime_state: MarketDecisionState = {
             **state,
             "information_workflow": workflow,
             "provider_selection": provider_selection,
         }
-        collected = collect_market_information(runtime_state, selected_config)
+        try:
+            collected = collect_market_information(runtime_state, selected_config)
+        except Exception as exc:
+            log_agent_error(agent_name, exc)
+            raise
+        log_trace(agent_name, "COLLECTOR OUTPUT", summarize_collected_data(collected))
         if not collected:
-            return {
-                "info_report": render_no_data_information_report(state, workflow, provider_selection),
+            report = render_no_data_information_report(state, workflow, provider_selection)
+            log_agent_output(agent_name, "info_report", report)
+            output: dict[str, Any] = {
+                "info_report": report,
                 "information_workflow": workflow,
                 "provider_selection": provider_selection,
             }
+            if candidate_discovery:
+                output["candidates"] = state.get("candidates", [])
+                output["metadata"] = state.get("metadata", {})
+            return output
 
         signal_reasoning = infer_trading_signals(collected)
         enriched_data = {
@@ -91,7 +120,8 @@ class InformationCollectionAgent:
             provider_selection=provider_selection,
             signal_reasoning=signal_reasoning,
         )
-        return {
+        log_agent_output(agent_name, "info_report", report)
+        output = {
             "info_report": report,
             "information_workflow": workflow,
             "provider_selection": provider_selection,
@@ -106,7 +136,10 @@ class InformationCollectionAgent:
                 ],
             },
         }
-
+        if candidate_discovery:
+            output["candidates"] = state.get("candidates", [])
+            output["metadata"]["auto_candidate_discovery"] = candidate_discovery
+        return output
 
 def run_prompt_agent(
     *,
@@ -117,6 +150,8 @@ def run_prompt_agent(
     system_prompt: str | None = None,
     user_prompt: str | None = None,
 ) -> dict[str, str]:
+    agent_name = config.get("name") or output_key
+    log_agent_start(agent_name, state, {"role": config.get("role"), "output_key": output_key})
     variables = prompt_vars(state)
     if prompt_template is not None:
         system_content, user_content = prompt_template.render(variables)
@@ -127,13 +162,17 @@ def run_prompt_agent(
         raise ValueError("run_prompt_agent requires prompt_template or system_prompt/user_prompt.")
 
     model = create_chat_model(config.get("model", {}))
-    content = invoke_text(
-        model,
-        [
-            {"role": "system", "content": system_content},
-            {"role": "user", "content": user_content},
-        ],
-    )
+    messages = [
+        {"role": "system", "content": system_content},
+        {"role": "user", "content": user_content},
+    ]
+    log_agent_messages(agent_name, config.get("model", {}), messages)
+    try:
+        content = invoke_text(model, messages)
+    except Exception as exc:
+        log_agent_error(agent_name, exc)
+        raise
+    log_agent_output(agent_name, output_key, content)
     return {output_key: content}
 
 
@@ -256,6 +295,7 @@ def content_part_to_text(part: Any) -> str:
 def build_information_workflow(state: MarketDecisionState) -> dict[str, Any]:
     task = state.get("task", "")
     symbols = [str(item.get("symbol", "")).upper() for item in state.get("candidates", []) if item.get("symbol")]
+    discovery = dict(state.get("metadata", {}).get("auto_candidate_discovery", {}) or {})
     return {
         "instruction_file": "prompts/information_agent.md",
         "workflow_steps": [
@@ -271,6 +311,8 @@ def build_information_workflow(state: MarketDecisionState) -> dict[str, Any]:
             "time_window": infer_time_window(task),
             "priceability": "high" if symbols else "medium",
             "candidates": symbols,
+            "candidate_source": "auto_discovery" if discovery else "user_input",
+            "candidate_discovery": discovery,
         },
         "routing_criteria": ["relevance", "time_match", "information_increment"],
     }
@@ -388,6 +430,7 @@ def apply_provider_selection(
 def infer_trading_signals(collected: dict[str, Any]) -> dict[str, Any]:
     sources = dict(collected.get("sources", {}))
     rows = [interpret_source_signal(label, value) for label, value in sources.items()]
+    candidate_comparison = build_candidate_comparison(sources)
     bullish = sum(1 for row in rows if row["bias"] == "bullish")
     bearish = sum(1 for row in rows if row["bias"] == "bearish")
     neutral = sum(1 for row in rows if row["bias"] == "neutral")
@@ -409,6 +452,7 @@ def infer_trading_signals(collected: dict[str, Any]) -> dict[str, Any]:
         },
         "resonance_signals": [row for row in rows if row["bias"] in {"bullish", "bearish"}][:10],
         "key_divergences": build_signal_divergences(rows),
+        "candidate_comparison": candidate_comparison,
         "time_stratification": {
             "short_term_3_to_12_months": [row for row in rows if row["time_horizon"] == "short_term"][:8],
             "medium_term_1_to_3_years": [row for row in rows if row["time_horizon"] == "medium_term"][:8],
@@ -433,6 +477,101 @@ def infer_trading_signals(collected: dict[str, Any]) -> dict[str, Any]:
         ],
         "most_likely_path": most_likely,
     }
+
+
+def build_candidate_comparison(sources: dict[str, Any]) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    for label, value in sources.items():
+        if not (label.startswith("equity.") and "tencent_metrics" in label):
+            continue
+        if not isinstance(value, dict):
+            continue
+        items = list(value.get("items", []) or [])
+        if not items or not isinstance(items[0], dict):
+            continue
+        item = items[0]
+        score, basis = score_tencent_candidate(item)
+        rows.append(
+            {
+                "symbol": item.get("symbol") or label.split(".")[1],
+                "name": item.get("name") or "",
+                "score": score,
+                "basis": basis,
+                "metrics": {
+                    key: item.get(key)
+                    for key in (
+                        "price",
+                        "change_pct",
+                        "turnover_rate",
+                        "volume_ratio",
+                        "pe",
+                        "pb",
+                        "float_market_cap_cny_100m",
+                        "total_market_cap_cny_100m",
+                        "amount_cny_10k",
+                    )
+                    if key in item
+                },
+            }
+        )
+    return sorted(rows, key=lambda row: row["score"], reverse=True)
+
+
+def score_tencent_candidate(metrics: dict[str, Any]) -> tuple[float, str]:
+    score = 0.0
+    basis: list[str] = []
+
+    change_pct = to_float(metrics.get("change_pct"))
+    if change_pct is not None:
+        score += max(min(change_pct / 3.0, 2.0), -2.0)
+        basis.append(f"daily change {change_pct}%")
+
+    volume_ratio = to_float(metrics.get("volume_ratio"))
+    if volume_ratio is not None:
+        score += max(min((volume_ratio - 1.0) * 1.5, 1.5), -1.0)
+        basis.append(f"volume ratio {volume_ratio}")
+
+    turnover_rate = to_float(metrics.get("turnover_rate"))
+    if turnover_rate is not None:
+        score += max(min(turnover_rate / 4.0, 1.2), 0.0)
+        basis.append(f"turnover {turnover_rate}%")
+
+    amount = to_float(metrics.get("amount_cny_10k"))
+    if amount is not None and amount > 0:
+        score += min(math.log10(amount) / 3.0, 2.0)
+        basis.append("liquidity present")
+
+    pe = to_float(metrics.get("pe"))
+    if pe is not None and pe > 0:
+        if pe <= 60:
+            score += 1.0
+            basis.append(f"PE {pe} within growth range")
+        elif pe > 100:
+            score -= 1.0
+            basis.append(f"PE {pe} is demanding")
+
+    pb = to_float(metrics.get("pb"))
+    if pb is not None and pb > 0:
+        if pb <= 8:
+            score += 0.5
+            basis.append(f"PB {pb} below high-premium zone")
+        elif pb > 15:
+            score -= 0.5
+            basis.append(f"PB {pb} is elevated")
+
+    market_cap = to_float(metrics.get("total_market_cap_cny_100m"))
+    if market_cap is not None and market_cap > 0:
+        score += min(math.log10(market_cap) / 4.0, 1.2)
+        basis.append("large tradable market-cap anchor")
+
+    return round(score, 3), "; ".join(basis) or "Tencent metrics available"
+
+
+def to_float(value: Any) -> float | None:
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return None
 
 
 def interpret_source_signal(label: str, value: Any) -> dict[str, Any]:
@@ -557,6 +696,14 @@ def build_collected_market_report(
         signal_reasoning=signal_reasoning,
         data_json=data_json,
     )
+    log_agent_messages(
+        config.get("name") or "information",
+        config.get("model", {}),
+        [
+            {"role": "system", "content": instructions},
+            {"role": "user", "content": prompt},
+        ],
+    )
     try:
         return invoke_text(
             model,
@@ -586,19 +733,31 @@ def build_information_report_prompt(
     data_json: str,
 ) -> str:
     return (
-        f"任务：{state.get('task', '筛选候选股票')}\n"
-        f"候选股票：\n{format_candidates(state.get('candidates', []))}\n\n"
-        "你必须严格按照 prompts/information_agent.md 的 Workflow 执行并输出报告：\n"
-        "1. 先说明问题拆解结果。\n"
-        "2. 说明为什么选择这些 provider，为什么排除其他 provider。\n"
-        "3. 只基于 Python provider 拉到的交易数据推理，不要编造新闻、观点或未出现的数据。\n"
-        "4. 明确多信号交叉验证、时间窗口、信号分歧和概率场景。\n"
-        "5. 最终输出必须遵循 information_agent.md Step 6 的结构化报告格式。\n\n"
+        f"Task: {state.get('task', 'screen candidate stocks')}\n"
+        f"Candidate stocks:\n{format_candidates(state.get('candidates', []))}\n\n"
+        "The Python workflow layer has already executed Steps 1-5. "
+        "Write only the Step 6 structured report required by the system prompt. "
+        "Use only the JSON inputs below; do not invent data and do not claim that you fetched anything yourself.\n\n"
         f"Workflow plan:\n```json\n{json.dumps(workflow, ensure_ascii=False, indent=2)}\n```\n\n"
         f"Provider selection:\n```json\n{json.dumps(provider_selection, ensure_ascii=False, indent=2)}\n```\n\n"
         f"Pre-computed trading signal reasoning:\n```json\n{json.dumps(signal_reasoning, ensure_ascii=False, indent=2, default=str)}\n```\n\n"
         f"Fetched provider data:\n```json\n{data_json}\n```\n"
     )
+
+
+def summarize_collected_data(collected: dict[str, Any]) -> dict[str, Any]:
+    if not collected:
+        return {"collection_status": "empty"}
+    sources = dict(collected.get("sources", {}) or {})
+    errors = dict(collected.get("errors", {}) or {})
+    return {
+        "collection_status": collected.get("collection_status"),
+        "generated_at": collected.get("generated_at"),
+        "source_count": collected.get("source_count", len(sources)),
+        "error_count": collected.get("error_count", len(errors)),
+        "sources": list(sources.keys()),
+        "errors": {key: str(value) for key, value in errors.items()},
+    }
 
 
 def render_no_data_information_report(
@@ -643,6 +802,12 @@ def render_deterministic_report(
     for item in signal_reasoning.get("probability_estimates", []):
         probabilities.append(f"| {item['scenario']} | {item['probability']} | {item['basis']} |")
 
+    comparison_rows = []
+    for item in signal_reasoning.get("candidate_comparison", [])[:12]:
+        comparison_rows.append(
+            f"| {item.get('symbol', '')} | {item.get('name', '')} | {item.get('score', '')} | {item.get('basis', '')} |"
+        )
+
     return "\n".join(
         [
             f"# {task}: Multi-Signal Synthesis",
@@ -665,6 +830,11 @@ def render_deterministic_report(
             "| Signal | Data | What it's saying |",
             "|--------|------|-----------------|",
             *source_rows,
+            "",
+            "### Candidate Comparison",
+            "| Symbol | Name | Score | Basis |",
+            "|--------|------|-------|-------|",
+            *(comparison_rows or ["| N/A | N/A | N/A | No comparable candidate metrics were collected. |"]),
             "",
             "## Analysis",
             "",

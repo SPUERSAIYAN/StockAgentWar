@@ -4,10 +4,13 @@ import math
 import re
 import sys
 import json
+import contextlib
+import io
+import time
 from dataclasses import asdict, is_dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 from collectors.connectors.china import build_china_equity_tasks
 from collectors.connectors.crypto import build_crypto_tasks
@@ -15,6 +18,12 @@ from collectors.connectors.equity import build_equity_tasks
 from collectors.connectors.macro import build_macro_tasks
 from collectors.connectors.prediction import build_prediction_market_tasks
 from collectors.connectors.web_search import build_web_search_tasks
+from agents.trace_logger import (
+    log_data_source_error,
+    log_data_source_start,
+    log_data_source_success,
+    log_trace,
+)
 from schemas.state import AgentRuntimeConfig, MarketDecisionState
 
 
@@ -67,6 +76,12 @@ DEFAULT_COLLECTOR_CONFIG: dict[str, Any] = {
             "enabled": False,
         },
     },
+    "candidate_discovery": {
+        "enabled": True,
+        "max_candidates": 8,
+        "scan_limit": 0,
+        "batch_size": 80,
+    },
 }
 
 
@@ -75,9 +90,30 @@ def collect_market_information(
     config: AgentRuntimeConfig,
 ) -> dict[str, Any] | None:
     collector_config = merge_dicts(DEFAULT_COLLECTOR_CONFIG, dict(config.get("collector", {})))
+    collector_name = config.get("name", "information")
+    log_trace(
+        collector_name,
+        "COLLECTOR CONFIG",
+        {
+            "enabled": collector_config.get("enabled"),
+            "timeout_seconds": collector_config.get("timeout_seconds"),
+            "max_workers": collector_config.get("max_workers"),
+            "providers": collector_config.get("providers", {}),
+            "candidate_discovery": collector_config.get("candidate_discovery", {}),
+        },
+    )
     if collector_config.get("enabled", False) is False:
+        log_trace(collector_name, "COLLECTOR SKIP", {"reason": "collector disabled"})
         return None
     if not (VENDOR_MARKET_INFORMATION_DIR / "digital_oracle").exists():
+        log_trace(
+            collector_name,
+            "COLLECTOR SKIP",
+            {
+                "reason": "digital_oracle vendor directory missing",
+                "path": str(VENDOR_MARKET_INFORMATION_DIR / "digital_oracle"),
+            },
+        )
         return None
 
     ensure_external_market_information_path()
@@ -85,11 +121,23 @@ def collect_market_information(
     try:
         from digital_oracle import gather
     except Exception as exc:
+        log_data_source_error("digital_oracle_import", 0, exc)
         return {
             "collection_status": "unavailable",
             "generated_at": now_iso(),
             "sources": {},
             "errors": {"digital_oracle_import": f"{type(exc).__name__}: {exc}"},
+        }
+
+    discovery = discover_candidate_universe(state, collector_config)
+    if discovery:
+        state = {
+            **state,
+            "candidates": discovery["candidates"],
+            "metadata": {
+                **dict(state.get("metadata", {})),
+                "auto_candidate_discovery": discovery,
+            },
         }
 
     symbols = extract_candidate_symbols(state)
@@ -98,53 +146,104 @@ def collect_market_information(
             "collection_status": "empty",
             "generated_at": now_iso(),
             "sources": {},
-            "errors": {"symbols": "未提供候选股票代码，无法调用市场数据 provider。"},
+            "errors": {
+                "symbols": (
+                    "No candidate symbols were provided and automatic candidate "
+                    "discovery did not match the task."
+                )
+            },
         }
 
     timeout_seconds = float(collector_config.get("timeout_seconds", 35))
     max_workers = int(collector_config.get("max_workers", 12))
 
-    tasks: dict[str, Any] = {}
+    tasks: dict[str, Callable[[], Any]] = {}
+    task_build_errors: dict[str, BaseException] = {}
     a_share_symbols = [symbol for symbol in symbols if is_a_share_symbol(symbol)]
     global_symbols = [symbol for symbol in symbols if symbol not in a_share_symbols]
 
-    tasks.update(
-        build_equity_tasks(
+    add_task_group(
+        tasks,
+        task_build_errors,
+        "task_build.us_equity",
+        lambda: build_equity_tasks(
             symbols=global_symbols,
             config=collector_config,
             is_plain_us_equity=is_plain_us_equity,
             to_yahoo_symbol=to_yahoo_symbol,
-        )
+        ),
     )
-    tasks.update(build_china_equity_tasks(symbols=a_share_symbols, config=collector_config))
-    tasks.update(build_macro_tasks(config=collector_config))
-    tasks.update(
-        build_prediction_market_tasks(
+    add_task_group(
+        tasks,
+        task_build_errors,
+        "task_build.china_equity",
+        lambda: build_china_equity_tasks(symbols=a_share_symbols, config=collector_config),
+    )
+    add_task_group(
+        tasks,
+        task_build_errors,
+        "task_build.macro",
+        lambda: build_macro_tasks(config=collector_config),
+    )
+    add_task_group(
+        tasks,
+        task_build_errors,
+        "task_build.prediction_markets",
+        lambda: build_prediction_market_tasks(
             task=state.get("task", ""),
             symbols=symbols,
             config=collector_config,
-        )
+        ),
     )
-    tasks.update(build_crypto_tasks(config=collector_config))
-    tasks.update(
-        build_web_search_tasks(
+    add_task_group(
+        tasks,
+        task_build_errors,
+        "task_build.crypto",
+        lambda: build_crypto_tasks(config=collector_config),
+    )
+    add_task_group(
+        tasks,
+        task_build_errors,
+        "task_build.web_search",
+        lambda: build_web_search_tasks(
             task=state.get("task", ""),
             symbols=symbols,
             config=collector_config,
-        )
+        ),
+    )
+    log_trace(
+        collector_name,
+        "DATA SOURCE TASKS",
+        {
+            "symbols": symbols,
+            "a_share_symbols": a_share_symbols,
+            "global_symbols": global_symbols,
+            "task_count": len(tasks),
+            "tasks": sorted(tasks.keys()),
+            "task_build_errors": {
+                label: f"{type(exc).__name__}: {exc}"
+                for label, exc in task_build_errors.items()
+            },
+            "timeout_seconds": timeout_seconds,
+            "max_workers": max_workers,
+        },
     )
 
     gathered = gather(
-        tasks,
+        trace_data_source_tasks(tasks, task=state.get("task", ""), symbols=symbols),
         max_workers=max_workers,
         timeout_seconds=timeout_seconds,
         fail_fast=False,
     )
+    for label, exc in gathered.errors.items():
+        if isinstance(exc, TimeoutError):
+            log_data_source_error(label, int(timeout_seconds * 1000), exc)
     return summarize_gathered_market_data(
         task=state.get("task", ""),
         symbols=symbols,
         results=gathered.results,
-        errors=gathered.errors,
+        errors={**task_build_errors, **gathered.errors},
+        discovery=discovery,
     )
 
 
@@ -152,6 +251,103 @@ def ensure_external_market_information_path() -> None:
     external_path = str(VENDOR_MARKET_INFORMATION_DIR)
     if VENDOR_MARKET_INFORMATION_DIR.exists() and external_path not in sys.path:
         sys.path.insert(0, external_path)
+
+
+def trace_data_source_tasks(
+    tasks: dict[str, Callable[[], Any]],
+    *,
+    task: str,
+    symbols: list[str],
+) -> dict[str, Callable[[], Any]]:
+    return {
+        label: trace_data_source_task(label, fn, task=task, symbols=symbols)
+        for label, fn in tasks.items()
+    }
+
+
+def add_task_group(
+    tasks: dict[str, Callable[[], Any]],
+    errors: dict[str, BaseException],
+    label: str,
+    build: Callable[[], dict[str, Callable[[], Any]]],
+) -> None:
+    log_data_source_start(label)
+    started_at = time.perf_counter()
+    try:
+        built_tasks = build()
+    except Exception as exc:
+        errors[label] = exc
+        log_data_source_error(label, elapsed_since(started_at), exc)
+        return
+    tasks.update(built_tasks)
+    log_data_source_success(
+        label,
+        elapsed_since(started_at),
+        {
+            "task_count": len(built_tasks),
+            "tasks": sorted(built_tasks.keys()),
+        },
+    )
+
+
+def trace_data_source_task(
+    label: str,
+    fn: Callable[[], Any],
+    *,
+    task: str,
+    symbols: list[str],
+) -> Callable[[], Any]:
+    def wrapped() -> Any:
+        context = infer_data_source_context(label, task=task, symbols=symbols)
+        log_data_source_start(label, context)
+        started_at = time.perf_counter()
+        try:
+            value = fn()
+        except Exception as exc:
+            log_data_source_error(label, elapsed_since(started_at), exc)
+            raise
+        log_data_source_success(label, elapsed_since(started_at), value)
+        return value
+
+    return wrapped
+
+
+def infer_data_source_context(label: str, *, task: str, symbols: list[str]) -> dict[str, Any]:
+    parts = label.split(".")
+    context: dict[str, Any] = {
+        "label": label,
+        "task": task,
+        "all_symbols": symbols,
+    }
+    if label.startswith("equity.") and len(parts) >= 3:
+        context.update(
+            {
+                "group": "equity",
+                "symbol": parts[1],
+                "data_kind": ".".join(parts[2:]),
+            }
+        )
+    elif label.startswith("macro.price."):
+        context.update(
+            {
+                "group": "macro",
+                "symbol": label.removeprefix("macro.price."),
+                "data_kind": "price_history",
+            }
+        )
+    elif label.startswith("macro."):
+        context.update({"group": "macro", "data_kind": label.removeprefix("macro.")})
+    elif label.startswith("prediction."):
+        context.update({"group": "prediction_markets", "data_kind": label.removeprefix("prediction.")})
+    elif label.startswith("crypto."):
+        context.update({"group": "crypto", "data_kind": label.removeprefix("crypto.")})
+    elif label.startswith("web.search."):
+        context.update({"group": "web_search", "data_kind": "search"})
+    return context
+
+
+def elapsed_since(started_at: float) -> int:
+    return int((time.perf_counter() - started_at) * 1000)
 
 
 def merge_dicts(base: dict[str, Any], override: dict[str, Any]) -> dict[str, Any]:
@@ -178,12 +374,332 @@ def extract_candidate_symbols(state: MarketDecisionState) -> list[str]:
     return symbols
 
 
+def discover_candidate_universe(
+    state: MarketDecisionState,
+    config: AgentRuntimeConfig,
+) -> dict[str, Any] | None:
+    if extract_candidate_symbols(state):
+        return None
+
+    discovery_config = dict(config.get("candidate_discovery", {}))
+    if discovery_config.get("enabled", True) is False:
+        return None
+
+    universe_name = infer_auto_candidate_universe(state.get("task", ""))
+    if not universe_name:
+        return None
+
+    discovery = discover_dynamic_candidates(
+        universe_name=universe_name,
+        config=config,
+        discovery_config=discovery_config,
+    )
+    if not discovery:
+        return None
+
+    candidates = discovery.pop("candidates")
+    return {
+        "mode": "provider_candidate_discovery",
+        "universe": universe_name,
+        "method": discovery.pop("method"),
+        "reason": build_discovery_reason(universe_name),
+        "candidates": candidates,
+        **discovery,
+    }
+
+
+def infer_auto_candidate_universe(task: str) -> str | None:
+    normalized = task.casefold()
+    china_tokens = (
+        "a-share",
+        "ashare",
+        "china",
+        "chinese stock",
+        "\u5927a",
+        "\u5927 a",
+        "a\u80a1",
+        "\u6caa\u6df1",
+        "\u4e2d\u56fd\u80a1",
+        "\u4e2d\u56fd\u80a1\u7968",
+    )
+    stock_selection_tokens = (
+        "\u80a1",
+        "\u80a1\u7968",
+        "\u54ea\u4e00\u53ea",
+        "\u54ea\u53ea",
+        "\u5019\u9009",
+        "\u6700\u6709\u6f5c\u529b",
+        "\u7b5b\u9009",
+    )
+    potential_tokens = ("\u672a\u6765", "\u6f5c\u529b")
+    if any(token in normalized for token in china_tokens):
+        return "china_a_share_core"
+    if any(token in normalized for token in stock_selection_tokens) and any(
+        token in normalized for token in potential_tokens
+    ):
+        return "china_a_share_core"
+    return None
+
+
+def build_discovery_reason(universe_name: str) -> str:
+    if universe_name == "china_a_share_core":
+        return (
+            "The task asks for stock selection without explicit symbols. "
+            "Candidates were discovered at runtime from the A-share stock list "
+            "and ranked by live Tencent trading and valuation metrics before "
+            "deeper provider collection."
+        )
+    return "Generated an automatic candidate universe for the task."
+
+
+def discover_dynamic_candidates(
+    *,
+    universe_name: str,
+    config: AgentRuntimeConfig,
+    discovery_config: dict[str, Any],
+) -> dict[str, Any] | None:
+    if universe_name != "china_a_share_core":
+        return None
+    return discover_china_a_share_candidates(config, discovery_config)
+
+
+def discover_china_a_share_candidates(
+    config: AgentRuntimeConfig,
+    discovery_config: dict[str, Any],
+) -> dict[str, Any] | None:
+    ensure_external_market_information_path()
+    try:
+        from digital_oracle import MootdxProvider, TencentFinanceProvider
+    except Exception as exc:
+        log_data_source_error("candidate_discovery.digital_oracle_import", 0, exc)
+        return None
+
+    provider_config = dict(config.get("providers", {}).get("china_equity", {}))
+    factory_options = dict(provider_config.get("mootdx_factory_options", {}))
+    max_candidates = int(discovery_config.get("max_candidates", 8))
+    scan_limit = int(discovery_config.get("scan_limit", 0))
+    batch_size = max(int(discovery_config.get("batch_size", 80)), 1)
+
+    try:
+        log_data_source_start(
+            "candidate_discovery.mootdx_stock_list",
+            {
+                "universe": "china_a_share_core",
+                "scan_limit": scan_limit,
+                "factory_options": factory_options,
+            },
+        )
+        started_at = time.perf_counter()
+        mootdx = MootdxProvider(**factory_options)
+        stock_rows = list_mootdx_a_share_symbols(mootdx)
+        log_data_source_success(
+            "candidate_discovery.mootdx_stock_list",
+            elapsed_since(started_at),
+            {
+                "row_count": len(stock_rows),
+                "preview": stock_rows[:8],
+            },
+        )
+        if scan_limit > 0:
+            stock_rows = stock_rows[:scan_limit]
+        symbols = [row["symbol"] for row in stock_rows]
+        tencent = TencentFinanceProvider()
+        log_data_source_start(
+            "candidate_discovery.tencent_metrics",
+            {
+                "symbol_count": len(symbols),
+                "batch_size": batch_size,
+            },
+        )
+        started_at = time.perf_counter()
+        metrics = fetch_tencent_metrics_for_symbols(tencent, symbols, batch_size=batch_size)
+        log_data_source_success(
+            "candidate_discovery.tencent_metrics",
+            elapsed_since(started_at),
+            {
+                "metric_count": len(metrics),
+                "preview": metrics[:3],
+            },
+        )
+    except Exception as exc:
+        log_data_source_error("candidate_discovery", 0, exc)
+        return None
+
+    ranked: list[dict[str, Any]] = []
+    names_by_symbol = {row["symbol"]: row.get("name", "") for row in stock_rows}
+    for metric in metrics:
+        item = to_jsonable(metric)
+        symbol = tencent_symbol_to_a_share_symbol(str(item.get("symbol", "")))
+        if not symbol:
+            continue
+        score, basis = score_discovered_a_share(item)
+        ranked.append(
+            {
+                "symbol": symbol,
+                "name": item.get("name") or names_by_symbol.get(symbol, ""),
+                "market": "CN",
+                "reason": basis,
+                "score": score,
+                "metadata": {
+                    key: item.get(key)
+                    for key in (
+                        "price",
+                        "change_pct",
+                        "turnover_rate",
+                        "volume_ratio",
+                        "pe",
+                        "pb",
+                        "float_market_cap_cny_100m",
+                        "total_market_cap_cny_100m",
+                        "amount_cny_10k",
+                    )
+                    if key in item
+                },
+            }
+        )
+
+    ranked = [
+        row
+        for row in sorted(ranked, key=lambda item: item.get("score", 0), reverse=True)
+        if row.get("score") is not None
+    ]
+    if not ranked:
+        return None
+    return {
+        "method": "mootdx_stock_list_plus_tencent_metrics",
+        "scanned_symbol_count": len(symbols),
+        "ranked_symbol_count": len(ranked),
+        "candidates": ranked[:max_candidates],
+    }
+
+
+def list_mootdx_a_share_symbols(mootdx: Any) -> list[dict[str, str]]:
+    rows: list[dict[str, str]] = []
+    for market, suffix, prefixes in (
+        ("sh", ".SH", ("600", "601", "603", "605", "688")),
+        ("sz", ".SZ", ("000", "001", "002", "003", "300", "301")),
+    ):
+        with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+            stocks = mootdx.list_stocks(market)
+        for stock in stocks:
+            code = str(getattr(stock, "symbol", "")).strip()
+            name = str(getattr(stock, "name", "") or "").replace("\x00", "").strip()
+            if not code.startswith(prefixes):
+                continue
+            if not re.fullmatch(r"\d{6}", code):
+                continue
+            if "ST" in name.upper():
+                continue
+            rows.append({"symbol": f"{code}{suffix}", "name": name})
+    return rows
+
+
+def fetch_tencent_metrics_for_symbols(
+    tencent: Any,
+    symbols: list[str],
+    *,
+    batch_size: int,
+) -> list[Any]:
+    from digital_oracle import TencentStockMetricsQuery
+
+    metrics: list[Any] = []
+    for start in range(0, len(symbols), batch_size):
+        batch = tuple(symbols[start : start + batch_size])
+        if not batch:
+            continue
+        label = f"candidate_discovery.tencent_metrics.batch_{start // batch_size + 1}"
+        log_data_source_start(
+            label,
+            {
+                "batch_start": start,
+                "batch_size": len(batch),
+                "symbols_preview": batch[:8],
+            },
+        )
+        started_at = time.perf_counter()
+        try:
+            batch_metrics = tencent.get_stock_metrics(TencentStockMetricsQuery(symbols=batch))
+            metrics.extend(batch_metrics)
+            log_data_source_success(
+                label,
+                elapsed_since(started_at),
+                {
+                    "metric_count": len(batch_metrics),
+                    "preview": batch_metrics[:3],
+                },
+            )
+        except Exception as exc:
+            log_data_source_error(label, elapsed_since(started_at), exc)
+            continue
+    return metrics
+
+
+def tencent_symbol_to_a_share_symbol(symbol: str) -> str | None:
+    normalized = symbol.strip().lower()
+    if re.fullmatch(r"sh\d{6}", normalized):
+        return f"{normalized[2:].upper()}.SH"
+    if re.fullmatch(r"sz\d{6}", normalized):
+        return f"{normalized[2:].upper()}.SZ"
+    return None
+
+
+def score_discovered_a_share(metrics: dict[str, Any]) -> tuple[float, str]:
+    score = 0.0
+    basis: list[str] = []
+
+    change_pct = to_float(metrics.get("change_pct"))
+    if change_pct is not None:
+        score += max(min(change_pct / 3.0, 2.0), -2.0)
+        basis.append(f"daily change {change_pct}%")
+
+    volume_ratio = to_float(metrics.get("volume_ratio"))
+    if volume_ratio is not None:
+        score += max(min((volume_ratio - 1.0) * 1.5, 1.5), -1.0)
+        basis.append(f"volume ratio {volume_ratio}")
+
+    turnover_rate = to_float(metrics.get("turnover_rate"))
+    if turnover_rate is not None:
+        score += max(min(turnover_rate / 4.0, 1.2), 0.0)
+        basis.append(f"turnover {turnover_rate}%")
+
+    amount = to_float(metrics.get("amount_cny_10k"))
+    if amount is not None and amount > 0:
+        score += min(math.log10(amount) / 3.0, 2.0)
+        basis.append("liquidity present")
+
+    pe = to_float(metrics.get("pe"))
+    if pe is not None and pe > 0:
+        if pe <= 60:
+            score += 1.0
+            basis.append(f"PE {pe} within growth range")
+        elif pe > 100:
+            score -= 1.0
+            basis.append(f"PE {pe} is demanding")
+
+    pb = to_float(metrics.get("pb"))
+    if pb is not None and pb > 0:
+        if pb <= 8:
+            score += 0.5
+            basis.append(f"PB {pb} below high-premium zone")
+        elif pb > 15:
+            score -= 0.5
+            basis.append(f"PB {pb} is elevated")
+
+    market_cap = to_float(metrics.get("total_market_cap_cny_100m"))
+    if market_cap is not None and market_cap > 0:
+        score += min(math.log10(market_cap) / 4.0, 1.2)
+        basis.append("large tradable market-cap anchor")
+
+    return round(score, 3), "; ".join(basis) or "live Tencent metrics available"
+
+
 def summarize_gathered_market_data(
     *,
     task: str,
     symbols: list[str],
     results: dict[str, Any],
     errors: dict[str, BaseException],
+    discovery: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     sources: dict[str, Any] = {}
     for label, value in results.items():
@@ -199,7 +715,7 @@ def summarize_gathered_market_data(
     else:
         status = "failed"
 
-    return {
+    summary = {
         "collection_status": status,
         "generated_at": now_iso(),
         "task": task,
@@ -209,6 +725,9 @@ def summarize_gathered_market_data(
         "sources": sources,
         "errors": rendered_errors,
     }
+    if discovery:
+        summary["candidate_discovery"] = discovery
+    return summary
 
 
 def summarize_provider_value(value: Any) -> Any:
@@ -468,6 +987,13 @@ def safe_average(values: list[float]) -> float | None:
     if not values:
         return None
     return round(sum(values) / len(values), 4)
+
+
+def to_float(value: Any) -> float | None:
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return None
 
 
 def to_yahoo_symbol(symbol: str) -> str:
