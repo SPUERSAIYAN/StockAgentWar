@@ -8,7 +8,7 @@ from agents.bear_agent import BearAgent
 from agents.bull_agent import BullAgent
 from agents.judge_agent import JudgeAgent
 from agents.risk_agent import RiskAgent
-from agents.skill_agent import MarketInformationSkillAgent
+from agents.information_agent import InformationCollectionAgent
 from schemas.state import AgentRuntimeConfig, MarketDecisionState
 
 
@@ -51,7 +51,7 @@ def build_stock_graph(
     builder = StateGraph(MarketDecisionState)
     builder.add_node(
         "information_analysis",
-        information_agent or MarketInformationSkillAgent(configs["information"]),
+        information_agent or InformationCollectionAgent(configs["information"]),
     )
     builder.add_node("bull_debate", BullAgent(configs["bull"]))
     builder.add_node("bear_debate", BearAgent(configs["bear"]))

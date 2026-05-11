@@ -40,6 +40,9 @@ class AgentRuntimeConfig(TypedDict, total=False):
 class MarketDecisionState(TypedDict, total=False):
     task: str
     candidates: list[StockCandidate]
+    information_workflow: dict[str, Any]
+    provider_selection: dict[str, Any]
+    signal_reasoning: dict[str, Any]
     raw_market_data: dict[str, Any]
     info_report: str
     bull_case: str

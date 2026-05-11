@@ -8,36 +8,47 @@
   </head>
   <body>
     <div class="app-shell">
+      <!-- ===== Topbar ===== -->
       <header class="topbar">
         <div>
-          <p class="eyebrow">LangGraph Multi-Agent</p>
+          <p class="eyebrow">Multi-Agent Decision Engine</p>
           <h1>股票决策工作台</h1>
         </div>
-        <div class="health" id="healthBadge">
-          <span class="dot"></span>
-          <span>检查配置</span>
+        <div class="topbar-right">
+          <div class="health" id="healthBadge">
+            <span class="dot"></span>
+            <span>检查配置</span>
+          </div>
         </div>
       </header>
 
       <main class="workspace">
+        <!-- ===== Left: Control Panel ===== -->
         <section class="control-panel" aria-label="决策输入">
-          <div class="field">
-            <label for="symbols">股票代码</label>
-            <input id="symbols" value="AAPL,MSFT,NVDA" autocomplete="off" />
+          <div class="panel-header">
+            <h2>决策参数</h2>
           </div>
 
           <div class="field">
-            <label for="task">任务</label>
+            <label for="symbols">股票代码</label>
+            <input id="symbols" value="AAPL,MSFT,NVDA" autocomplete="off" placeholder="逗号分隔，如 AAPL,MSFT" />
+          </div>
+
+          <div class="field">
+            <label for="task">任务描述</label>
             <textarea id="task" rows="5">筛选未来 1-3 个月的候选股票，输出做多/观望/回避建议，并说明风险控制条件。</textarea>
           </div>
 
-          <div class="segmented" role="radiogroup" aria-label="模型模式">
-            <button class="segment active" data-mode="openrouter" type="button">OpenRouter</button>
-            <button class="segment" data-mode="mock" type="button">Mock</button>
+          <div class="field">
+            <label>推理模式</label>
+            <div class="segmented" role="radiogroup" aria-label="模型模式">
+              <button class="segment active" data-mode="openrouter" type="button">OpenRouter</button>
+              <button class="segment" data-mode="mock" type="button">Mock</button>
+            </div>
           </div>
 
           <button id="runButton" class="run-button" type="button">
-            <i data-lucide="play"></i>
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 3 20 12 6 21 6 3"/></svg>
             <span>运行决策</span>
           </button>
 
@@ -53,29 +64,47 @@
           </div>
         </section>
 
+        <!-- ===== Right: Process Panel ===== -->
         <section class="process-panel" aria-label="决策流程">
+          <div class="panel-header">
+            <h2>决策流程</h2>
+          </div>
           <div class="pipeline" id="pipeline"></div>
           <div class="stage-grid" id="stageGrid"></div>
         </section>
 
+        <!-- ===== Bottom: Result Panel (5 stages) ===== -->
         <section class="result-panel" aria-label="最终结果">
-          <div class="section-head">
+          <div class="panel-header">
             <div>
-              <p class="eyebrow">Final</p>
-              <h2>候选股票结果</h2>
+              <p class="eyebrow">Decision Output</p>
+              <h2>完整决策报告</h2>
             </div>
             <button id="copyButton" class="icon-button" type="button" title="复制结果">
-              <i data-lucide="copy"></i>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
             </button>
+          </div>
+
+          <!-- 5 stage summary tabs -->
+          <div class="result-tabs" id="resultTabs"></div>
+
+          <!-- Stage content viewer -->
+          <div id="resultViewer" class="result-viewer">
+            <div class="viewer-placeholder">
+              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
+              <span>运行后显示各阶段报告</span>
+            </div>
+          </div>
+
+          <!-- Final merged markdown -->
+          <div class="final-divider">
+            <span>完整汇总</span>
           </div>
           <div id="finalOutput" class="markdown empty">等待模型输出。</div>
         </section>
       </main>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.2.3/dist/purify.min.js"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
     <script src="/app.js"></script>
   </body>
 </html>
