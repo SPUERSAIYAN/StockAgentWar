@@ -1,0 +1,60 @@
+agents:
+  information:
+    collector:
+      enabled: true
+      timeout_seconds: 35
+      max_workers: 12
+      price_history_limit: 90
+      include_macro: true
+      include_options: true
+      include_edgar: true
+      include_a_share_metrics: true
+      macro_symbols:
+        - SPY
+        - QQQ
+        - ^VIX
+        - GC=F
+        - USDCNY=X
+    model:
+      provider: openrouter
+      model: openai/gpt-5.2
+      temperature: 0.2
+      api_key_env: OPENROUTER_API_KEY
+      site_url: http://localhost
+      app_title: multi-Agent-Inv
+
+  bull:
+    model:
+      provider: openrouter
+      model: openai/gpt-5.2
+      temperature: 0.5
+      api_key_env: OPENROUTER_API_KEY
+      site_url: http://localhost
+      app_title: multi-Agent-Inv
+
+  bear:
+    model:
+      provider: openrouter
+      model: openai/gpt-5.2
+      temperature: 0.5
+      api_key_env: OPENROUTER_API_KEY
+      site_url: http://localhost
+      app_title: multi-Agent-Inv
+
+  judge:
+    model:
+      provider: openrouter
+      model: openai/gpt-5.2
+      temperature: 0.1
+      api_key_env: OPENROUTER_API_KEY
+      site_url: http://localhost
+      app_title: multi-Agent-Inv
+
+  risk:
+    model:
+      provider: openrouter
+      model: openai/gpt-5.2
+      temperature: 0.1
+      api_key_env: OPENROUTER_API_KEY
+      site_url: http://localhost
+      app_title: multi-Agent-Inv
