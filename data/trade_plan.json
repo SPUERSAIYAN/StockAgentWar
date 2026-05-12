@@ -1,0 +1,90 @@
+{
+  "generated_at": "2026-05-12 19:20:24",
+  "monitored_stocks": [
+    {
+      "symbol": "600667.SH",
+      "name": "太极实业",
+      "allocation_pct": 20.0,
+      "allocation_amount": 200000.0,
+      "quantity": 16200,
+      "buy_trigger_price": 12.15,
+      "sell_trigger_price": 13.74,
+      "stop_loss_price": 11.29,
+      "take_profit_price": 13.74,
+      "valid_from": "2026-05-12",
+      "valid_until": "2026-06-11",
+      "expiry_action": "REVIEW",
+      "conditions": [
+        {
+          "type": "PRICE_BELOW",
+          "price": 12.15,
+          "action": "BUY",
+          "quantity": 16200
+        },
+        {
+          "type": "PRICE_ABOVE",
+          "price": 13.74,
+          "action": "SELL",
+          "quantity": 16200
+        }
+      ]
+    },
+    {
+      "symbol": "688213.SH",
+      "name": "思特威-W",
+      "allocation_pct": 20.0,
+      "allocation_amount": 200000.0,
+      "quantity": 2000,
+      "buy_trigger_price": 98.5,
+      "sell_trigger_price": 111.44,
+      "stop_loss_price": 91.54,
+      "take_profit_price": 111.44,
+      "valid_from": "2026-05-12",
+      "valid_until": "2026-06-11",
+      "expiry_action": "REVIEW",
+      "conditions": [
+        {
+          "type": "PRICE_BELOW",
+          "price": 98.5,
+          "action": "BUY",
+          "quantity": 2000
+        },
+        {
+          "type": "PRICE_ABOVE",
+          "price": 111.44,
+          "action": "SELL",
+          "quantity": 2000
+        }
+      ]
+    },
+    {
+      "symbol": "300001.SZ",
+      "name": "特锐德",
+      "allocation_pct": 20.0,
+      "allocation_amount": 200000.0,
+      "quantity": 6000,
+      "buy_trigger_price": 32.52,
+      "sell_trigger_price": 36.79,
+      "stop_loss_price": 30.22,
+      "take_profit_price": 36.79,
+      "valid_from": "2026-05-12",
+      "valid_until": "2026-06-11",
+      "expiry_action": "REVIEW",
+      "conditions": [
+        {
+          "type": "PRICE_BELOW",
+          "price": 32.52,
+          "action": "BUY",
+          "quantity": 6000
+        },
+        {
+          "type": "PRICE_ABOVE",
+          "price": 36.79,
+          "action": "SELL",
+          "quantity": 6000
+        }
+      ]
+    }
+  ],
+  "position_sizing_rationale": "单只仓位不超过 20%，总仓位不超过 80%；数量按 A 股 100 股整数倍取整。"
+}

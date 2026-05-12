@@ -2,7 +2,7 @@ agents:
   information:
     collector:
       enabled: true
-      timeout_seconds: 35
+      timeout_seconds: 90
       max_workers: 12
       price_history_limit: 90
       include_macro: true
@@ -11,9 +11,15 @@ agents:
       include_a_share_metrics: true
       candidate_discovery:
         enabled: true
-        max_candidates: 8
-        scan_limit: 0
+        max_candidates: 15
+        scan_limit: 5000
         batch_size: 80
+        a_share_filters:
+          exclude_st: true
+          exclude_new_days: 60
+          min_market_cap_yi: 50
+          max_pe: 80
+          exclude_suspended: true
       macro_symbols:
         - SPY
         - QQQ
@@ -27,16 +33,60 @@ agents:
           weekly_price: true
           options: true
           edgar: true
+          edgar_filings: true
+          edgar_filing_forms: 10-K,10-Q
+          edgar_filing_limit: 8
           stooq_compat: false
           edgar_form4_limit: 8
         china_equity:
           enabled: true
           tencent: true
+          tencent_index_metrics: true
+          tencent_index_symbols:
+            - sh000001
+            - sz399001
+            - sz399006
+            - sh000300
+          tencent_board_queries: []
           mootdx: true
+          mootdx_frequencies:
+            - day
+            - week
+            - month
+            - 1m
+            - 5m
+            - 15m
+            - 30m
+            - 1h
           mootdx_bar_offset: 120
+          mootdx_minute_bar_offset: 240
           mootdx_realtime: true
+          mootdx_intraday: true
+          mootdx_order_book: true
           mootdx_financials: true
-          mootdx_transactions: false
+          mootdx_shareholders: true
+          mootdx_company_profile: true
+          mootdx_index_symbols:
+            - sh000001
+            - sz399001
+            - sz399006
+            - sh000300
+          mootdx_index_frequencies:
+            - day
+            - week
+            - month
+            - 1m
+            - 5m
+            - 15m
+            - 30m
+            - 1h
+          mootdx_local_tdxdir: ""
+          mootdx_local_frequencies:
+            - day
+            - 1m
+            - 5m
+          mootdx_local_market: std
+          mootdx_transactions: true
           mootdx_factory_options:
             market: std
             timeout: 15
@@ -44,6 +94,15 @@ agents:
         macro:
           enabled: true
           treasury: true
+          treasury_curve_kinds:
+            - real
+            - bill
+            - long_term
+          treasury_exchange_rates: true
+          treasury_exchange_rate_countries:
+            - China
+            - Japan
+          treasury_exchange_rate_limit: 12
           fear_greed: true
           cme_fedwatch: true
           cftc: true
@@ -74,7 +133,10 @@ agents:
           kalshi_status: open
           kalshi_series_ticker:
           kalshi_event_ticker:
+          kalshi_event_tickers: []
           kalshi_tickers: []
+          kalshi_orderbook_tickers: []
+          kalshi_orderbook_depth: 10
           polymarket: true
           polymarket_limit: 10
           polymarket_tag_slugs:
@@ -82,6 +144,8 @@ agents:
             - crypto
             - fed
           polymarket_title_contains:
+          polymarket_event_slugs: []
+          polymarket_orderbook_token_ids: []
         crypto:
           enabled: true
           coingecko: true
@@ -94,10 +158,14 @@ agents:
             - BTC
             - ETH
           deribit_options: true
+          deribit_orderbook_instruments: []
+          deribit_orderbook_depth: 5
         web_search:
           enabled: false
           max_results: 5
           queries: []
+          pages: []
+          max_page_chars: 8000
     model:
       provider: openrouter
       model: openai/gpt-5.5
@@ -141,3 +209,45 @@ agents:
       api_key_env: OPENROUTER_API_KEY
       site_url: http://localhost
       app_title: multi-Agent-Inv
+
+  portfolio_manager:
+    model:
+      provider: openrouter
+      model: openai/gpt-5.5
+      temperature: 0.1
+      api_key_env: OPENROUTER_API_KEY
+      site_url: http://localhost
+      app_title: multi-Agent-Inv
+    position_sizing:
+      max_single_position_pct: 20
+      max_total_exposure_pct: 80
+      cash_reserve_min_pct: 20
+    risk_control:
+      max_drawdown_pct: 10
+      stop_loss_pct: 8
+      take_profit_pct: 20
+
+  trader:
+    mode: SIMULATED
+    simulated:
+      initial_capital: 1000000
+      commission_rate: 0.0003
+      stamp_tax_rate: 0.0005
+    paper:
+      broker: ""
+    live:
+      broker: ""
+      enabled: false
+
+trade_monitor:
+  enabled: true
+  interval_seconds: 60
+  mode: SIMULATED
+  plan_file: data/trade_plan.json
+  a_share_market_hours:
+    morning_start: "09:30"
+    morning_end: "11:30"
+    afternoon_start: "13:00"
+    afternoon_end: "15:00"
+  price_source: tencent
+  order_log_file: data/order_log.json

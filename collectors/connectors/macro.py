@@ -7,19 +7,21 @@ TaskMap = dict[str, Callable[[], Any]]
 
 
 def build_macro_tasks(*, config: dict[str, Any]) -> TaskMap:
-    from digital_oracle import (
+    from collectors.digital_oracle import (
         BisCreditGapQuery,
         BisProvider,
         BisRateQuery,
         CftcCotProvider,
         CftcCotQuery,
         CMEFedWatchProvider,
+        ExchangeRateQuery,
         FearGreedProvider,
         PriceHistoryQuery,
         USTreasuryProvider,
         WorldBankProvider,
         WorldBankQuery,
         YahooPriceProvider,
+        YieldCurveQuery,
     )
 
     provider_config = dict(config.get("providers", {}).get("macro", {}))
@@ -29,6 +31,21 @@ def build_macro_tasks(*, config: dict[str, Any]) -> TaskMap:
     tasks: TaskMap = {}
     if bool(provider_config.get("treasury", True)):
         tasks["macro.yield_curve"] = lambda: USTreasuryProvider().latest_yield_curve()
+        curve_kinds = tuple(provider_config.get("treasury_curve_kinds", ("real", "bill", "long_term")))
+        for curve_kind in curve_kinds:
+            tasks[f"macro.treasury.{curve_kind}_curve"] = (
+                lambda kind=str(curve_kind): USTreasuryProvider().latest_yield_curve(
+                    YieldCurveQuery(curve_kind=kind)
+                )
+            )
+        if bool(provider_config.get("treasury_exchange_rates", True)):
+            countries = tuple(provider_config.get("treasury_exchange_rate_countries", ("China", "Japan")))
+            exchange_limit = int(provider_config.get("treasury_exchange_rate_limit", 12))
+            tasks["macro.treasury.exchange_rates"] = (
+                lambda c=countries, limit=exchange_limit: USTreasuryProvider().list_exchange_rates(
+                    ExchangeRateQuery(countries=c, limit=limit)
+                )
+            )
     if bool(provider_config.get("fear_greed", True)):
         tasks["macro.fear_greed"] = lambda: FearGreedProvider().get_index()
     if bool(provider_config.get("cme_fedwatch", True)):
@@ -86,4 +103,3 @@ def build_macro_tasks(*, config: dict[str, Any]) -> TaskMap:
             )
 
     return tasks
-

@@ -160,6 +160,21 @@ def summarize_state(state: dict[str, Any]) -> dict[str, Any]:
                 "sources": list(dict(raw.get("sources", {}) or {}).keys()),
                 "errors": list(dict(raw.get("errors", {}) or {}).keys()),
             }
+    for key in (
+        "stock_pool",
+        "sector_summary",
+        "bull_cases",
+        "bear_cases",
+        "judge_rulings",
+        "trade_plan",
+        "final_decision",
+    ):
+        if key in state:
+            value = state.get(key)
+            if isinstance(value, list):
+                summary[key] = {"count": len(value), "preview": value[:3]}
+            elif isinstance(value, dict):
+                summary[key] = value
     return summary
 
 

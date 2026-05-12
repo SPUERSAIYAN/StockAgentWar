@@ -1,71 +1,75 @@
 /* ============================================================
-   Stage metadata — agent identity, icons, brands
+   Stage metadata
    ============================================================ */
 
-const STAGE_ORDER = [
+const ICONS = {
+  radar: `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>`,
+  bank: `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 10 9-7 9 7"/><path d="M5 10v10"/><path d="M19 10v10"/><path d="M9 10v10"/><path d="M15 10v10"/><path d="M3 20h18"/></svg>`,
+  up: `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>`,
+  down: `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 17 13.5 8.5 8.5 13.5 2 7"/><polyline points="16 17 22 17 22 11"/></svg>`,
+  scale: `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></svg>`,
+  shield: `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg>`,
+  briefcase: `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 6V5a2 2 0 0 1 2-2h0a2 2 0 0 1 2 2v1"/><rect width="20" height="14" x="2" y="6" rx="2"/><path d="M2 12h20"/><path d="M12 12v2"/></svg>`,
+  clipboard: `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="4" x="8" y="2" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M8 12h8"/><path d="M8 16h5"/></svg>`,
+};
+
+const STAGE_META = {
+  information_analysis: { agent: "信息分析", title: "市场数据汇总", color: "#3B82F6", icon: ICONS.radar },
+  a_share_context: { agent: "A 股上下文", title: "股票池与板块", color: "#06B6D4", icon: ICONS.bank },
+  bull_debate: { agent: "多头", title: "看涨逻辑", color: "#22C55E", icon: ICONS.up },
+  bear_debate: { agent: "空头", title: "看跌反驳", color: "#EF4444", icon: ICONS.down },
+  judge_decision: { agent: "裁判", title: "综合裁决", color: "#A78BFA", icon: ICONS.scale },
+  risk_review: { agent: "风控", title: "风险复核", color: "#F59E0B", icon: ICONS.shield },
+  portfolio_manager: { agent: "总经理", title: "最终决策", color: "#EC4899", icon: ICONS.briefcase },
+  save_trade_plan: { agent: "交易计划", title: "计划落盘", color: "#14B8A6", icon: ICONS.clipboard },
+};
+
+const COMMON_STAGE_ORDER = ["information_analysis", "bull_debate", "bear_debate", "judge_decision", "risk_review"];
+const A_SHARE_STAGE_ORDER = [
   "information_analysis",
+  "a_share_context",
   "bull_debate",
   "bear_debate",
   "judge_decision",
   "risk_review",
+  "portfolio_manager",
+  "save_trade_plan",
 ];
-
-const STAGE_META = {
-  information_analysis: {
-    agent: "信息分析",
-    title: "市场数据汇总",
-    color: "#3B82F6",
-    icon: `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>`,
-  },
-  bull_debate: {
-    agent: "多头",
-    title: "看涨逻辑",
-    color: "#22C55E",
-    icon: `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>`,
-  },
-  bear_debate: {
-    agent: "空头",
-    title: "看跌反驳",
-    color: "#EF4444",
-    icon: `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 17 13.5 8.5 8.5 13.5 2 7"/><polyline points="16 17 22 17 22 11"/></svg>`,
-  },
-  judge_decision: {
-    agent: "裁判",
-    title: "综合裁决",
-    color: "#A78BFA",
-    icon: `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></svg>`,
-  },
-  risk_review: {
-    agent: "风控",
-    title: "风险复核",
-    color: "#F59E0B",
-    icon: `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg>`,
-  },
-};
 
 /* ============================================================
    App state
    ============================================================ */
 
 const state = {
-  mode: "openrouter",
+  runMode: "common",
+  modelMode: "openrouter",
+  riskTolerance: "moderate",
   running: false,
+  paused: false,
+  abortController: null,
   finalText: "",
   startedAt: 0,
   timer: null,
-  stageContent: {},      // { nodeId: markdownString }
-  sourceTrace: {},        // { nodeId: [{ site, data, status, ... }] }
-  activeTab: null,        // currently selected result tab
+  stageOrder: [...COMMON_STAGE_ORDER],
+  stageContent: {},
+  stageSummary: {},
+  sourceTrace: {},
+  activeStageTab: null,
+  activeStageView: "summary",
+  completeState: {},
 };
 
 /* ============================================================
-   DOM refs  (all IDs match app.js deps + new result UI)
+   DOM refs
    ============================================================ */
 
 const els = {
   symbols: document.querySelector("#symbols"),
+  sectors: document.querySelector("#sectors"),
+  capital: document.querySelector("#capital"),
   task: document.querySelector("#task"),
   runButton: document.querySelector("#runButton"),
+  pauseButton: document.querySelector("#pauseButton"),
   copyButton: document.querySelector("#copyButton"),
   pipeline: document.querySelector("#pipeline"),
   stageGrid: document.querySelector("#stageGrid"),
@@ -73,9 +77,13 @@ const els = {
   elapsed: document.querySelector("#elapsed"),
   statusText: document.querySelector("#statusText"),
   healthBadge: document.querySelector("#healthBadge"),
-  segments: document.querySelectorAll(".segment"),
+  runModeSegments: document.querySelectorAll("[data-run-mode]"),
+  modelModeSegments: document.querySelectorAll("[data-model-mode]"),
+  riskSegments: document.querySelectorAll("[data-risk]"),
   resultTabs: document.querySelector("#resultTabs"),
+  viewTabs: document.querySelector("#viewTabs"),
   resultViewer: document.querySelector("#resultViewer"),
+  tradePlanPanel: document.querySelector("#tradePlanPanel"),
 };
 
 init();
@@ -86,22 +94,56 @@ init();
 
 function init() {
   configureMarkdown();
-  renderSkeleton();
+  renderStageShell();
   renderResultTabs();
+  updateVisibleFields();
   bindEvents();
   loadHealth();
 }
 
 function bindEvents() {
   els.runButton.addEventListener("click", runDecision);
+  els.pauseButton.addEventListener("click", pauseRun);
   els.copyButton.addEventListener("click", copyFinal);
   els.stageGrid.addEventListener("click", toggleSourceInspector);
-  els.segments.forEach((btn) => {
+
+  els.runModeSegments.forEach((btn) => {
     btn.addEventListener("click", () => {
-      state.mode = btn.dataset.mode;
-      els.segments.forEach((s) => s.classList.toggle("active", s === btn));
+      state.runMode = btn.dataset.runMode;
+      setActiveSegment(els.runModeSegments, btn);
+      updateVisibleFields();
+      applyModeDefaults();
+      renderStageShell();
+      renderResultTabs();
+      resetViewer();
     });
   });
+
+  els.modelModeSegments.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      state.modelMode = btn.dataset.modelMode;
+      setActiveSegment(els.modelModeSegments, btn);
+    });
+  });
+
+  els.riskSegments.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      state.riskTolerance = btn.dataset.risk;
+      setActiveSegment(els.riskSegments, btn);
+    });
+  });
+
+  els.viewTabs.addEventListener("click", (event) => {
+    const tab = event.target.closest("[data-view]");
+    if (!tab) return;
+    state.activeStageView = tab.dataset.view;
+    setActiveSegment(els.viewTabs.querySelectorAll("[data-view]"), tab);
+    renderResultViewer();
+  });
+}
+
+function setActiveSegment(group, activeButton) {
+  group.forEach((button) => button.classList.toggle("active", button === activeButton));
 }
 
 /* ============================================================
@@ -123,34 +165,94 @@ async function loadHealth() {
 }
 
 /* ============================================================
-   Render skeleton (pipeline + stage cards)
+   Mode-aware inputs
    ============================================================ */
 
-function renderSkeleton() {
-  // Pipeline nodes
-  els.pipeline.innerHTML = STAGE_ORDER
+function updateVisibleFields() {
+  const isAShare = isAShareMode();
+  setFieldVisible("modelMode", !isAShare);
+  setFieldVisible("riskTolerance", isAShare);
+  setFieldVisible("capital", isAShare);
+  setFieldVisible("sectors", state.runMode === "a_share_sector");
+  setFieldVisible("symbols", !isAShare || state.runMode === "a_share_deep");
+}
+
+function setFieldVisible(name, visible) {
+  const field = document.querySelector(`[data-field="${name}"]`);
+  if (field) field.classList.toggle("hidden", !visible);
+}
+
+function applyModeDefaults() {
+  if (state.runMode === "common") {
+    if (!els.symbols.value.trim() || isLikelyAShareSymbolList(els.symbols.value)) {
+      els.symbols.value = "AAPL,MSFT,NVDA";
+    }
+    els.task.value = "筛选未来 1-3 个月的候选股票，输出做多/观望/回避建议，并说明风险控制条件。";
+    return;
+  }
+  if (state.runMode === "a_share_daily") {
+    els.task.value = "扫描全市场，找出未来1个月最具投资价值的 A 股标的，并生成价格触发式交易计划。";
+    return;
+  }
+  if (state.runMode === "a_share_sector") {
+    els.task.value = "分析指定 A 股板块并给出买入建议和交易触发条件。";
+    return;
+  }
+  if (state.runMode === "a_share_deep") {
+    if (!els.symbols.value.trim() || !isLikelyAShareSymbolList(els.symbols.value)) {
+      els.symbols.value = "600519,000858,300750";
+    }
+    els.task.value = "深度分析指定 A 股并给出交易策略。";
+  }
+}
+
+function isAShareMode() {
+  return state.runMode !== "common";
+}
+
+function isLikelyAShareSymbolList(value) {
+  return value
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean)
+    .every((item) => /^(SH|SZ)?\d{6}(\.(SH|SZ))?$/i.test(item));
+}
+
+/* ============================================================
+   Stage shell
+   ============================================================ */
+
+function currentStageOrder() {
+  return isAShareMode() ? [...A_SHARE_STAGE_ORDER] : [...COMMON_STAGE_ORDER];
+}
+
+function renderStageShell(stagesFromServer) {
+  state.stageOrder = stagesFromServer?.length
+    ? stagesFromServer.map((item) => item.id).filter((id) => STAGE_META[id])
+    : currentStageOrder();
+
+  els.pipeline.innerHTML = state.stageOrder
     .map((id) => {
-      const m = STAGE_META[id];
+      const meta = STAGE_META[id];
       return `
-        <div class="pipeline-node" data-node="${id}">
-          <span class="node-icon">${m.icon}</span>
-          <strong>${m.agent}</strong>
-          <span>${m.title}</span>
+        <div class="pipeline-node" data-node="${id}" style="--node-brand:${meta.color}">
+          <span class="node-icon">${meta.icon}</span>
+          <strong>${meta.agent}</strong>
+          <span>${meta.title}</span>
         </div>`;
     })
     .join("");
 
-  // Stage cards
-  els.stageGrid.innerHTML = STAGE_ORDER
+  els.stageGrid.innerHTML = state.stageOrder
     .map((id) => {
-      const m = STAGE_META[id];
+      const meta = STAGE_META[id];
       return `
-        <article class="stage-card" data-node="${id}">
+        <article class="stage-card" data-node="${id}" style="--card-brand:${meta.color}">
           <div class="stage-head">
-            <span class="stage-icon">${m.icon}</span>
+            <span class="stage-icon">${meta.icon}</span>
             <div class="stage-title">
-              <h3>${m.agent}</h3>
-              <span>${m.title}</span>
+              <h3>${meta.agent}</h3>
+              <span>${meta.title}</span>
             </div>
             <div class="badge">等待</div>
           </div>
@@ -174,121 +276,103 @@ function renderSourceInspectorShell() {
     </div>`;
 }
 
-/* ============================================================
-   Render result tabs (5 stage tabs in result panel)
-   ============================================================ */
-
 function renderResultTabs() {
-  els.resultTabs.innerHTML = STAGE_ORDER
+  els.resultTabs.innerHTML = state.stageOrder
     .map((id) => {
-      const m = STAGE_META[id];
+      const meta = STAGE_META[id];
       return `
-        <button class="rtab" data-node="${id}" type="button">
+        <button class="rtab" data-node="${id}" style="--tab-brand:${meta.color}" type="button">
           <span class="rtab-dot"></span>
-          ${m.agent}
+          ${meta.agent}
         </button>`;
     })
     .join("");
 
-  els.resultTabs.addEventListener("click", (e) => {
-    const tab = e.target.closest(".rtab");
-    if (!tab) return;
-    const node = tab.dataset.node;
-    switchTab(node);
+  els.resultTabs.querySelectorAll(".rtab").forEach((tab) => {
+    tab.addEventListener("click", () => switchStageTab(tab.dataset.node));
   });
 }
 
-function switchTab(node) {
-  // update active tab
-  document.querySelectorAll(".rtab").forEach((t) => {
-    t.classList.toggle("active", t.dataset.node === node);
+function switchStageTab(node) {
+  state.activeStageTab = node;
+  document.querySelectorAll(".rtab").forEach((tab) => {
+    tab.classList.toggle("active", tab.dataset.node === node);
   });
-  state.activeTab = node;
-
-  // show content in viewer
-  const viewer = els.resultViewer;
-  const content = state.stageContent[node];
-  if (content) {
-    viewer.innerHTML = `<div class="stage-body markdown">${renderMarkdown(content)}</div>`;
-  } else {
-    const m = STAGE_META[node];
-    viewer.innerHTML = `
-      <div class="viewer-placeholder">
-        ${m.icon}
-        <span>${m.agent} — 暂无输出</span>
-      </div>`;
-  }
+  renderResultViewer();
 }
 
 /* ============================================================
-   Reset before a new run
+   Run lifecycle
    ============================================================ */
 
 function resetRun() {
+  state.paused = false;
+  state.abortController = null;
   state.finalText = "";
   state.stageContent = {};
+  state.stageSummary = {};
   state.sourceTrace = {};
-  state.activeTab = null;
+  state.activeStageTab = null;
+  state.activeStageView = "summary";
+  state.completeState = {};
   state.startedAt = Date.now();
+
+  renderStageShell();
+  renderResultTabs();
+  setActiveSegment(els.viewTabs.querySelectorAll("[data-view]"), els.viewTabs.querySelector('[data-view="summary"]'));
+  resetViewer();
+  resetTradePlanPanel();
 
   els.finalOutput.className = "markdown empty";
   els.finalOutput.textContent = "等待模型输出。";
   els.statusText.textContent = "运行中";
   setElapsed(0);
 
-  // reset pipeline
-  document.querySelectorAll(".pipeline-node").forEach((n) => {
-    n.className = "pipeline-node";
-  });
+  clearInterval(state.timer);
+  state.timer = setInterval(() => setElapsed(Date.now() - state.startedAt), 200);
+}
 
-  // reset stage cards
-  document.querySelectorAll(".stage-card").forEach((c) => {
-    c.className = "stage-card";
-    c.querySelector(".badge").textContent = "等待";
-    const body = c.querySelector(".stage-body");
-    body.className = "stage-body markdown empty";
-    body.textContent = "等待输出。";
-  });
-  resetSourceInspector();
-
-  // reset result tabs
-  document.querySelectorAll(".rtab").forEach((t) => {
-    t.classList.remove("active", "has-content");
-  });
-
-  // reset viewer
+function resetViewer() {
   els.resultViewer.innerHTML = `
     <div class="viewer-placeholder">
       <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
       <span>运行后显示各阶段报告</span>
     </div>`;
-
-  clearInterval(state.timer);
-  state.timer = setInterval(() => {
-    setElapsed(Date.now() - state.startedAt);
-  }, 200);
 }
 
-/* ============================================================
-   Run decision (POST /api/decide/stream)
-   ============================================================ */
+function resetTradePlanPanel() {
+  els.tradePlanPanel.className = "trade-plan-panel hidden";
+  els.tradePlanPanel.innerHTML = "";
+}
+
+function setRunningControls(isRunning) {
+  els.runButton.disabled = isRunning;
+  els.pauseButton.disabled = !isRunning;
+  els.pauseButton.classList.toggle("active", isRunning);
+  els.pauseButton.setAttribute("aria-pressed", String(isRunning));
+}
+
+function pauseRun() {
+  if (!state.running || !state.abortController) return;
+  state.paused = true;
+  els.pauseButton.disabled = true;
+  els.statusText.textContent = "暂停中";
+  state.abortController.abort();
+}
 
 async function runDecision() {
   if (state.running) return;
   state.running = true;
-  els.runButton.disabled = true;
   resetRun();
+  state.abortController = new AbortController();
+  setRunningControls(true);
 
   try {
     const response = await fetch("/api/decide/stream", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        task: els.task.value.trim(),
-        symbols: els.symbols.value.trim(),
-        mode: state.mode,
-        config_path: "config.yaml",
-      }),
+      body: JSON.stringify(buildRequestPayload()),
+      signal: state.abortController.signal,
     });
 
     if (!response.ok || !response.body) {
@@ -297,17 +381,35 @@ async function runDecision() {
 
     await readNdjson(response.body, handleEvent);
   } catch (error) {
-    renderError(error.message || String(error));
+    if (state.paused || error.name === "AbortError") {
+      renderPaused();
+    } else {
+      renderError(error.message || String(error));
+    }
   } finally {
     state.running = false;
-    els.runButton.disabled = false;
+    state.abortController = null;
+    setRunningControls(false);
     clearInterval(state.timer);
     setElapsed(Date.now() - state.startedAt);
   }
 }
 
+function buildRequestPayload() {
+  const mode = state.runMode === "common" ? state.modelMode : state.runMode;
+  return {
+    task: els.task.value.trim(),
+    symbols: state.runMode === "a_share_daily" || state.runMode === "a_share_sector" ? "" : els.symbols.value.trim(),
+    sectors: state.runMode === "a_share_sector" ? els.sectors.value.trim() : "",
+    mode,
+    risk_tolerance: state.riskTolerance,
+    capital: Number(String(els.capital.value).replace(/,/g, "")) || 1000000,
+    config_path: "config.yaml",
+  };
+}
+
 /* ============================================================
-   NDJSON reader
+   NDJSON
    ============================================================ */
 
 async function readNdjson(stream, onEvent) {
@@ -325,43 +427,50 @@ async function readNdjson(stream, onEvent) {
       if (line.trim()) onEvent(JSON.parse(line));
     }
   }
-
   if (buffer.trim()) onEvent(JSON.parse(buffer));
 }
 
-/* ============================================================
-   Event handler
-   ============================================================ */
-
 function handleEvent(event) {
+  if (event.type === "start") {
+    if (Array.isArray(event.stages)) {
+      renderStageShell(event.stages);
+      renderResultTabs();
+    }
+    return;
+  }
+
   if (event.type === "stage_status") {
     updateStageStatus(event.node, event.status);
     return;
   }
 
   if (event.type === "stage") {
-    updateStageContent(event.node, event.content);
+    updateStageContent(event.node, event.content, event.summary);
     if (event.node === "information_analysis") {
       updateSourceTrace(event.node, event.source_trace || []);
     }
     updateStageStatus(event.node, "done");
-    // mark result tab as having content
     const tab = document.querySelector(`.rtab[data-node="${event.node}"]`);
     if (tab) tab.classList.add("has-content");
+    if (!state.activeStageTab) switchStageTab(event.node);
     els.statusText.textContent = `${STAGE_META[event.node]?.agent || "节点"}完成`;
     return;
   }
 
   if (event.type === "complete") {
     state.finalText = event.final_output || "";
+    state.completeState = event.state || {};
     els.finalOutput.className = "markdown";
     els.finalOutput.innerHTML = renderMarkdown(state.finalText);
     els.statusText.textContent = "完成";
-    // auto-select first tab that has content
-    const firstWithContent = STAGE_ORDER.find(
-      (id) => state.stageContent[id],
-    );
-    if (firstWithContent) switchTab(firstWithContent);
+    els.pauseButton.disabled = true;
+    els.pauseButton.classList.remove("active");
+    els.pauseButton.setAttribute("aria-pressed", "false");
+    renderTradePlanPanel();
+    if (!state.activeStageTab) {
+      const firstWithContent = state.stageOrder.find((id) => state.stageContent[id]);
+      if (firstWithContent) switchStageTab(firstWithContent);
+    }
     return;
   }
 
@@ -371,47 +480,82 @@ function handleEvent(event) {
 }
 
 /* ============================================================
-   Update stage status (pipeline + card)
+   Stage rendering
    ============================================================ */
 
 function updateStageStatus(node, status) {
-  const pipelineNode = document.querySelector(
-    `.pipeline-node[data-node="${node}"]`,
-  );
+  const pipelineNode = document.querySelector(`.pipeline-node[data-node="${node}"]`);
   const card = document.querySelector(`.stage-card[data-node="${node}"]`);
   if (!pipelineNode || !card) return;
 
-  pipelineNode.classList.remove("running", "done", "error");
-  card.classList.remove("running", "done", "error");
+  pipelineNode.classList.remove("running", "done", "error", "paused");
+  card.classList.remove("running", "done", "error", "paused");
   pipelineNode.classList.add(status);
   card.classList.add(status);
   card.querySelector(".badge").textContent = statusText(status);
 }
 
-/* ============================================================
-   Update stage content (card body + result viewer)
-   ============================================================ */
+function updateStageContent(node, content, summary) {
+  const renderedContent = content || "无输出。";
+  state.stageContent[node] = renderedContent;
+  state.stageSummary[node] = summary || summarizeContent(renderedContent);
 
-function updateStageContent(node, content) {
-  // card body
   const card = document.querySelector(`.stage-card[data-node="${node}"]`);
   if (card) {
     const body = card.querySelector(".stage-body");
     body.className = "stage-body markdown";
-    body.innerHTML = renderMarkdown(content || "无输出。");
+    body.innerHTML = renderMarkdown(renderedContent);
   }
 
-  // store for result tabs
-  state.stageContent[node] = content || "";
+  if (state.activeStageTab === node) renderResultViewer();
+}
 
-  // refresh viewer if this node is active
-  if (state.activeTab === node) {
-    switchTab(node);
+function renderResultViewer() {
+  const node = state.activeStageTab;
+  if (!node) {
+    resetViewer();
+    return;
+  }
+  if (state.activeStageView === "summary") {
+    const summary = state.stageSummary[node] || summarizeContent(state.stageContent[node] || "");
+    els.resultViewer.innerHTML = `<div class="summary-view markdown">${renderMarkdown(summary || "暂无摘要。")}</div>`;
+    return;
+  }
+  if (state.activeStageView === "raw") {
+    const content = state.stageContent[node];
+    els.resultViewer.innerHTML = content
+      ? `<div class="stage-body markdown">${renderMarkdown(content)}</div>`
+      : renderEmptyViewer(node, "暂无原文输出");
+    return;
+  }
+  if (state.activeStageView === "sources") {
+    const trace = state.sourceTrace[node] || [];
+    els.resultViewer.innerHTML = trace.length
+      ? `<div class="source-view">${trace.map(renderSourceRow).join("")}</div>`
+      : renderEmptyViewer(node, node === "information_analysis" ? "本次没有返回数据源明细" : "此阶段无独立数据源");
   }
 }
 
+function renderEmptyViewer(node, text) {
+  const meta = STAGE_META[node] || STAGE_META.information_analysis;
+  return `
+    <div class="viewer-placeholder">
+      ${meta.icon}
+      <span>${escapeHtml(meta.agent)} — ${escapeHtml(text)}</span>
+    </div>`;
+}
+
+function summarizeContent(content) {
+  const text = String(content || "")
+    .split(/\r?\n/)
+    .map((line) => line.trim().replace(/^#+\s*/, "").replace(/^[-*]\s*/, ""))
+    .filter((line) => line && !line.startsWith("|") && !line.startsWith("```"))
+    .join(" ");
+  return text.length > 220 ? `${text.slice(0, 220).trim()}...` : text;
+}
+
 /* ============================================================
-   Information source trace
+   Source trace
    ============================================================ */
 
 function toggleSourceInspector(event) {
@@ -424,23 +568,6 @@ function toggleSourceInspector(event) {
   const expanded = button.getAttribute("aria-expanded") === "true";
   button.setAttribute("aria-expanded", String(!expanded));
   list.hidden = expanded;
-}
-
-function resetSourceInspector() {
-  const inspector = document.querySelector(
-    '.source-inspector[data-source-node="information_analysis"]',
-  );
-  if (!inspector) return;
-  inspector.className = "source-inspector";
-  const button = inspector.querySelector(".source-toggle");
-  const summary = inspector.querySelector(".source-toggle-summary");
-  const list = inspector.querySelector(".source-list");
-  if (button) button.setAttribute("aria-expanded", "false");
-  if (summary) summary.textContent = "等待接通";
-  if (list) {
-    list.hidden = true;
-    list.innerHTML = `<div class="source-empty">运行后显示浏览的网站、获取的数据和接通状态。</div>`;
-  }
 }
 
 function updateSourceTrace(node, trace) {
@@ -458,20 +585,14 @@ function updateSourceTrace(node, trace) {
   inspector.classList.toggle("has-failure", failedCount > 0);
 
   if (summary) {
-    summary.textContent =
-      trace.length > 0 ? `${successCount} 成功 / ${failedCount} 失败` : "无外部接通";
+    summary.textContent = trace.length ? `${successCount} 成功 / ${failedCount} 失败` : "无外部接通";
   }
-
   if (!list) return;
   list.hidden = false;
   if (button) button.setAttribute("aria-expanded", "true");
-
-  if (!trace.length) {
-    list.innerHTML = `<div class="source-empty">本次没有返回外部网站或 provider 接通明细。</div>`;
-    return;
-  }
-
-  list.innerHTML = trace.map(renderSourceRow).join("");
+  list.innerHTML = trace.length
+    ? trace.map(renderSourceRow).join("")
+    : `<div class="source-empty">本次没有返回外部网站或 provider 接通明细。</div>`;
 }
 
 function renderSourceRow(item) {
@@ -497,21 +618,102 @@ function renderSourceRow(item) {
 }
 
 /* ============================================================
+   Trade plan panel
+   ============================================================ */
+
+function renderTradePlanPanel() {
+  const decision = state.completeState.final_decision || {};
+  const tradePlan = state.completeState.trade_plan || {};
+  const stocks = Array.isArray(tradePlan.monitored_stocks) ? tradePlan.monitored_stocks : [];
+  const confidence = state.completeState.manager_confidence;
+  const isBuy = decision.action === "BUY" && stocks.length > 0;
+
+  if (!isBuy) {
+    els.tradePlanPanel.className = "trade-plan-panel compact";
+    els.tradePlanPanel.innerHTML = `
+      <div class="trade-plan-head">
+        <strong>交易计划</strong>
+        <span>${escapeHtml(decision.action || "WAIT")}</span>
+      </div>
+      <p>${escapeHtml(decision.reasoning || "未生成交易计划。")}</p>`;
+    return;
+  }
+
+  els.tradePlanPanel.className = "trade-plan-panel";
+  els.tradePlanPanel.innerHTML = `
+    <div class="trade-plan-head">
+      <strong>交易计划</strong>
+      <span>决策 ${escapeHtml(decision.action)} · 置信度 ${formatConfidence(confidence)}</span>
+    </div>
+    <div class="trade-plan-reason">${escapeHtml(decision.reasoning || "")}</div>
+    <div class="trade-plan-table">
+      ${stocks.map(renderTradePlanStock).join("")}
+    </div>
+    <div class="trade-plan-note">${escapeHtml(tradePlan.position_sizing_rationale || "")}</div>`;
+}
+
+function renderTradePlanStock(stock) {
+  return `
+    <article class="trade-stock">
+      <div class="trade-stock-title">
+        <strong>${escapeHtml(stock.name || stock.symbol || "标的")}</strong>
+        <span>${escapeHtml(stock.symbol || "")}</span>
+      </div>
+      <dl>
+        <div><dt>仓位</dt><dd>${escapeHtml(stock.allocation_pct ?? "")}%</dd></div>
+        <div><dt>数量</dt><dd>${escapeHtml(stock.quantity ?? "")}</dd></div>
+        <div><dt>买入触发</dt><dd>${escapeHtml(stock.buy_trigger_price ?? "")}</dd></div>
+        <div><dt>卖出触发</dt><dd>${escapeHtml(stock.sell_trigger_price ?? "")}</dd></div>
+        <div><dt>止损</dt><dd>${escapeHtml(stock.stop_loss_price ?? "")}</dd></div>
+        <div><dt>止盈</dt><dd>${escapeHtml(stock.take_profit_price ?? "")}</dd></div>
+        <div><dt>有效期</dt><dd>${escapeHtml(stock.valid_from || "")} 至 ${escapeHtml(stock.valid_until || "")}</dd></div>
+      </dl>
+    </article>`;
+}
+
+function formatConfidence(value) {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric)) return "N/A";
+  return `${Math.round(numeric * 100)}%`;
+}
+
+/* ============================================================
    Error rendering
    ============================================================ */
 
+function renderPaused() {
+  els.statusText.textContent = "已暂停";
+  state.stageOrder.forEach((id) => {
+    const card = document.querySelector(`.stage-card[data-node="${id}"]`);
+    const pipelineNode = document.querySelector(`.pipeline-node[data-node="${id}"]`);
+    if (card?.classList.contains("running")) {
+      card.classList.remove("running", "error");
+      card.classList.add("paused");
+      card.querySelector(".badge").textContent = "已暂停";
+    }
+    if (pipelineNode?.classList.contains("running")) {
+      pipelineNode.classList.remove("running", "error");
+      pipelineNode.classList.add("paused");
+    }
+  });
+
+  const completedCount = Object.keys(state.stageContent).length;
+  els.finalOutput.className = "markdown";
+  els.finalOutput.innerHTML = renderMarkdown(`## 运行已暂停\n\n已保留 ${completedCount} 个阶段输出。可以调整参数后重新运行。`);
+}
+
 function renderError(message) {
   els.statusText.textContent = "失败";
-  STAGE_ORDER.forEach((id) => {
+  state.stageOrder.forEach((id) => {
     const card = document.querySelector(`.stage-card[data-node="${id}"]`);
-    const pipelineNode = document.querySelector(
-      `.pipeline-node[data-node="${id}"]`,
-    );
+    const pipelineNode = document.querySelector(`.pipeline-node[data-node="${id}"]`);
     if (card?.classList.contains("running")) {
+      card.classList.remove("running");
       card.classList.add("error");
       card.querySelector(".badge").textContent = "失败";
     }
     if (pipelineNode?.classList.contains("running")) {
+      pipelineNode.classList.remove("running");
       pipelineNode.classList.add("error");
     }
   });
@@ -524,7 +726,7 @@ function renderError(message) {
    ============================================================ */
 
 function statusText(status) {
-  const map = { running: "运行", done: "完成", error: "失败" };
+  const map = { running: "运行", done: "完成", error: "失败", paused: "已暂停" };
   return map[status] || "等待";
 }
 
@@ -535,35 +737,21 @@ function configureMarkdown() {
     (typeof markedApi?.marked?.setOptions === "function"
       ? markedApi.marked.setOptions.bind(markedApi.marked)
       : null);
-
-  if (typeof setOptions === "function") {
-    setOptions({
-      breaks: true,
-      gfm: true,
-    });
-  }
+  if (typeof setOptions === "function") setOptions({ breaks: true, gfm: true });
 }
 
 function renderMarkdown(text) {
   const raw = String(text ?? "");
   const parser = getMarkdownParser();
-  if (parser && window.DOMPurify) {
-    return window.DOMPurify.sanitize(parser(raw));
-  }
+  if (parser && window.DOMPurify) return window.DOMPurify.sanitize(parser(raw));
   return renderBasicMarkdown(raw);
 }
 
 function getMarkdownParser() {
   const markedApi = window.marked;
-  if (typeof markedApi?.parse === "function") {
-    return markedApi.parse.bind(markedApi);
-  }
-  if (typeof markedApi?.marked?.parse === "function") {
-    return markedApi.marked.parse.bind(markedApi.marked);
-  }
-  if (typeof markedApi === "function") {
-    return markedApi;
-  }
+  if (typeof markedApi?.parse === "function") return markedApi.parse.bind(markedApi);
+  if (typeof markedApi?.marked?.parse === "function") return markedApi.marked.parse.bind(markedApi.marked);
+  if (typeof markedApi === "function") return markedApi;
   return null;
 }
 
@@ -579,13 +767,11 @@ function renderBasicMarkdown(text) {
     html.push(`<p>${paragraph.map(renderInlineMarkdown).join("<br>")}</p>`);
     paragraph = [];
   };
-
   const flushList = () => {
     if (!listItems.length) return;
     html.push(`<ul>${listItems.map((item) => `<li>${renderInlineMarkdown(item)}</li>`).join("")}</ul>`);
     listItems = [];
   };
-
   const flushTable = () => {
     if (tableRows.length < 2) {
       tableRows.forEach((row) => paragraph.push(row));
@@ -593,17 +779,7 @@ function renderBasicMarkdown(text) {
       return;
     }
     const rows = tableRows.filter((row) => !/^\s*\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?\s*$/.test(row));
-    const renderedRows = rows.map((row, index) => {
-      const cells = row
-        .trim()
-        .replace(/^\|/, "")
-        .replace(/\|$/, "")
-        .split("|")
-        .map((cell) => renderInlineMarkdown(cell.trim()));
-      const tag = index === 0 ? "th" : "td";
-      return `<tr>${cells.map((cell) => `<${tag}>${cell}</${tag}>`).join("")}</tr>`;
-    });
-    html.push(`<table>${renderedRows.join("")}</table>`);
+    html.push(`<table>${rows.map(renderTableRow).join("")}</table>`);
     tableRows = [];
   };
 
@@ -614,9 +790,7 @@ function renderBasicMarkdown(text) {
       tableRows.push(line);
       return;
     }
-
     flushTable();
-
     const heading = line.match(/^(#{1,4})\s+(.+)$/);
     if (heading) {
       flushParagraph();
@@ -625,20 +799,17 @@ function renderBasicMarkdown(text) {
       html.push(`<h${level}>${renderInlineMarkdown(heading[2])}</h${level}>`);
       return;
     }
-
     const list = line.match(/^\s*[-*]\s+(.+)$/);
     if (list) {
       flushParagraph();
       listItems.push(list[1]);
       return;
     }
-
     if (!line.trim()) {
       flushParagraph();
       flushList();
       return;
     }
-
     paragraph.push(line);
   });
 
@@ -646,6 +817,17 @@ function renderBasicMarkdown(text) {
   flushParagraph();
   flushList();
   return html.join("");
+}
+
+function renderTableRow(row, index) {
+  const cells = row
+    .trim()
+    .replace(/^\|/, "")
+    .replace(/\|$/, "")
+    .split("|")
+    .map((cell) => renderInlineMarkdown(cell.trim()));
+  const tag = index === 0 ? "th" : "td";
+  return `<tr>${cells.map((cell) => `<${tag}>${cell}</${tag}>`).join("")}</tr>`;
 }
 
 function renderInlineMarkdown(value) {

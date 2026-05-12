@@ -3,7 +3,7 @@
 所有 provider 零 API key。YahooPriceProvider 和 YFinanceProvider 需要 `pip install yfinance`；MootdxProvider 需要 `pip install mootdx`。
 
 ```python
-from digital_oracle import (
+from collectors.digital_oracle import (
     PolymarketProvider, PolymarketEventQuery,
     KalshiProvider, KalshiMarketQuery,
     YahooPriceProvider, PriceHistoryQuery,   # pip install yfinance
@@ -107,7 +107,7 @@ hist = yahoo.get_history(PriceHistoryQuery(
 中国 A 股通达信数据。覆盖日/周/月/分钟 K、实时行情、分时、分笔、五档盘口、指数 K、本地通达信文件、基础财务摘要、股东/股本快照和 F10 公司概况。**需要 `pip install mootdx`。**
 
 ```python
-from digital_oracle import (
+from collectors.digital_oracle import (
     MootdxProvider, MootdxBarQuery, MootdxDateRangeQuery,
     MootdxIntradayQuery, MootdxTransactionQuery, MootdxLocalDataQuery,
     MootdxCompanyProfileQuery,
@@ -187,7 +187,7 @@ profile = mootdx.get_company_profile(MootdxCompanyProfileQuery(
 腾讯财经 A 股实时估值/交易指标。覆盖 PE、PB、市值、换手率，同时附带当前价、涨跌幅、成交量/成交额。无需外部依赖。
 
 ```python
-from digital_oracle import TencentFinanceProvider, TencentStockMetricsQuery, TencentBoardQuery
+from collectors.digital_oracle import TencentFinanceProvider, TencentStockMetricsQuery, TencentBoardQuery
 
 tencent = TencentFinanceProvider()
 
@@ -292,7 +292,7 @@ result = web.search("VIX index current level")
 # result.text() -> 渲染为可读文本块
 
 # 也可传 WebSearchQuery 控制结果数
-from digital_oracle import WebSearchQuery
+from collectors.digital_oracle import WebSearchQuery
 result = web.search(WebSearchQuery(query="US high yield OAS spread", max_results=3))
 
 # 抓取页面正文
@@ -485,7 +485,7 @@ chain.total_open_interest       # 总持仓量
 chain.max_pain()                # 最大痛点行权价
 
 # 独立使用 Black-Scholes Greeks
-from digital_oracle import black_scholes_greeks
+from collectors.digital_oracle import black_scholes_greeks
 g = black_scholes_greeks(S=150, K=145, T=0.1, r=0.045, sigma=0.25, option_type="call")
 # g.delta, g.gamma, g.theta, g.vega
 ```

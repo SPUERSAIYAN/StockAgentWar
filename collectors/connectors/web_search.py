@@ -7,7 +7,7 @@ TaskMap = dict[str, Callable[[], Any]]
 
 
 def build_web_search_tasks(*, task: str, symbols: list[str], config: dict[str, Any]) -> TaskMap:
-    from digital_oracle import WebSearchProvider, WebSearchQuery
+    from collectors.digital_oracle import WebPageQuery, WebSearchProvider, WebSearchQuery
 
     provider_config = dict(config.get("providers", {}).get("web_search", {}))
     if provider_config.get("enabled", False) is False:
@@ -29,5 +29,15 @@ def build_web_search_tasks(*, task: str, symbols: list[str], config: dict[str, A
                 WebSearchQuery(query=q, max_results=max_results)
             )
         )
+    max_page_chars = int(provider_config.get("max_page_chars", 8000))
+    for index, url in enumerate(provider_config.get("pages", ()), 1):
+        tasks[f"web.page.{index}.{safe_task_label(url)}"] = (
+            lambda page_url=str(url), limit=max_page_chars: WebSearchProvider().fetch_page(
+                WebPageQuery(url=page_url, max_chars=limit)
+            )
+        )
     return tasks
 
+
+def safe_task_label(value: object) -> str:
+    return str(value).replace(" ", "_").replace("/", "_").replace(".", "_")[:80]

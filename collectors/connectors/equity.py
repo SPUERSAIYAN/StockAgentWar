@@ -14,9 +14,10 @@ def build_equity_tasks(
     is_plain_us_equity: Callable[[str], bool],
     to_yahoo_symbol: Callable[[str], str],
 ) -> TaskMap:
-    from digital_oracle import (
+    from collectors.digital_oracle import (
         EdgarInsiderQuery,
         EdgarProvider,
+        EdgarSearchQuery,
         OptionsChainQuery,
         PriceHistoryQuery,
         StooqProvider,
@@ -34,6 +35,7 @@ def build_equity_tasks(
     include_weekly = bool(provider_config.get("weekly_price", True))
     include_options = bool(provider_config.get("options", config.get("include_options", True)))
     include_edgar = bool(provider_config.get("edgar", config.get("include_edgar", True)))
+    include_edgar_filings = bool(provider_config.get("edgar_filings", include_edgar))
     include_stooq = bool(provider_config.get("stooq_compat", False))
     edgar_user_email = (
         provider_config.get("edgar_user_email")
@@ -41,6 +43,8 @@ def build_equity_tasks(
         or os.getenv("EDGAR_USER_EMAIL")
         or "market-information-agent@example.com"
     )
+    edgar_filing_forms = str(provider_config.get("edgar_filing_forms", "10-K,10-Q"))
+    edgar_filing_limit = int(provider_config.get("edgar_filing_limit", 8))
 
     for symbol in symbols:
         yahoo_symbol = to_yahoo_symbol(symbol)
@@ -75,5 +79,10 @@ def build_equity_tasks(
                     user_email=edgar_user_email
                 ).get_insider_transactions(EdgarInsiderQuery(ticker=s, limit=limit))
             )
+        if include_edgar_filings and is_plain_us_equity(yahoo_symbol):
+            tasks[f"equity.{symbol}.edgar_filings"] = (
+                lambda s=yahoo_symbol, forms=edgar_filing_forms, limit=edgar_filing_limit: EdgarProvider(
+                    user_email=edgar_user_email
+                ).search_filings(EdgarSearchQuery(query=s, forms=forms, limit=limit))
+            )
     return tasks
-

@@ -30,6 +30,7 @@ warnings.filterwarnings(
 )
 
 from graph.stock_graph import DEFAULT_AGENT_CONFIGS, build_stock_graph
+from graph.a_share_auto_trade_graph import build_a_share_auto_trade_graph
 from schemas.state import AgentRuntimeConfig, StockCandidate
 
 
@@ -37,9 +38,32 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Run the LangGraph stock decision system.")
     parser.add_argument("--task", default="筛选候选股票", help="决策任务")
     parser.add_argument(
+        "--mode",
+        default="stock_decision",
+        choices=("stock_decision", "a_share_daily", "a_share_sector", "a_share_deep"),
+        help="运行模式：通用股票决策或 A 股自动购买流程",
+    )
+    parser.add_argument(
         "--symbols",
         default="",
         help="逗号分隔的股票代码，例如 AAPL,MSFT,NVDA",
+    )
+    parser.add_argument(
+        "--sectors",
+        default="",
+        help="A 股模式使用，逗号分隔的板块名称，例如 白酒,半导体,新能源",
+    )
+    parser.add_argument(
+        "--risk-tolerance",
+        default="moderate",
+        choices=("conservative", "moderate", "aggressive"),
+        help="A 股模式使用，风险偏好",
+    )
+    parser.add_argument(
+        "--capital",
+        type=float,
+        default=1_000_000,
+        help="A 股模式使用，可用资金",
     )
     parser.add_argument(
         "--config",
@@ -50,15 +74,39 @@ def main() -> None:
     args = parser.parse_args()
 
     agent_configs = load_agent_configs(args.config)
-    graph = build_stock_graph(agent_configs=agent_configs)
-    result = graph.invoke(
-        {
-            "task": args.task,
-            "candidates": parse_symbols(args.symbols),
-            "agent_configs": agent_configs,
-            "metadata": {},
-        }
-    )
+    if args.mode.startswith("a_share_"):
+        graph = build_a_share_auto_trade_graph(agent_configs=agent_configs)
+        result = graph.invoke(
+            {
+                "task": args.task,
+                "candidates": parse_symbols(args.symbols),
+                "scan_scope": {
+                    "market": "A_SHARE",
+                    "sectors": parse_csv(args.sectors),
+                    "exclude_st": True,
+                    "exclude_new_days": 60,
+                },
+                "portfolio_context": {
+                    "current_positions": [],
+                    "available_capital": args.capital,
+                    "max_position_pct": 20,
+                    "max_drawdown_limit": 10,
+                    "risk_tolerance": args.risk_tolerance,
+                },
+                "agent_configs": agent_configs,
+                "metadata": {"mode": args.mode},
+            }
+        )
+    else:
+        graph = build_stock_graph(agent_configs=agent_configs)
+        result = graph.invoke(
+            {
+                "task": args.task,
+                "candidates": parse_symbols(args.symbols),
+                "agent_configs": agent_configs,
+                "metadata": {},
+            }
+        )
     print(result.get("final_output") or result.get("risk_report") or result.get("judge_decision"))
 
 
@@ -94,6 +142,10 @@ def load_agent_configs(path: Path | None) -> dict[str, AgentRuntimeConfig]:
 def parse_symbols(raw: str) -> list[StockCandidate]:
     symbols = [symbol.strip().upper() for symbol in raw.split(",") if symbol.strip()]
     return [{"symbol": symbol} for symbol in symbols]
+
+
+def parse_csv(raw: str) -> list[str]:
+    return [item.strip() for item in raw.split(",") if item.strip()]
 
 
 if __name__ == "__main__":

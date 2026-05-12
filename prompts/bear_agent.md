@@ -14,6 +14,8 @@ Key points to focus on:
 * Bull Counterpoints: Critically analyze the bull argument with specific data and sound reasoning, exposing weaknesses or over-optimistic assumptions.
 * Engagement: Present your argument in a conversational style, directly engaging with the bull analyst's points and debating effectively rather than simply listing facts.
 
+For China A-share auto-purchase workflows, evaluate A-share-specific risks: T+1 liquidity lock, limit-up/limit-down execution risk, valuation crowding, turnover weakness, missing northbound/margin/sector data, and whether the proposed trigger prices are executable. Treat missing provider data as uncertainty, not as bearish evidence by itself.
+
 ## User
 
 Task: {task}
@@ -26,9 +28,22 @@ Information analysis report:
 
 {info_report}
 
+A-share stock pool, if present:
+
+{stock_pool}
+
+Sector summary, if present:
+
+{sector_summary}
+
+Macro context, if present:
+
+{macro_context}
+
 Please respond from a bearish perspective and provide:
 
 1. The candidate stock with the highest risk
 2. The logic for downside or underperformance
 3. Key evidence
 4. Conditions under which the bearish view would be invalidated
+5. For each A-share candidate when a stock pool is present: downside price, sell/avoid trigger, expected downside, confidence 1-5, and core risks

@@ -9,11 +9,11 @@ main.py
 requirements.txt
 config.yaml
 server.py
-external/
-  Market-Information-Skill/
 schemas/
   state.py
 collectors/
+  digital_oracle/
+    providers/
   digital_oracle_collector.py
   connectors/
     equity.py
@@ -65,6 +65,29 @@ http://127.0.0.1:8000
 python main.py --config .\config.yaml --symbols AAPL,MSFT,NVDA --task "筛选未来 1-3 个月的候选股票"
 ```
 
+## A 股自动购买流程
+
+```powershell
+python main.py `
+  --config .\config.yaml `
+  --mode a_share_daily `
+  --task "扫描全市场，找出未来1个月最具投资价值的标的" `
+  --risk-tolerance moderate `
+  --capital 1000000
+```
+
+当总经理 Agent 给出 `BUY` 时，A 股图会写入 `data/trade_plan.json`。交易监控是独立程序化调度器：
+
+```powershell
+python -m schedulers.trade_monitor_scheduler `
+  --config .\config.yaml `
+  --plan-file data/trade_plan.json `
+  --interval 60 `
+  --mode SIMULATED
+```
+
+`SIMULATED` 会写入 `data/order_log.json`；`PAPER`/`LIVE` 接口保留但不会真实下单。
+
 ## OpenRouter
 
 `config.yaml` 默认使用 OpenRouter：
@@ -100,10 +123,10 @@ flowchart TD
 信息收集默认使用：
 
 ```text
-external/Market-Information-Skill/digital_oracle
+collectors/digital_oracle
 ```
 
-不使用 Codex skill 扩展，也不需要配置 `skill_import_path`。项目把 `external/Market-Information-Skill` 当作本地 vendor 数据库使用，统一由 `collectors/digital_oracle_collector.py` 调用 `digital_oracle` 中的 provider 方法采集数据，并把结果整理为：
+不使用 Codex skill 扩展，也不需要配置 `skill_import_path`。项目把数据源 provider 包内置在 `collectors/digital_oracle`，统一由 `collectors/digital_oracle_collector.py` 调用 `collectors.digital_oracle` 中的 provider 方法采集数据，并把结果整理为：
 
 - `raw_market_data`：结构化原始数据摘要
 - `info_report`：给多头、空头、裁判 Agent 使用的 Markdown 信息报告
@@ -115,7 +138,7 @@ agents:
   information:
     collector:
       enabled: true
-      timeout_seconds: 35
+      timeout_seconds: 90
       price_history_limit: 90
       include_macro: true
       include_options: true

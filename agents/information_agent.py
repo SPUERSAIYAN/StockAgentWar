@@ -49,6 +49,8 @@ class MockChatModel:
             return mock_judge_decision(user_message)
         if "risk" in model_name:
             return mock_risk_report(user_message)
+        if "portfolio" in model_name or "manager" in model_name:
+            return mock_portfolio_manager_report(user_message)
         return f"[{self.name}] mock response\n\n{user_message[:500]}"
 
 
@@ -267,11 +269,22 @@ def prompt_vars(state: MarketDecisionState) -> dict[str, str]:
     return {
         "task": state.get("task", "筛选候选股票"),
         "candidates": format_candidates(state.get("candidates", [])),
+        "stock_pool": compact_json(state.get("stock_pool", []), 3000),
+        "sector_summary": compact_json(state.get("sector_summary", []), 1600),
+        "macro_context": compact_json(state.get("macro_context", {}), 1800),
         "info_report": state.get("info_report", "暂无信息分析报告。"),
         "bull_case": state.get("bull_case", "暂无多头观点。"),
+        "bull_cases": compact_json(state.get("bull_cases", []), 2200),
+        "bull_summary": state.get("bull_summary", "暂无多头总结。"),
         "bear_case": state.get("bear_case", "暂无空头观点。"),
+        "bear_cases": compact_json(state.get("bear_cases", []), 2200),
+        "bear_summary": state.get("bear_summary", "暂无空头总结。"),
         "judge_decision": state.get("judge_decision", "暂无裁判结论。"),
+        "judge_rulings": compact_json(state.get("judge_rulings", []), 2200),
+        "judge_report": state.get("judge_report", state.get("judge_decision", "暂无裁判报告。")),
         "risk_report": state.get("risk_report", "暂无风控报告。"),
+        "portfolio_context": compact_json(state.get("portfolio_context", {}), 1600),
+        "data_gaps": compact_json(state.get("data_gaps", []), 1200),
     }
 
 
@@ -925,4 +938,14 @@ def mock_risk_report(user_message: str) -> str:
         "| 待接入真实数据 | WATCH | 中 | 0%-5% | 数据补齐前不进入实盘 | 缺少实时行情、成交量、财报和新闻验证 |\n\n"
         "- 输出仅用于研究流程验证，不构成投资建议。\n\n"
         f"### 裁判输入摘录\n{user_message[:700]}"
+    )
+
+
+def mock_portfolio_manager_report(user_message: str) -> str:
+    return (
+        "## 总经理决策\n\n"
+        "- 仅在裁判裁决、风控意见和价格触发条件同时满足时生成交易计划。\n"
+        "- 单票仓位、总仓位、止损止盈按配置约束执行，数量按 100 股整数倍取整。\n"
+        "- 数据缺口存在时降低置信度，不允许绕过风控直接实盘。\n\n"
+        f"### 输入摘录\n{user_message[:700]}"
     )

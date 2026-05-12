@@ -1,6 +1,8 @@
 from __future__ import annotations
 
-from schemas.state import AgentRuntimeConfig, MarketDecisionState
+from typing import Any
+
+from schemas.state import AgentRuntimeConfig
 
 from agents.prompt_loader import load_agent_prompt
 from agents.information_agent import run_prompt_agent
@@ -11,11 +13,10 @@ class BullAgent:
         self.config = config
         self.prompt = load_agent_prompt("bull_agent.md")
 
-    def __call__(self, state: MarketDecisionState) -> dict[str, str]:
+    def __call__(self, state: dict[str, Any]) -> dict[str, str]:
         return run_prompt_agent(
             config=self.config,
             state=state,
             output_key="bull_case",
             prompt_template=self.prompt,
         )
-

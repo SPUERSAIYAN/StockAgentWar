@@ -7,7 +7,7 @@ TaskMap = dict[str, Callable[[], Any]]
 
 
 def build_crypto_tasks(*, config: dict[str, Any]) -> TaskMap:
-    from digital_oracle import (
+    from collectors.digital_oracle import (
         CoinGeckoMarketQuery,
         CoinGeckoPriceQuery,
         CoinGeckoProvider,
@@ -34,6 +34,8 @@ def build_crypto_tasks(*, config: dict[str, Any]) -> TaskMap:
 
     if bool(provider_config.get("deribit", True)):
         currencies = tuple(provider_config.get("deribit_currencies", ("BTC", "ETH")))
+        orderbook_instruments = tuple(provider_config.get("deribit_orderbook_instruments", ()))
+        orderbook_depth = int(provider_config.get("deribit_orderbook_depth", 5))
         for currency in currencies:
             tasks[f"crypto.deribit.{currency}.futures_curve"] = (
                 lambda c=str(currency): DeribitProvider().get_futures_term_structure(
@@ -46,5 +48,15 @@ def build_crypto_tasks(*, config: dict[str, Any]) -> TaskMap:
                         DeribitOptionChainQuery(currency=c)
                     )
                 )
+        for instrument_name in orderbook_instruments:
+            tasks[f"crypto.deribit.orderbook.{safe_task_label(instrument_name)}"] = (
+                lambda name=str(instrument_name), depth=orderbook_depth: DeribitProvider().get_order_book(
+                    name,
+                    depth=depth,
+                )
+            )
     return tasks
 
+
+def safe_task_label(value: object) -> str:
+    return str(value).replace(" ", "_").replace("/", "_").replace(".", "_")[:80]

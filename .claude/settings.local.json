@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:github.com)",
+      "Bash(mkdir -p __TRACKED_VAR__/.orchestra/skills/planning-with-files-zh)",
+      "Bash(cp -r '/tmp/planning-with-files/skills/planning-with-files-zh/*' __TRACKED_VAR__/.orchestra/skills/planning-with-files-zh/)",
+      "Bash(grep -E \"\\\\.md$|\\\\.yaml$|\\\\.json$|\\\\.py$|\\\\.txt$|\\\\.html$\")",
+      "Bash(curl:*)"
+    ]
+  }
+}

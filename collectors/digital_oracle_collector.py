@@ -2,14 +2,12 @@ from __future__ import annotations
 
 import math
 import re
-import sys
 import json
 import contextlib
 import io
 import time
 from dataclasses import asdict, is_dataclass
 from datetime import datetime
-from pathlib import Path
 from typing import Any, Callable
 
 from collectors.connectors.china import build_china_equity_tasks
@@ -26,12 +24,9 @@ from agents.trace_logger import (
 )
 from schemas.state import AgentRuntimeConfig, MarketDecisionState
 
-
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-VENDOR_MARKET_INFORMATION_DIR = PROJECT_ROOT / "external" / "Market-Information-Skill"
 DEFAULT_COLLECTOR_CONFIG: dict[str, Any] = {
     "enabled": True,
-    "timeout_seconds": 35,
+    "timeout_seconds": 90,
     "max_workers": 12,
     "price_history_limit": 90,
     "include_macro": True,
@@ -46,16 +41,37 @@ DEFAULT_COLLECTOR_CONFIG: dict[str, Any] = {
             "weekly_price": True,
             "options": True,
             "edgar": True,
+            "edgar_filings": True,
+            "edgar_filing_forms": "10-K,10-Q",
+            "edgar_filing_limit": 8,
             "stooq_compat": False,
         },
         "china_equity": {
             "enabled": True,
             "tencent": True,
+            "tencent_index_metrics": True,
+            "tencent_index_symbols": ("sh000001", "sz399001", "sz399006"),
+            "tencent_board_queries": (),
             "mootdx": False,
+            "mootdx_frequencies": ("day",),
+            "mootdx_minute_bar_offset": 240,
+            "mootdx_intraday": False,
+            "mootdx_order_book": False,
+            "mootdx_shareholders": False,
+            "mootdx_company_profile": False,
+            "mootdx_index_symbols": (),
+            "mootdx_index_frequencies": ("day",),
+            "mootdx_local_tdxdir": "",
+            "mootdx_local_frequencies": ("day",),
+            "mootdx_local_market": "std",
         },
         "macro": {
             "enabled": True,
             "treasury": True,
+            "treasury_curve_kinds": ("real", "bill", "long_term"),
+            "treasury_exchange_rates": True,
+            "treasury_exchange_rate_countries": ("China", "Japan"),
+            "treasury_exchange_rate_limit": 12,
             "fear_greed": True,
             "cme_fedwatch": True,
             "cftc": True,
@@ -65,15 +81,24 @@ DEFAULT_COLLECTOR_CONFIG: dict[str, Any] = {
         "prediction_markets": {
             "enabled": True,
             "kalshi": True,
+            "kalshi_event_tickers": (),
+            "kalshi_orderbook_tickers": (),
+            "kalshi_orderbook_depth": 10,
             "polymarket": True,
+            "polymarket_event_slugs": (),
+            "polymarket_orderbook_token_ids": (),
         },
         "crypto": {
             "enabled": True,
             "coingecko": True,
             "deribit": True,
+            "deribit_orderbook_instruments": (),
+            "deribit_orderbook_depth": 5,
         },
         "web_search": {
             "enabled": False,
+            "pages": (),
+            "max_page_chars": 8000,
         },
     },
     "candidate_discovery": {
@@ -105,21 +130,9 @@ def collect_market_information(
     if collector_config.get("enabled", False) is False:
         log_trace(collector_name, "COLLECTOR SKIP", {"reason": "collector disabled"})
         return None
-    if not (VENDOR_MARKET_INFORMATION_DIR / "digital_oracle").exists():
-        log_trace(
-            collector_name,
-            "COLLECTOR SKIP",
-            {
-                "reason": "digital_oracle vendor directory missing",
-                "path": str(VENDOR_MARKET_INFORMATION_DIR / "digital_oracle"),
-            },
-        )
-        return None
-
-    ensure_external_market_information_path()
 
     try:
-        from digital_oracle import gather
+        from collectors.digital_oracle import gather
     except Exception as exc:
         log_data_source_error("digital_oracle_import", 0, exc)
         return {
@@ -247,12 +260,6 @@ def collect_market_information(
     )
 
 
-def ensure_external_market_information_path() -> None:
-    external_path = str(VENDOR_MARKET_INFORMATION_DIR)
-    if VENDOR_MARKET_INFORMATION_DIR.exists() and external_path not in sys.path:
-        sys.path.insert(0, external_path)
-
-
 def trace_data_source_tasks(
     tasks: dict[str, Callable[[], Any]],
     *,
@@ -343,6 +350,10 @@ def infer_data_source_context(label: str, *, task: str, symbols: list[str]) -> d
         context.update({"group": "crypto", "data_kind": label.removeprefix("crypto.")})
     elif label.startswith("web.search."):
         context.update({"group": "web_search", "data_kind": "search"})
+    elif label.startswith("web.page."):
+        context.update({"group": "web_search", "data_kind": "page_fetch"})
+    elif label.startswith("china."):
+        context.update({"group": "china_equity", "data_kind": label.removeprefix("china.")})
     return context
 
 
@@ -467,9 +478,8 @@ def discover_china_a_share_candidates(
     config: AgentRuntimeConfig,
     discovery_config: dict[str, Any],
 ) -> dict[str, Any] | None:
-    ensure_external_market_information_path()
     try:
-        from digital_oracle import MootdxProvider, TencentFinanceProvider
+        from collectors.digital_oracle import MootdxProvider, TencentFinanceProvider
     except Exception as exc:
         log_data_source_error("candidate_discovery.digital_oracle_import", 0, exc)
         return None
@@ -479,6 +489,7 @@ def discover_china_a_share_candidates(
     max_candidates = int(discovery_config.get("max_candidates", 8))
     scan_limit = int(discovery_config.get("scan_limit", 0))
     batch_size = max(int(discovery_config.get("batch_size", 80)), 1)
+    a_share_filters = dict(discovery_config.get("a_share_filters", {}) or {})
 
     try:
         log_data_source_start(
@@ -526,11 +537,15 @@ def discover_china_a_share_candidates(
         return None
 
     ranked: list[dict[str, Any]] = []
+    filtered_out_count = 0
     names_by_symbol = {row["symbol"]: row.get("name", "") for row in stock_rows}
     for metric in metrics:
         item = to_jsonable(metric)
         symbol = tencent_symbol_to_a_share_symbol(str(item.get("symbol", "")))
         if not symbol:
+            continue
+        if not passes_a_share_candidate_filters(item, a_share_filters):
+            filtered_out_count += 1
             continue
         score, basis = score_discovered_a_share(item)
         ranked.append(
@@ -569,8 +584,38 @@ def discover_china_a_share_candidates(
         "method": "mootdx_stock_list_plus_tencent_metrics",
         "scanned_symbol_count": len(symbols),
         "ranked_symbol_count": len(ranked),
+        "filtered_out_count": filtered_out_count,
+        "a_share_filters": a_share_filters,
         "candidates": ranked[:max_candidates],
     }
+
+
+def passes_a_share_candidate_filters(
+    metrics: dict[str, Any],
+    filters: dict[str, Any],
+) -> bool:
+    if not filters:
+        return True
+
+    name = str(metrics.get("name") or "").upper()
+    if filters.get("exclude_st", True) and "ST" in name:
+        return False
+
+    price = to_float(metrics.get("price"))
+    if filters.get("exclude_suspended", True) and (price is None or price <= 0):
+        return False
+
+    min_market_cap = to_float(filters.get("min_market_cap_yi"))
+    market_cap = to_float(metrics.get("total_market_cap_cny_100m"))
+    if min_market_cap is not None and market_cap is not None and market_cap < min_market_cap:
+        return False
+
+    max_pe = to_float(filters.get("max_pe"))
+    pe = to_float(metrics.get("pe"))
+    if max_pe is not None and pe is not None and pe > 0 and pe > max_pe:
+        return False
+
+    return True
 
 
 def list_mootdx_a_share_symbols(mootdx: Any) -> list[dict[str, str]]:
@@ -600,7 +645,7 @@ def fetch_tencent_metrics_for_symbols(
     *,
     batch_size: int,
 ) -> list[Any]:
-    from digital_oracle import TencentStockMetricsQuery
+    from collectors.digital_oracle import TencentStockMetricsQuery
 
     metrics: list[Any] = []
     for start in range(0, len(symbols), batch_size):
@@ -752,6 +797,10 @@ def summarize_provider_value(value: Any) -> Any:
         return summarize_worldbank_result(value)
     if class_name == "WebSearchResult":
         return summarize_web_search_result(value)
+    if class_name == "WebPageContent":
+        return summarize_web_page_content(value)
+    if class_name == "MootdxCompanyProfile":
+        return summarize_mootdx_company_profile(value)
     return to_jsonable(value)
 
 
@@ -909,6 +958,31 @@ def summarize_web_search_result(result: Any) -> dict[str, Any]:
         "snippet_count": len(snippets),
         "snippets": [to_jsonable(snippet) for snippet in snippets[:8]],
         "truncated": len(snippets) > 8,
+    }
+
+
+def summarize_web_page_content(page: Any, *, max_chars: int = 1200) -> dict[str, Any]:
+    text = str(getattr(page, "text", "") or "")
+    return {
+        "url": getattr(page, "url", ""),
+        "title": getattr(page, "title", ""),
+        "fetched_at": getattr(page, "fetched_at", ""),
+        "text": text[:max_chars],
+        "truncated": bool(getattr(page, "truncated", False)) or len(text) > max_chars,
+    }
+
+
+def summarize_mootdx_company_profile(profile: Any, *, max_chars: int = 1200) -> dict[str, Any]:
+    sections = dict(getattr(profile, "sections", {}) or {})
+    rendered: dict[str, str] = {}
+    for name, text in list(sections.items())[:6]:
+        text_value = str(text or "")
+        rendered[str(name)] = text_value[:max_chars]
+    return {
+        "symbol": getattr(profile, "symbol", ""),
+        "section_count": len(sections),
+        "sections": rendered,
+        "truncated": any(len(str(text or "")) > max_chars for text in sections.values()) or len(sections) > 6,
     }
 
 
