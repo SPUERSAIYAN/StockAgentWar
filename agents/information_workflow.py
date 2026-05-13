@@ -104,13 +104,18 @@ def build_information_workflow(state: MarketDecisionState) -> dict[str, Any]:
     task = state.get("task", "")
     symbols = [str(item.get("symbol", "")).upper() for item in state.get("candidates", []) if item.get("symbol")]
     discovery = dict(state.get("metadata", {}).get("auto_candidate_discovery", {}) or {})
-    question_type = infer_question_type(task, symbols)
-    time_window = infer_time_window(task)
+    question_understanding = dict(state.get("question_understanding", {}) or {})
+    signal_plan = dict(state.get("signal_plan", {}) or {})
+    question_type = infer_question_type_from_plan(task, symbols, question_understanding)
+    time_window = infer_time_window_from_plan(task, question_understanding)
     selected_signals = select_signal_specs(question_type, task, symbols)
+    selected_signals = apply_planned_signal_groups(selected_signals, signal_plan)
     routed_signals = route_signal_specs(selected_signals, question_type, time_window, task)
     return {
         "instruction_file": "prompts/information_agent.md",
         "workflow_steps": WORKFLOW_STEPS,
+        "question_understanding": question_understanding,
+        "planner_signal_plan": signal_plan,
         "question_decomposition": {
             "core_variable": infer_core_variable(task, symbols),
             "time_window": time_window,
@@ -140,6 +145,8 @@ def infer_core_variable(task: str, symbols: list[str]) -> str:
 
 def infer_time_window(task: str) -> str:
     lowered = task.lower()
+    if any(token in lowered for token in ("明天", "tomorrow", "1-5", "next few days", "几天", "短线")):
+        return "very_short_term_1_to_5_trading_days"
     if any(token in lowered for token in ("3-5", "5 year", "5 years", "long-term", "长期", "五年")):
         return "long_term_3_to_5_years"
     if any(token in lowered for token in ("1-3", "1 year", "3 year", "medium-term", "中期", "一年", "三年")):
@@ -155,6 +162,8 @@ def infer_question_type(task: str, symbols: list[str]) -> str:
         token in lowered for token in ("大a", "a股", "沪深", "中国股票", "china a-share", "a-share")
     ):
         return "china_a_share_analysis"
+    if any(token in lowered for token in ("明天", "哪只股票", "哪一只", "买哪只")) and not symbols:
+        return "china_a_share_analysis"
     if any(token in lowered for token in ("war", "conflict", "ceasefire", "invasion", "战争", "冲突", "台海")):
         return "geopolitical_conflict_or_war_risk"
     if any(token in lowered for token in ("recession", "macro", "fed", "rate", "衰退", "宏观", "利率")):
@@ -164,6 +173,62 @@ def infer_question_type(task: str, symbols: list[str]) -> str:
     if any(token in lowered for token in ("bubble", "industry", "sector", "泡沫", "行业")):
         return "industry_cycle_or_bubble_assessment"
     return "asset_pricing_or_stock_selection"
+
+
+def infer_question_type_from_plan(
+    task: str,
+    symbols: list[str],
+    question_understanding: dict[str, Any],
+) -> str:
+    market_scope = str(question_understanding.get("market_scope", "")).lower()
+    rewritten = str(question_understanding.get("rewritten_question", "")).lower()
+    if any(token in market_scope or token in rewritten for token in ("a-share", "ashare", "a股", "中国股", "沪深")):
+        return "china_a_share_analysis"
+    return infer_question_type(task, symbols)
+
+
+def infer_time_window_from_plan(task: str, question_understanding: dict[str, Any]) -> str:
+    window_text = " ".join(
+        str(question_understanding.get(key, ""))
+        for key in ("primary_time_window", "secondary_time_window")
+    ).lower()
+    if any(token in window_text for token in ("1-5", "trading days", "交易日", "tomorrow", "明天")):
+        return "very_short_term_1_to_5_trading_days"
+    if window_text:
+        return infer_time_window(window_text)
+    return infer_time_window(task)
+
+
+def apply_planned_signal_groups(
+    selected_signals: list[dict[str, Any]],
+    signal_plan: dict[str, Any],
+) -> list[dict[str, Any]]:
+    planned_groups = [
+        str(group)
+        for group in signal_plan.get("selected_provider_groups", [])
+        if isinstance(group, str)
+    ]
+    if not planned_groups:
+        return selected_signals
+
+    filtered = [dict(item) for item in selected_signals if item.get("provider_group") in planned_groups]
+    existing_groups = {item["provider_group"] for item in filtered}
+    for item in signal_plan.get("selected_signals", []) or []:
+        if not isinstance(item, dict):
+            continue
+        group = str(item.get("provider_group", ""))
+        if group not in planned_groups or group in existing_groups:
+            continue
+        filtered.append(
+            signal(
+                str(item.get("id") or f"{group}.planner_selected"),
+                group,
+                "short_term",
+                str(item.get("description") or item.get("reason") or "Planner-selected signal."),
+            )
+        )
+        existing_groups.add(group)
+    return filtered or selected_signals
 
 
 def select_signal_specs(
@@ -256,6 +321,13 @@ def select_information_providers(
     symbols = workflow["question_decomposition"]["candidates"]
     routed = workflow.get("signal_routing", {}).get("routed_signals", [])
     kept_groups = {item["provider_group"] for item in routed if item.get("decision") == "keep"}
+    planned_groups = {
+        str(group)
+        for group in dict(state.get("signal_plan", {}) or {}).get("selected_provider_groups", [])
+        if isinstance(group, str)
+    }
+    if planned_groups:
+        kept_groups = planned_groups
 
     has_a_share = any(is_a_share_symbol_text(symbol) for symbol in symbols)
     has_global_symbol = any(not is_a_share_symbol_text(symbol) for symbol in symbols)

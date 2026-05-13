@@ -168,7 +168,7 @@ agents:
           max_page_chars: 8000
     model:
       provider: openrouter
-      model: openai/gpt-5.5
+      model: qwen/qwen3.5-plus-20260420
       temperature: 0.2
       api_key_env: OPENROUTER_API_KEY
       site_url: http://localhost
@@ -213,7 +213,7 @@ agents:
   portfolio_manager:
     model:
       provider: openrouter
-      model: openai/gpt-5.5
+      model: qwen/qwen3.5-plus-20260420
       temperature: 0.1
       api_key_env: OPENROUTER_API_KEY
       site_url: http://localhost

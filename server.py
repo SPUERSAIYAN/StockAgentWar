@@ -32,6 +32,8 @@ from main import load_agent_configs, parse_symbols
 
 PROJECT_ROOT = Path(__file__).resolve().parent
 WEB_DIR = PROJECT_ROOT / "web"
+WEB_DIST_DIR = WEB_DIR / "dist"
+STATIC_WEB_DIR = WEB_DIST_DIR if (WEB_DIST_DIR / "index.html").exists() else WEB_DIR
 DEFAULT_CONFIG_PATH = PROJECT_ROOT / "config.yaml"
 
 load_dotenv(PROJECT_ROOT / ".env")
@@ -50,6 +52,13 @@ class DecisionRequest(BaseModel):
 
 
 COMMON_STAGES: dict[str, dict[str, str]] = {
+    "question_planning": {
+        "id": "question_planning",
+        "agent": "问题理解",
+        "title": "意图与信号规划",
+        "output_key": "question_plan_report",
+        "color": "#38BDF8",
+    },
     "information_analysis": {
         "id": "information_analysis",
         "agent": "信息分析",
@@ -113,6 +122,7 @@ A_SHARE_STAGES: dict[str, dict[str, str]] = {
 }
 
 A_SHARE_STAGE_ORDER = [
+    "question_planning",
     "information_analysis",
     "a_share_context",
     "bull_debate",
@@ -124,6 +134,7 @@ A_SHARE_STAGE_ORDER = [
 ]
 
 COMMON_STAGE_ORDER = [
+    "question_planning",
     "information_analysis",
     "bull_debate",
     "bear_debate",
@@ -173,7 +184,7 @@ def stream_decision(request: DecisionRequest):
             "stages": ordered_stage_list(stages, stage_order),
         },
     )
-    yield stage_status("information_analysis", "running", started_at)
+    yield stage_status("question_planning", "running", started_at)
 
     try:
         agent_configs = resolve_agent_configs(request)
@@ -274,7 +285,9 @@ def build_graph_inputs(
 
 
 def emit_next_statuses(node: str, completed: set[str], started_at: float, is_a_share: bool):
-    if node == "information_analysis":
+    if node == "question_planning":
+        yield stage_status("information_analysis", "running", started_at)
+    elif node == "information_analysis":
         if is_a_share:
             yield stage_status("a_share_context", "running", started_at)
             return
@@ -306,6 +319,9 @@ def stage_status(node: str, status: str, started_at: float) -> str:
 
 def public_state(state: dict[str, Any]) -> dict[str, Any]:
     keys = [
+        "question_understanding",
+        "signal_plan",
+        "question_plan_report",
         "information_workflow",
         "provider_selection",
         "signal_reasoning",
@@ -636,4 +652,4 @@ def event(event_type: str, payload: dict[str, Any]) -> str:
     return json.dumps({"type": event_type, **payload}, ensure_ascii=False) + "\n"
 
 
-app.mount("/", StaticFiles(directory=WEB_DIR, html=True), name="web")
+app.mount("/", StaticFiles(directory=STATIC_WEB_DIR, html=True), name="web")

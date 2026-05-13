@@ -39,6 +39,8 @@ class MockChatModel:
     def invoke(self, messages: list[dict[str, str]]) -> str:
         user_message = messages[-1]["content"] if messages else ""
         model_name = self.name.lower()
+        if "question" in model_name or "planning" in model_name:
+            return mock_question_plan(user_message)
         if "information" in model_name or "info" in model_name:
             return mock_information_report(user_message)
         if "bull" in model_name:
@@ -303,6 +305,95 @@ def content_part_to_text(part: Any) -> str:
     if isinstance(part, dict):
         return str(part.get("text") or part.get("content") or part)
     return str(part)
+
+
+def mock_question_plan(user_message: str) -> str:
+    task_match = re.search(r"Task:\s*(.*)", user_message)
+    task = task_match.group(1).strip() if task_match else ""
+    lowered = user_message.lower()
+    is_a_share = any(
+        token in lowered
+        for token in ("a-share", "a股", "a 股", "china a-share", "中国股", "沪深", "明天", "哪只股票")
+    )
+    if is_a_share:
+        payload = {
+            "question_understanding": {
+                "rewritten_question": "A股市场极短期具有上涨潜力的个股/板块识别",
+                "core_intent": "寻找当前市场定价中存在正向预期差的方向",
+                "market_scope": "China A-share",
+                "primary_time_window": "1-5 trading days",
+                "secondary_time_window": "1-3 months trend confirmation",
+                "candidate_scope": "A-share candidate discovery when explicit symbols are absent",
+                "risk_notes": ["研究支持，不构成个性化投资建议。"],
+            },
+            "signal_plan": {
+                "selected_provider_groups": ["china_equity", "macro"],
+                "selected_signals": [
+                    {
+                        "id": "china.candidate_discovery",
+                        "provider_group": "china_equity",
+                        "description": "A-share candidate discovery, realtime quotes, valuation, turnover, volume ratio and amount.",
+                        "reason": "Needed to identify tradable A-share candidates.",
+                    },
+                    {
+                        "id": "macro.china_risk_pricing",
+                        "provider_group": "macro",
+                        "description": "USDCNY, VIX and broad risk proxies.",
+                        "reason": "Needed to cross-check short-term market risk appetite.",
+                    },
+                ],
+                "rejected_provider_groups": [
+                    {"provider_group": "us_equity", "reason": "A-share task does not need US single-stock data."},
+                    {"provider_group": "prediction_markets", "reason": "No explicit event-probability question."},
+                    {"provider_group": "crypto", "reason": "No crypto-linked thesis."},
+                    {"provider_group": "web_search", "reason": "No concrete structured-data gap requested."},
+                ],
+                "data_needed_by_information_agent": [
+                    "A-share candidate discovery and realtime trading metrics.",
+                    "China risk-pricing macro proxies.",
+                ],
+            },
+        }
+    else:
+        payload = {
+            "question_understanding": {
+                "rewritten_question": task or "Global equity candidate assessment",
+                "core_intent": "Assess tradable upside/downside using structured market data",
+                "market_scope": "US/global listed assets",
+                "primary_time_window": "3-12 months",
+                "secondary_time_window": "1-3 years context",
+                "candidate_scope": "User-supplied symbols",
+                "risk_notes": ["Research support only; do not frame as personalized investment advice."],
+            },
+            "signal_plan": {
+                "selected_provider_groups": ["us_equity", "macro"],
+                "selected_signals": [
+                    {
+                        "id": "equity.price_options",
+                        "provider_group": "us_equity",
+                        "description": "Price history, weekly trend, realized volatility, options and EDGAR where available.",
+                        "reason": "Needed for listed US/global symbols.",
+                    },
+                    {
+                        "id": "macro.risk_pricing",
+                        "provider_group": "macro",
+                        "description": "Rates, VIX and broad risk proxies.",
+                        "reason": "Needed to cross-check market risk appetite.",
+                    },
+                ],
+                "rejected_provider_groups": [
+                    {"provider_group": "china_equity", "reason": "No A-share scope detected."},
+                    {"provider_group": "prediction_markets", "reason": "No explicit event-probability question."},
+                    {"provider_group": "crypto", "reason": "No crypto-linked thesis."},
+                    {"provider_group": "web_search", "reason": "No concrete structured-data gap requested."},
+                ],
+                "data_needed_by_information_agent": [
+                    "US/global equity price, options, and filing data.",
+                    "Macro risk proxies.",
+                ],
+            },
+        }
+    return json.dumps(payload, ensure_ascii=False)
 
 
 def build_information_workflow(state: MarketDecisionState) -> dict[str, Any]:
