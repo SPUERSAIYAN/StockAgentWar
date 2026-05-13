@@ -1,0 +1,1653 @@
+0 verbose cli E:\nodejs\node.exe E:\nodejs\node_modules\npm\bin\npm-cli.js
+1 info using npm@10.7.0
+2 info using node@v20.15.0
+3 silly config:load:file:E:\nvm_git_change\v20.15.0\node_modules\npm\npmrc
+4 silly config:load:file:E:\IDEA\multi-Agent-Inv\web\.npmrc
+5 silly config:load:file:C:\Users\TTC\.npmrc
+6 silly config:load:file:E:\JavaScript\node_global\etc\npmrc
+7 verbose title npm install
+8 verbose argv "install" "--cache" ".npm-cache"
+9 verbose logfile logs-max:10 dir:E:\IDEA\multi-Agent-Inv\web\.npm-cache\_logs\2026-05-12T13_42_51_955Z-
+10 verbose logfile E:\IDEA\multi-Agent-Inv\web\.npm-cache\_logs\2026-05-12T13_42_51_955Z-debug-0.log
+11 silly logfile done cleaning log files
+12 silly idealTree buildDeps
+13 silly fetch manifest @vitejs/plugin-react@^4.2.1
+14 http fetch GET 200 https://registry.npmmirror.com/npm 234ms
+15 http fetch GET 200 https://registry.npmmirror.com/@vitejs%2fplugin-react 205ms (cache miss)
+16 silly fetch manifest vite@^5.4.0
+17 http fetch GET 200 https://registry.npmmirror.com/vite 819ms (cache miss)
+18 silly fetch manifest @types/node@^18.0.0 || >=20.0.0
+19 http fetch GET 200 https://registry.npmmirror.com/@types%2fnode 460ms (cache miss)
+20 silly fetch manifest less@*
+21 http fetch GET 200 https://registry.npmmirror.com/less 42ms (cache miss)
+22 silly fetch manifest lightningcss@^1.21.0
+23 http fetch GET 200 https://registry.npmmirror.com/lightningcss 50ms (cache miss)
+24 silly fetch manifest sass@*
+25 http fetch GET 200 https://registry.npmmirror.com/sass 45ms (cache miss)
+26 silly fetch manifest sass-embedded@*
+27 http fetch GET 200 https://registry.npmmirror.com/sass-embedded 57ms (cache miss)
+28 silly fetch manifest stylus@*
+29 http fetch GET 200 https://registry.npmmirror.com/stylus 42ms (cache miss)
+30 silly fetch manifest sugarss@*
+31 http fetch GET 200 https://registry.npmmirror.com/sugarss 49ms (cache miss)
+32 silly fetch manifest postcss@^8.3.3
+33 http fetch GET 200 https://registry.npmmirror.com/postcss 48ms (cache miss)
+34 silly fetch manifest terser@^5.4.0
+35 http fetch GET 200 https://registry.npmmirror.com/terser 71ms (cache miss)
+36 silly fetch manifest typescript@^5.5.4
+37 http fetch GET 200 https://registry.npmmirror.com/typescript 188ms (cache miss)
+38 silly fetch manifest react@^18.3.1
+39 http fetch GET 200 https://registry.npmmirror.com/react 293ms (cache miss)
+40 silly fetch manifest react-dom@^18.3.1
+41 http fetch GET 200 https://registry.npmmirror.com/react-dom 130ms (cache miss)
+42 silly fetch manifest react-markdown@^9.0.1
+43 http fetch GET 200 https://registry.npmmirror.com/react-markdown 56ms (cache miss)
+44 silly fetch manifest @types/react@^18.3.3
+45 http fetch GET 200 https://registry.npmmirror.com/@types%2freact 63ms (cache miss)
+46 silly fetch manifest remark-gfm@^4.0.0
+47 http fetch GET 200 https://registry.npmmirror.com/remark-gfm 54ms (cache miss)
+48 silly fetch manifest @types/react-dom@^18.3.0
+49 http fetch GET 200 https://registry.npmmirror.com/@types%2freact-dom 140ms (cache miss)
+50 silly placeDep ROOT @types/react@18.3.28 OK for: stock-decision-console@0.1.0 want: ^18.3.3
+51 silly placeDep ROOT @types/react-dom@18.3.7 OK for: stock-decision-console@0.1.0 want: ^18.3.0
+52 silly placeDep ROOT @vitejs/plugin-react@4.7.0 OK for: stock-decision-console@0.1.0 want: ^4.2.1
+53 silly placeDep ROOT vite@5.4.21 OK for: @vitejs/plugin-react@4.7.0 want: ^4.2.0 || ^5.0.0 || ^6.0.0 || ^7.0.0
+54 silly placeDep ROOT react@18.3.1 OK for: stock-decision-console@0.1.0 want: ^18.3.1
+55 silly placeDep ROOT react-dom@18.3.1 OK for: stock-decision-console@0.1.0 want: ^18.3.1
+56 silly placeDep ROOT react-markdown@9.1.0 OK for: stock-decision-console@0.1.0 want: ^9.0.1
+57 silly placeDep ROOT remark-gfm@4.0.1 OK for: stock-decision-console@0.1.0 want: ^4.0.0
+58 silly placeDep ROOT typescript@5.9.3 OK for: stock-decision-console@0.1.0 want: ^5.5.4
+59 silly fetch manifest @types/prop-types@*
+60 silly fetch manifest csstype@^3.2.2
+61 silly fetch manifest @babel/core@^7.28.0
+62 silly fetch manifest @babel/plugin-transform-react-jsx-self@^7.27.1
+63 silly fetch manifest @babel/plugin-transform-react-jsx-source@^7.27.1
+64 silly fetch manifest @rolldown/pluginutils@1.0.0-beta.27
+65 silly fetch manifest @types/babel__core@^7.20.5
+66 silly fetch manifest react-refresh@^0.17.0
+67 silly fetch manifest esbuild@^0.21.3
+68 silly fetch manifest postcss@^8.4.43
+69 silly fetch manifest rollup@^4.20.0
+70 silly fetch manifest fsevents@~2.3.3
+71 silly fetch manifest loose-envify@^1.1.0
+72 silly fetch manifest scheduler@^0.23.2
+73 silly fetch manifest @types/hast@^3.0.0
+74 http fetch GET 200 https://registry.npmmirror.com/csstype 64ms (cache miss)
+75 silly fetch manifest @types/mdast@^4.0.0
+76 http fetch GET 200 https://registry.npmmirror.com/@types%2fprop-types 144ms (cache miss)
+77 silly fetch manifest devlop@^1.0.0
+78 http fetch GET 200 https://registry.npmmirror.com/@types%2fmdast 83ms (cache miss)
+79 silly fetch manifest hast-util-to-jsx-runtime@^2.0.0
+80 http fetch GET 200 https://registry.npmmirror.com/loose-envify 142ms (cache miss)
+81 silly fetch manifest html-url-attributes@^3.0.0
+82 silly fetch manifest mdast-util-to-hast@^13.0.0
+83 http fetch GET 200 https://registry.npmmirror.com/@types%2fhast 143ms (cache miss)
+84 silly fetch manifest remark-parse@^11.0.0
+85 http fetch GET 200 https://registry.npmmirror.com/@babel%2fplugin-transform-react-jsx-self 165ms (cache miss)
+86 silly fetch manifest remark-rehype@^11.0.0
+87 http fetch GET 200 https://registry.npmmirror.com/@babel%2fplugin-transform-react-jsx-source 174ms (cache miss)
+88 silly fetch manifest unified@^11.0.0
+89 http fetch GET 200 https://registry.npmmirror.com/@types%2fbabel__core 207ms (cache miss)
+90 silly fetch manifest unist-util-visit@^5.0.0
+91 http fetch GET 200 https://registry.npmmirror.com/fsevents 215ms (cache miss)
+92 silly fetch manifest vfile@^6.0.0
+93 http fetch GET 200 https://registry.npmmirror.com/html-url-attributes 76ms (cache miss)
+94 silly fetch manifest mdast-util-gfm@^3.0.0
+95 http fetch GET 200 https://registry.npmmirror.com/devlop 96ms (cache miss)
+96 silly fetch manifest micromark-extension-gfm@^3.0.0
+97 http fetch GET 200 https://registry.npmmirror.com/hast-util-to-jsx-runtime 94ms (cache miss)
+98 http fetch GET 200 https://registry.npmmirror.com/remark-parse 92ms (cache miss)
+99 silly fetch manifest remark-stringify@^11.0.0
+100 http fetch GET 200 https://registry.npmmirror.com/remark-rehype 98ms (cache miss)
+101 http fetch GET 200 https://registry.npmmirror.com/@rolldown%2fpluginutils 271ms (cache miss)
+102 http fetch GET 200 https://registry.npmmirror.com/mdast-util-to-hast 126ms (cache miss)
+103 http fetch GET 200 https://registry.npmmirror.com/unified 117ms (cache miss)
+104 http fetch GET 200 https://registry.npmmirror.com/@babel%2fcore 304ms (cache miss)
+105 http fetch GET 200 https://registry.npmmirror.com/unist-util-visit 102ms (cache miss)
+106 http fetch GET 200 https://registry.npmmirror.com/mdast-util-gfm 84ms (cache miss)
+107 http fetch GET 200 https://registry.npmmirror.com/micromark-extension-gfm 80ms (cache miss)
+108 http fetch GET 200 https://registry.npmmirror.com/vfile 98ms (cache miss)
+109 http fetch GET 200 https://registry.npmmirror.com/remark-stringify 77ms (cache miss)
+110 http fetch GET 200 https://registry.npmmirror.com/esbuild 331ms (cache miss)
+111 http fetch GET 200 https://registry.npmmirror.com/scheduler 412ms (cache miss)
+112 http fetch GET 200 https://registry.npmmirror.com/rollup 473ms (cache miss)
+113 http fetch GET 200 https://registry.npmmirror.com/react-refresh 544ms (cache miss)
+114 silly placeDep ROOT @types/prop-types@15.7.15 OK for: @types/react@18.3.28 want: *
+115 silly placeDep ROOT csstype@3.2.3 OK for: @types/react@18.3.28 want: ^3.2.2
+116 silly placeDep ROOT @babel/core@7.29.0 OK for: @vitejs/plugin-react@4.7.0 want: ^7.28.0
+117 silly placeDep ROOT @babel/plugin-transform-react-jsx-self@7.27.1 OK for: @vitejs/plugin-react@4.7.0 want: ^7.27.1
+118 silly placeDep ROOT @babel/plugin-transform-react-jsx-source@7.27.1 OK for: @vitejs/plugin-react@4.7.0 want: ^7.27.1
+119 silly placeDep ROOT @rolldown/pluginutils@1.0.0-beta.27 OK for: @vitejs/plugin-react@4.7.0 want: 1.0.0-beta.27
+120 silly placeDep ROOT @types/babel__core@7.20.5 OK for: @vitejs/plugin-react@4.7.0 want: ^7.20.5
+121 silly placeDep ROOT react-refresh@0.17.0 OK for: @vitejs/plugin-react@4.7.0 want: ^0.17.0
+122 silly fetch manifest @babel/code-frame@^7.29.0
+123 silly fetch manifest @babel/generator@^7.29.0
+124 silly fetch manifest @babel/helper-compilation-targets@^7.28.6
+125 silly fetch manifest @babel/helper-module-transforms@^7.28.6
+126 silly fetch manifest @babel/helpers@^7.28.6
+127 silly fetch manifest @babel/parser@^7.29.0
+128 silly fetch manifest @babel/template@^7.28.6
+129 silly fetch manifest @babel/traverse@^7.29.0
+130 silly fetch manifest @babel/types@^7.29.0
+131 silly fetch manifest @jridgewell/remapping@^2.3.5
+132 silly fetch manifest convert-source-map@^2.0.0
+133 silly fetch manifest debug@^4.1.0
+134 silly fetch manifest gensync@^1.0.0-beta.2
+135 silly fetch manifest json5@^2.2.3
+136 silly fetch manifest semver@^6.3.1
+137 http fetch GET 200 https://registry.npmmirror.com/gensync 127ms (cache miss)
+138 silly fetch manifest @babel/helper-plugin-utils@^7.27.1
+139 http fetch GET 200 https://registry.npmmirror.com/@jridgewell%2fremapping 131ms (cache miss)
+140 http fetch GET 200 https://registry.npmmirror.com/convert-source-map 135ms (cache miss)
+141 silly fetch manifest @babel/parser@^7.20.7
+142 http fetch GET 200 https://registry.npmmirror.com/@babel%2fcode-frame 143ms (cache miss)
+143 silly fetch manifest @babel/types@^7.20.7
+144 http fetch GET 200 https://registry.npmmirror.com/@babel%2fhelper-compilation-targets 149ms (cache miss)
+145 silly fetch manifest @types/babel__generator@*
+146 http fetch GET 200 https://registry.npmmirror.com/semver 152ms (cache miss)
+147 silly fetch manifest @types/babel__template@*
+148 http fetch GET 200 https://registry.npmmirror.com/@babel%2ftemplate 164ms (cache miss)
+149 silly fetch manifest @types/babel__traverse@*
+150 http fetch GET 200 https://registry.npmmirror.com/debug 165ms (cache miss)
+151 http fetch GET 200 https://registry.npmmirror.com/@babel%2fhelper-module-transforms 184ms (cache miss)
+152 http fetch GET 200 https://registry.npmmirror.com/@babel%2fhelpers 191ms (cache miss)
+153 http fetch GET 200 https://registry.npmmirror.com/@babel%2ftypes 195ms (cache miss)
+154 http fetch GET 200 https://registry.npmmirror.com/@babel%2fgenerator 211ms (cache miss)
+155 http fetch GET 200 https://registry.npmmirror.com/@babel%2ftraverse 212ms (cache miss)
+156 http fetch GET 200 https://registry.npmmirror.com/@babel%2fparser 221ms (cache miss)
+157 http fetch GET 200 https://registry.npmmirror.com/json5 224ms (cache miss)
+158 http fetch GET 200 https://registry.npmmirror.com/@babel%2fhelper-plugin-utils 102ms (cache miss)
+159 http fetch GET 200 https://registry.npmmirror.com/@types%2fbabel__generator 85ms (cache miss)
+160 http fetch GET 200 https://registry.npmmirror.com/@types%2fbabel__template 78ms (cache miss)
+161 http fetch GET 200 https://registry.npmmirror.com/@babel%2ftypes 100ms (cache miss)
+162 http fetch GET 200 https://registry.npmmirror.com/@types%2fbabel__traverse 79ms (cache miss)
+163 http fetch GET 200 https://registry.npmmirror.com/@babel%2fparser 110ms (cache miss)
+164 silly fetch manifest @babel/core@^7.0.0
+165 silly placeDep ROOT @babel/code-frame@7.29.0 OK for: @babel/core@7.29.0 want: ^7.29.0
+166 silly placeDep ROOT @babel/generator@7.29.1 OK for: @babel/core@7.29.0 want: ^7.29.0
+167 silly placeDep ROOT @babel/helper-compilation-targets@7.28.6 OK for: @babel/core@7.29.0 want: ^7.28.6
+168 silly placeDep ROOT @babel/helper-module-transforms@7.28.6 OK for: @babel/core@7.29.0 want: ^7.28.6
+169 silly placeDep ROOT @babel/helpers@7.29.2 OK for: @babel/core@7.29.0 want: ^7.28.6
+170 silly placeDep ROOT @babel/parser@7.29.3 OK for: @babel/core@7.29.0 want: ^7.29.0
+171 silly placeDep ROOT @babel/template@7.28.6 OK for: @babel/core@7.29.0 want: ^7.28.6
+172 silly placeDep ROOT @babel/traverse@7.29.0 OK for: @babel/core@7.29.0 want: ^7.29.0
+173 silly placeDep ROOT @babel/types@7.29.0 OK for: @babel/core@7.29.0 want: ^7.29.0
+174 silly placeDep ROOT @jridgewell/remapping@2.3.5 OK for: @babel/core@7.29.0 want: ^2.3.5
+175 silly placeDep ROOT convert-source-map@2.0.0 OK for: @babel/core@7.29.0 want: ^2.0.0
+176 silly placeDep ROOT debug@4.4.3 OK for: @babel/core@7.29.0 want: ^4.1.0
+177 silly placeDep ROOT gensync@1.0.0-beta.2 OK for: @babel/core@7.29.0 want: ^1.0.0-beta.2
+178 silly placeDep ROOT json5@2.2.3 OK for: @babel/core@7.29.0 want: ^2.2.3
+179 silly placeDep ROOT semver@6.3.1 OK for: @babel/core@7.29.0 want: ^6.3.1
+180 silly fetch manifest @babel/helper-validator-identifier@^7.28.5
+181 silly fetch manifest js-tokens@^4.0.0
+182 silly fetch manifest picocolors@^1.1.1
+183 silly fetch manifest @jridgewell/gen-mapping@^0.3.12
+184 silly fetch manifest @jridgewell/trace-mapping@^0.3.28
+185 silly fetch manifest jsesc@^3.0.2
+186 silly fetch manifest @babel/compat-data@^7.28.6
+187 silly fetch manifest @babel/helper-validator-option@^7.27.1
+188 silly fetch manifest browserslist@^4.24.0
+189 silly fetch manifest lru-cache@^5.1.1
+190 silly fetch manifest @babel/helper-module-imports@^7.28.6
+191 silly fetch manifest @babel/traverse@^7.28.6
+192 silly fetch manifest @babel/types@^7.28.6
+193 silly fetch manifest @babel/helper-globals@^7.28.0
+194 silly fetch manifest debug@^4.3.1
+195 silly fetch manifest @babel/helper-string-parser@^7.27.1
+196 http fetch GET 200 https://registry.npmmirror.com/js-tokens 95ms (cache miss)
+197 silly fetch manifest @jridgewell/gen-mapping@^0.3.5
+198 http fetch GET 200 https://registry.npmmirror.com/jsesc 96ms (cache miss)
+199 silly fetch manifest @jridgewell/trace-mapping@^0.3.24
+200 http fetch GET 200 https://registry.npmmirror.com/picocolors 101ms (cache miss)
+201 silly fetch manifest ms@^2.1.3
+202 http fetch GET 200 https://registry.npmmirror.com/@babel%2fhelper-string-parser 94ms (cache miss)
+203 http fetch GET 200 https://registry.npmmirror.com/@babel%2fhelper-validator-identifier 109ms (cache miss)
+204 http fetch GET 200 https://registry.npmmirror.com/@jridgewell%2ftrace-mapping 109ms (cache miss)
+205 http fetch GET 200 https://registry.npmmirror.com/@babel%2fhelper-globals 104ms (cache miss)
+206 http fetch GET 200 https://registry.npmmirror.com/@jridgewell%2fgen-mapping 113ms (cache miss)
+207 http fetch GET 200 https://registry.npmmirror.com/@babel%2fhelper-validator-option 112ms (cache miss)
+208 http fetch GET 200 https://registry.npmmirror.com/@babel%2fhelper-module-imports 113ms (cache miss)
+209 http fetch GET 200 https://registry.npmmirror.com/@babel%2fcompat-data 121ms (cache miss)
+210 http fetch GET 200 https://registry.npmmirror.com/@jridgewell%2ftrace-mapping 40ms (cache hit)
+211 http fetch GET 200 https://registry.npmmirror.com/browserslist 140ms (cache miss)
+212 http fetch GET 200 https://registry.npmmirror.com/lru-cache 147ms (cache miss)
+213 http fetch GET 200 https://registry.npmmirror.com/@jridgewell%2fgen-mapping 64ms (cache miss)
+214 http fetch GET 200 https://registry.npmmirror.com/ms 63ms (cache miss)
+215 silly placeDep ROOT @babel/helper-validator-identifier@7.28.5 OK for: @babel/code-frame@7.29.0 want: ^7.28.5
+216 silly placeDep ROOT js-tokens@4.0.0 OK for: @babel/code-frame@7.29.0 want: ^4.0.0
+217 silly placeDep ROOT picocolors@1.1.1 OK for: @babel/code-frame@7.29.0 want: ^1.1.1
+218 silly placeDep ROOT @jridgewell/gen-mapping@0.3.13 OK for: @babel/generator@7.29.1 want: ^0.3.12
+219 silly placeDep ROOT @jridgewell/trace-mapping@0.3.31 OK for: @babel/generator@7.29.1 want: ^0.3.28
+220 silly placeDep ROOT jsesc@3.1.0 OK for: @babel/generator@7.29.1 want: ^3.0.2
+221 silly fetch manifest @jridgewell/sourcemap-codec@^1.5.0
+222 silly fetch manifest @jridgewell/resolve-uri@^3.1.0
+223 silly fetch manifest @jridgewell/sourcemap-codec@^1.4.14
+224 http fetch GET 200 https://registry.npmmirror.com/@jridgewell%2fsourcemap-codec 41ms (cache miss)
+225 http fetch GET 200 https://registry.npmmirror.com/@jridgewell%2fsourcemap-codec 42ms (cache miss)
+226 http fetch GET 200 https://registry.npmmirror.com/@jridgewell%2fresolve-uri 59ms (cache miss)
+227 silly placeDep ROOT @babel/compat-data@7.29.3 OK for: @babel/helper-compilation-targets@7.28.6 want: ^7.28.6
+228 silly placeDep ROOT @babel/helper-validator-option@7.27.1 OK for: @babel/helper-compilation-targets@7.28.6 want: ^7.27.1
+229 silly placeDep ROOT browserslist@4.28.2 OK for: @babel/helper-compilation-targets@7.28.6 want: ^4.24.0
+230 silly placeDep ROOT lru-cache@5.1.1 OK for: @babel/helper-compilation-targets@7.28.6 want: ^5.1.1
+231 silly fetch manifest baseline-browser-mapping@^2.10.12
+232 silly fetch manifest caniuse-lite@^1.0.30001782
+233 silly fetch manifest electron-to-chromium@^1.5.328
+234 silly fetch manifest node-releases@^2.0.36
+235 silly fetch manifest update-browserslist-db@^1.2.3
+236 silly fetch manifest yallist@^3.0.2
+237 http fetch GET 200 https://registry.npmmirror.com/update-browserslist-db 47ms (cache miss)
+238 http fetch GET 200 https://registry.npmmirror.com/node-releases 54ms (cache miss)
+239 http fetch GET 200 https://registry.npmmirror.com/baseline-browser-mapping 62ms (cache miss)
+240 http fetch GET 200 https://registry.npmmirror.com/yallist 102ms (cache miss)
+241 http fetch GET 200 https://registry.npmmirror.com/electron-to-chromium 170ms (cache miss)
+242 http fetch GET 200 https://registry.npmmirror.com/caniuse-lite 215ms (cache miss)
+243 silly placeDep ROOT @babel/helper-module-imports@7.28.6 OK for: @babel/helper-module-transforms@7.28.6 want: ^7.28.6
+244 silly placeDep ROOT @babel/helper-plugin-utils@7.28.6 OK for: @babel/plugin-transform-react-jsx-self@7.27.1 want: ^7.27.1
+245 silly placeDep ROOT @babel/helper-globals@7.28.0 OK for: @babel/traverse@7.29.0 want: ^7.28.0
+246 silly placeDep ROOT @babel/helper-string-parser@7.27.1 OK for: @babel/types@7.29.0 want: ^7.27.1
+247 silly placeDep ROOT @jridgewell/sourcemap-codec@1.5.5 OK for: @jridgewell/gen-mapping@0.3.13 want: ^1.5.0
+248 silly placeDep ROOT @jridgewell/resolve-uri@3.1.2 OK for: @jridgewell/trace-mapping@0.3.31 want: ^3.1.0
+249 silly placeDep ROOT @types/babel__generator@7.27.0 OK for: @types/babel__core@7.20.5 want: *
+250 silly placeDep ROOT @types/babel__template@7.4.4 OK for: @types/babel__core@7.20.5 want: *
+251 silly placeDep ROOT @types/babel__traverse@7.28.0 OK for: @types/babel__core@7.20.5 want: *
+252 silly fetch manifest browserslist@>= 4.21.0
+253 silly placeDep ROOT baseline-browser-mapping@2.10.29 OK for: browserslist@4.28.2 want: ^2.10.12
+254 silly placeDep ROOT caniuse-lite@1.0.30001792 OK for: browserslist@4.28.2 want: ^1.0.30001782
+255 silly placeDep ROOT electron-to-chromium@1.5.353 OK for: browserslist@4.28.2 want: ^1.5.328
+256 silly placeDep ROOT node-releases@2.0.44 OK for: browserslist@4.28.2 want: ^2.0.36
+257 silly placeDep ROOT update-browserslist-db@1.2.3 OK for: browserslist@4.28.2 want: ^1.2.3
+258 silly fetch manifest escalade@^3.2.0
+259 http fetch GET 200 https://registry.npmmirror.com/escalade 33ms (cache miss)
+260 silly placeDep ROOT ms@2.1.3 OK for: debug@4.4.3 want: ^2.1.3
+261 silly placeDep ROOT yallist@3.1.1 OK for: lru-cache@5.1.1 want: ^3.0.2
+262 silly placeDep ROOT loose-envify@1.4.0 OK for: react@18.3.1 want: ^1.1.0
+263 silly placeDep ROOT scheduler@0.23.2 OK for: react-dom@18.3.1 want: ^0.23.2
+264 silly placeDep ROOT @types/hast@3.0.4 OK for: react-markdown@9.1.0 want: ^3.0.0
+265 silly placeDep ROOT @types/mdast@4.0.4 OK for: react-markdown@9.1.0 want: ^4.0.0
+266 silly placeDep ROOT devlop@1.1.0 OK for: react-markdown@9.1.0 want: ^1.0.0
+267 silly placeDep ROOT hast-util-to-jsx-runtime@2.3.6 OK for: react-markdown@9.1.0 want: ^2.0.0
+268 silly placeDep ROOT html-url-attributes@3.0.1 OK for: react-markdown@9.1.0 want: ^3.0.0
+269 silly placeDep ROOT mdast-util-to-hast@13.2.1 OK for: react-markdown@9.1.0 want: ^13.0.0
+270 silly placeDep ROOT remark-parse@11.0.0 OK for: react-markdown@9.1.0 want: ^11.0.0
+271 silly placeDep ROOT remark-rehype@11.1.2 OK for: react-markdown@9.1.0 want: ^11.0.0
+272 silly placeDep ROOT unified@11.0.5 OK for: react-markdown@9.1.0 want: ^11.0.0
+273 silly placeDep ROOT unist-util-visit@5.1.0 OK for: react-markdown@9.1.0 want: ^5.0.0
+274 silly placeDep ROOT vfile@6.0.3 OK for: react-markdown@9.1.0 want: ^6.0.0
+275 silly fetch manifest @types/unist@*
+276 silly fetch manifest dequal@^2.0.0
+277 silly fetch manifest @types/estree@^1.0.0
+278 silly fetch manifest @types/unist@^3.0.0
+279 silly fetch manifest comma-separated-tokens@^2.0.0
+280 silly fetch manifest estree-util-is-identifier-name@^3.0.0
+281 silly fetch manifest hast-util-whitespace@^3.0.0
+282 silly fetch manifest mdast-util-mdx-expression@^2.0.0
+283 silly fetch manifest mdast-util-mdx-jsx@^3.0.0
+284 silly fetch manifest mdast-util-mdxjs-esm@^2.0.0
+285 silly fetch manifest property-information@^7.0.0
+286 silly fetch manifest space-separated-tokens@^2.0.0
+287 silly fetch manifest style-to-js@^1.0.0
+288 silly fetch manifest unist-util-position@^5.0.0
+289 http fetch GET 200 https://registry.npmmirror.com/dequal 105ms (cache miss)
+290 silly fetch manifest vfile-message@^4.0.0
+291 http fetch GET 200 https://registry.npmmirror.com/estree-util-is-identifier-name 100ms (cache miss)
+292 silly fetch manifest @ungap/structured-clone@^1.0.0
+293 http fetch GET 200 https://registry.npmmirror.com/@types%2festree 104ms (cache miss)
+294 silly fetch manifest micromark-util-sanitize-uri@^2.0.0
+295 http fetch GET 200 https://registry.npmmirror.com/@types%2funist 106ms (cache miss)
+296 silly fetch manifest trim-lines@^3.0.0
+297 http fetch GET 200 https://registry.npmmirror.com/comma-separated-tokens 108ms (cache miss)
+298 http fetch GET 200 https://registry.npmmirror.com/hast-util-whitespace 109ms (cache miss)
+299 silly fetch manifest mdast-util-from-markdown@^2.0.0
+300 http fetch GET 200 https://registry.npmmirror.com/mdast-util-mdxjs-esm 109ms (cache miss)
+301 silly fetch manifest micromark-util-types@^2.0.0
+302 http fetch GET 200 https://registry.npmmirror.com/style-to-js 110ms (cache miss)
+303 silly fetch manifest bail@^2.0.0
+304 http fetch GET 200 https://registry.npmmirror.com/@types%2funist 127ms (cache miss)
+305 silly fetch manifest extend@^3.0.0
+306 silly fetch manifest is-plain-obj@^4.0.0
+307 http fetch GET 200 https://registry.npmmirror.com/space-separated-tokens 119ms (cache miss)
+308 silly fetch manifest trough@^2.0.0
+309 http fetch GET 200 https://registry.npmmirror.com/mdast-util-mdx-expression 124ms (cache miss)
+310 silly fetch manifest unist-util-is@^6.0.0
+311 http fetch GET 200 https://registry.npmmirror.com/unist-util-position 132ms (cache miss)
+312 silly fetch manifest unist-util-visit-parents@^6.0.0
+313 http fetch GET 200 https://registry.npmmirror.com/mdast-util-mdx-jsx 142ms (cache miss)
+314 http fetch GET 200 https://registry.npmmirror.com/property-information 160ms (cache miss)
+315 http fetch GET 200 https://registry.npmmirror.com/micromark-util-sanitize-uri 84ms (cache miss)
+316 http fetch GET 200 https://registry.npmmirror.com/micromark-util-types 77ms (cache miss)
+317 http fetch GET 200 https://registry.npmmirror.com/is-plain-obj 73ms (cache miss)
+318 http fetch GET 200 https://registry.npmmirror.com/@ungap%2fstructured-clone 90ms (cache miss)
+319 http fetch GET 200 https://registry.npmmirror.com/trim-lines 87ms (cache miss)
+320 http fetch GET 200 https://registry.npmmirror.com/bail 78ms (cache miss)
+321 http fetch GET 200 https://registry.npmmirror.com/vfile-message 98ms (cache miss)
+322 http fetch GET 200 https://registry.npmmirror.com/extend 80ms (cache miss)
+323 http fetch GET 200 https://registry.npmmirror.com/unist-util-is 73ms (cache miss)
+324 http fetch GET 200 https://registry.npmmirror.com/mdast-util-from-markdown 91ms (cache miss)
+325 http fetch GET 200 https://registry.npmmirror.com/trough 83ms (cache miss)
+326 http fetch GET 200 https://registry.npmmirror.com/unist-util-visit-parents 70ms (cache miss)
+327 silly placeDep ROOT @types/unist@3.0.3 OK for: @types/hast@3.0.4 want: *
+328 silly placeDep ROOT dequal@2.0.3 OK for: devlop@1.1.0 want: ^2.0.0
+329 silly placeDep ROOT @types/estree@1.0.9 OK for: hast-util-to-jsx-runtime@2.3.6 want: ^1.0.0
+330 silly placeDep ROOT comma-separated-tokens@2.0.3 OK for: hast-util-to-jsx-runtime@2.3.6 want: ^2.0.0
+331 silly placeDep ROOT estree-util-is-identifier-name@3.0.0 OK for: hast-util-to-jsx-runtime@2.3.6 want: ^3.0.0
+332 silly placeDep ROOT hast-util-whitespace@3.0.0 OK for: hast-util-to-jsx-runtime@2.3.6 want: ^3.0.0
+333 silly placeDep ROOT mdast-util-mdx-expression@2.0.1 OK for: hast-util-to-jsx-runtime@2.3.6 want: ^2.0.0
+334 silly placeDep ROOT mdast-util-mdx-jsx@3.2.0 OK for: hast-util-to-jsx-runtime@2.3.6 want: ^3.0.0
+335 silly placeDep ROOT mdast-util-mdxjs-esm@2.0.1 OK for: hast-util-to-jsx-runtime@2.3.6 want: ^2.0.0
+336 silly placeDep ROOT property-information@7.1.0 OK for: hast-util-to-jsx-runtime@2.3.6 want: ^7.0.0
+337 silly placeDep ROOT space-separated-tokens@2.0.2 OK for: hast-util-to-jsx-runtime@2.3.6 want: ^2.0.0
+338 silly placeDep ROOT style-to-js@1.1.21 OK for: hast-util-to-jsx-runtime@2.3.6 want: ^1.0.0
+339 silly placeDep ROOT unist-util-position@5.0.0 OK for: hast-util-to-jsx-runtime@2.3.6 want: ^5.0.0
+340 silly placeDep ROOT vfile-message@4.0.3 OK for: hast-util-to-jsx-runtime@2.3.6 want: ^4.0.0
+341 silly fetch manifest @types/estree-jsx@^1.0.0
+342 silly fetch manifest mdast-util-to-markdown@^2.0.0
+343 silly fetch manifest ccount@^2.0.0
+344 silly fetch manifest parse-entities@^4.0.0
+345 silly fetch manifest stringify-entities@^4.0.0
+346 silly fetch manifest unist-util-stringify-position@^4.0.0
+347 silly fetch manifest style-to-object@1.0.14
+348 http fetch GET 200 https://registry.npmmirror.com/@types%2festree-jsx 58ms (cache miss)
+349 http fetch GET 200 https://registry.npmmirror.com/unist-util-stringify-position 55ms (cache miss)
+350 http fetch GET 200 https://registry.npmmirror.com/ccount 59ms (cache miss)
+351 http fetch GET 200 https://registry.npmmirror.com/parse-entities 60ms (cache miss)
+352 http fetch GET 200 https://registry.npmmirror.com/stringify-entities 62ms (cache miss)
+353 http fetch GET 200 https://registry.npmmirror.com/mdast-util-to-markdown 66ms (cache miss)
+354 http fetch GET 200 https://registry.npmmirror.com/style-to-object 95ms (cache miss)
+355 silly placeDep ROOT @types/estree-jsx@1.0.5 OK for: mdast-util-mdx-expression@2.0.1 want: ^1.0.0
+356 silly placeDep ROOT mdast-util-from-markdown@2.0.3 OK for: mdast-util-mdx-expression@2.0.1 want: ^2.0.0
+357 silly placeDep ROOT mdast-util-to-markdown@2.1.2 OK for: mdast-util-mdx-expression@2.0.1 want: ^2.0.0
+358 silly fetch manifest decode-named-character-reference@^1.0.0
+359 silly fetch manifest mdast-util-to-string@^4.0.0
+360 silly fetch manifest micromark@^4.0.0
+361 silly fetch manifest micromark-util-decode-numeric-character-reference@^2.0.0
+362 silly fetch manifest micromark-util-decode-string@^2.0.0
+363 silly fetch manifest micromark-util-normalize-identifier@^2.0.0
+364 silly fetch manifest micromark-util-symbol@^2.0.0
+365 silly fetch manifest longest-streak@^3.0.0
+366 silly fetch manifest mdast-util-phrasing@^4.0.0
+367 silly fetch manifest micromark-util-classify-character@^2.0.0
+368 silly fetch manifest zwitch@^2.0.0
+369 http fetch GET 200 https://registry.npmmirror.com/mdast-util-to-string 73ms (cache miss)
+370 http fetch GET 200 https://registry.npmmirror.com/micromark-util-symbol 75ms (cache miss)
+371 http fetch GET 200 https://registry.npmmirror.com/micromark-util-decode-string 79ms (cache miss)
+372 http fetch GET 200 https://registry.npmmirror.com/zwitch 76ms (cache miss)
+373 http fetch GET 200 https://registry.npmmirror.com/micromark-util-normalize-identifier 80ms (cache miss)
+374 http fetch GET 200 https://registry.npmmirror.com/mdast-util-phrasing 79ms (cache miss)
+375 http fetch GET 200 https://registry.npmmirror.com/micromark-util-decode-numeric-character-reference 83ms (cache miss)
+376 http fetch GET 200 https://registry.npmmirror.com/micromark-util-classify-character 79ms (cache miss)
+377 http fetch GET 200 https://registry.npmmirror.com/decode-named-character-reference 85ms (cache miss)
+378 http fetch GET 200 https://registry.npmmirror.com/micromark 85ms (cache miss)
+379 http fetch GET 200 https://registry.npmmirror.com/longest-streak 85ms (cache miss)
+380 silly placeDep ROOT decode-named-character-reference@1.3.0 OK for: mdast-util-from-markdown@2.0.3 want: ^1.0.0
+381 silly placeDep ROOT mdast-util-to-string@4.0.0 OK for: mdast-util-from-markdown@2.0.3 want: ^4.0.0
+382 silly placeDep ROOT micromark@4.0.2 OK for: mdast-util-from-markdown@2.0.3 want: ^4.0.0
+383 silly placeDep ROOT micromark-util-decode-numeric-character-reference@2.0.2 OK for: mdast-util-from-markdown@2.0.3 want: ^2.0.0
+384 silly placeDep ROOT micromark-util-decode-string@2.0.1 OK for: mdast-util-from-markdown@2.0.3 want: ^2.0.0
+385 silly placeDep ROOT micromark-util-normalize-identifier@2.0.1 OK for: mdast-util-from-markdown@2.0.3 want: ^2.0.0
+386 silly placeDep ROOT micromark-util-symbol@2.0.1 OK for: mdast-util-from-markdown@2.0.3 want: ^2.0.0
+387 silly placeDep ROOT micromark-util-types@2.0.2 OK for: mdast-util-from-markdown@2.0.3 want: ^2.0.0
+388 silly placeDep ROOT unist-util-stringify-position@4.0.0 OK for: mdast-util-from-markdown@2.0.3 want: ^4.0.0
+389 silly fetch manifest character-entities@^2.0.0
+390 silly fetch manifest @types/debug@^4.0.0
+391 silly fetch manifest micromark-core-commonmark@^2.0.0
+392 silly fetch manifest micromark-factory-space@^2.0.0
+393 silly fetch manifest micromark-util-character@^2.0.0
+394 silly fetch manifest micromark-util-chunked@^2.0.0
+395 silly fetch manifest micromark-util-combine-extensions@^2.0.0
+396 silly fetch manifest micromark-util-encode@^2.0.0
+397 silly fetch manifest micromark-util-resolve-all@^2.0.0
+398 silly fetch manifest micromark-util-subtokenize@^2.0.0
+399 http fetch GET 200 https://registry.npmmirror.com/character-entities 75ms (cache miss)
+400 http fetch GET 200 https://registry.npmmirror.com/micromark-util-character 74ms (cache miss)
+401 http fetch GET 200 https://registry.npmmirror.com/micromark-factory-space 80ms (cache miss)
+402 http fetch GET 200 https://registry.npmmirror.com/micromark-util-combine-extensions 79ms (cache miss)
+403 http fetch GET 200 https://registry.npmmirror.com/micromark-util-subtokenize 74ms (cache miss)
+404 http fetch GET 200 https://registry.npmmirror.com/micromark-util-chunked 82ms (cache miss)
+405 http fetch GET 200 https://registry.npmmirror.com/micromark-util-resolve-all 78ms (cache miss)
+406 http fetch GET 200 https://registry.npmmirror.com/micromark-core-commonmark 87ms (cache miss)
+407 http fetch GET 200 https://registry.npmmirror.com/@types%2fdebug 89ms (cache miss)
+408 http fetch GET 200 https://registry.npmmirror.com/micromark-util-encode 83ms (cache miss)
+409 silly placeDep ROOT character-entities@2.0.2 OK for: decode-named-character-reference@1.3.0 want: ^2.0.0
+410 silly placeDep ROOT ccount@2.0.1 OK for: mdast-util-mdx-jsx@3.2.0 want: ^2.0.0
+411 silly placeDep ROOT parse-entities@4.0.2 OK for: mdast-util-mdx-jsx@3.2.0 want: ^4.0.0
+412 silly placeDep ROOT stringify-entities@4.0.4 OK for: mdast-util-mdx-jsx@3.2.0 want: ^4.0.0
+413 silly fetch manifest @types/unist@^2.0.0
+414 silly fetch manifest character-entities-legacy@^3.0.0
+415 silly fetch manifest character-reference-invalid@^2.0.0
+416 silly fetch manifest is-alphanumerical@^2.0.0
+417 silly fetch manifest is-decimal@^2.0.0
+418 silly fetch manifest is-hexadecimal@^2.0.0
+419 silly fetch manifest character-entities-html4@^2.0.0
+420 http fetch GET 200 https://registry.npmmirror.com/character-reference-invalid 52ms (cache miss)
+421 http fetch GET 200 https://registry.npmmirror.com/character-entities-html4 55ms (cache miss)
+422 http fetch GET 200 https://registry.npmmirror.com/is-alphanumerical 59ms (cache miss)
+423 http fetch GET 200 https://registry.npmmirror.com/is-decimal 59ms (cache miss)
+424 http fetch GET 200 https://registry.npmmirror.com/character-entities-legacy 62ms (cache miss)
+425 http fetch GET 200 https://registry.npmmirror.com/is-hexadecimal 60ms (cache miss)
+426 silly placeDep ROOT @ungap/structured-clone@1.3.1 OK for: mdast-util-to-hast@13.2.1 want: ^1.0.0
+427 silly placeDep ROOT micromark-util-sanitize-uri@2.0.1 OK for: mdast-util-to-hast@13.2.1 want: ^2.0.0
+428 silly placeDep ROOT trim-lines@3.0.1 OK for: mdast-util-to-hast@13.2.1 want: ^3.0.0
+429 silly placeDep ROOT longest-streak@3.1.0 OK for: mdast-util-to-markdown@2.1.2 want: ^3.0.0
+430 silly placeDep ROOT mdast-util-phrasing@4.1.0 OK for: mdast-util-to-markdown@2.1.2 want: ^4.0.0
+431 silly placeDep ROOT micromark-util-classify-character@2.0.1 OK for: mdast-util-to-markdown@2.1.2 want: ^2.0.0
+432 silly placeDep ROOT zwitch@2.0.4 OK for: mdast-util-to-markdown@2.1.2 want: ^2.0.0
+433 silly placeDep ROOT unist-util-is@6.0.1 OK for: mdast-util-phrasing@4.1.0 want: ^6.0.0
+434 silly placeDep ROOT @types/debug@4.1.13 OK for: micromark@4.0.2 want: ^4.0.0
+435 silly placeDep ROOT micromark-core-commonmark@2.0.3 OK for: micromark@4.0.2 want: ^2.0.0
+436 silly placeDep ROOT micromark-factory-space@2.0.1 OK for: micromark@4.0.2 want: ^2.0.0
+437 silly placeDep ROOT micromark-util-character@2.1.1 OK for: micromark@4.0.2 want: ^2.0.0
+438 silly placeDep ROOT micromark-util-chunked@2.0.1 OK for: micromark@4.0.2 want: ^2.0.0
+439 silly placeDep ROOT micromark-util-combine-extensions@2.0.1 OK for: micromark@4.0.2 want: ^2.0.0
+440 silly placeDep ROOT micromark-util-encode@2.0.1 OK for: micromark@4.0.2 want: ^2.0.0
+441 silly placeDep ROOT micromark-util-resolve-all@2.0.1 OK for: micromark@4.0.2 want: ^2.0.0
+442 silly placeDep ROOT micromark-util-subtokenize@2.1.0 OK for: micromark@4.0.2 want: ^2.0.0
+443 silly fetch manifest @types/ms@*
+444 silly fetch manifest micromark-factory-destination@^2.0.0
+445 silly fetch manifest micromark-factory-label@^2.0.0
+446 silly fetch manifest micromark-factory-title@^2.0.0
+447 silly fetch manifest micromark-factory-whitespace@^2.0.0
+448 silly fetch manifest micromark-util-html-tag-name@^2.0.0
+449 http fetch GET 200 https://registry.npmmirror.com/micromark-factory-whitespace 49ms (cache miss)
+450 http fetch GET 200 https://registry.npmmirror.com/micromark-factory-destination 53ms (cache miss)
+451 http fetch GET 200 https://registry.npmmirror.com/micromark-util-html-tag-name 51ms (cache miss)
+452 http fetch GET 200 https://registry.npmmirror.com/micromark-factory-title 53ms (cache miss)
+453 http fetch GET 200 https://registry.npmmirror.com/@types%2fms 57ms (cache miss)
+454 http fetch GET 200 https://registry.npmmirror.com/micromark-factory-label 57ms (cache miss)
+455 silly placeDep ROOT @types/ms@2.1.0 OK for: @types/debug@4.1.13 want: *
+456 silly placeDep ROOT micromark-factory-destination@2.0.1 OK for: micromark-core-commonmark@2.0.3 want: ^2.0.0
+457 silly placeDep ROOT micromark-factory-label@2.0.1 OK for: micromark-core-commonmark@2.0.3 want: ^2.0.0
+458 silly placeDep ROOT micromark-factory-title@2.0.1 OK for: micromark-core-commonmark@2.0.3 want: ^2.0.0
+459 silly placeDep ROOT micromark-factory-whitespace@2.0.1 OK for: micromark-core-commonmark@2.0.3 want: ^2.0.0
+460 silly placeDep ROOT micromark-util-html-tag-name@2.0.1 OK for: micromark-core-commonmark@2.0.3 want: ^2.0.0
+461 silly placeDep node_modules/parse-entities @types/unist@2.0.11 OK for: parse-entities@4.0.2 want: ^2.0.0
+462 silly placeDep ROOT character-entities-legacy@3.0.0 OK for: parse-entities@4.0.2 want: ^3.0.0
+463 silly placeDep ROOT character-reference-invalid@2.0.1 OK for: parse-entities@4.0.2 want: ^2.0.0
+464 silly placeDep ROOT is-alphanumerical@2.0.1 OK for: parse-entities@4.0.2 want: ^2.0.0
+465 silly placeDep ROOT is-decimal@2.0.1 OK for: parse-entities@4.0.2 want: ^2.0.0
+466 silly placeDep ROOT is-hexadecimal@2.0.1 OK for: parse-entities@4.0.2 want: ^2.0.0
+467 silly fetch manifest is-alphabetical@^2.0.0
+468 http fetch GET 200 https://registry.npmmirror.com/is-alphabetical 41ms (cache miss)
+469 silly placeDep ROOT is-alphabetical@2.0.1 OK for: is-alphanumerical@2.0.1 want: ^2.0.0
+470 silly placeDep ROOT mdast-util-gfm@3.1.0 OK for: remark-gfm@4.0.1 want: ^3.0.0
+471 silly placeDep ROOT micromark-extension-gfm@3.0.0 OK for: remark-gfm@4.0.1 want: ^3.0.0
+472 silly placeDep ROOT remark-stringify@11.0.0 OK for: remark-gfm@4.0.1 want: ^11.0.0
+473 silly fetch manifest mdast-util-gfm-autolink-literal@^2.0.0
+474 silly fetch manifest mdast-util-gfm-footnote@^2.0.0
+475 silly fetch manifest mdast-util-gfm-strikethrough@^2.0.0
+476 silly fetch manifest mdast-util-gfm-table@^2.0.0
+477 silly fetch manifest mdast-util-gfm-task-list-item@^2.0.0
+478 silly fetch manifest micromark-extension-gfm-autolink-literal@^2.0.0
+479 silly fetch manifest micromark-extension-gfm-footnote@^2.0.0
+480 silly fetch manifest micromark-extension-gfm-strikethrough@^2.0.0
+481 silly fetch manifest micromark-extension-gfm-table@^2.0.0
+482 silly fetch manifest micromark-extension-gfm-tagfilter@^2.0.0
+483 silly fetch manifest micromark-extension-gfm-task-list-item@^2.0.0
+484 http fetch GET 200 https://registry.npmmirror.com/micromark-extension-gfm-task-list-item 74ms (cache miss)
+485 http fetch GET 200 https://registry.npmmirror.com/mdast-util-gfm-strikethrough 81ms (cache miss)
+486 http fetch GET 200 https://registry.npmmirror.com/mdast-util-gfm-table 81ms (cache miss)
+487 http fetch GET 200 https://registry.npmmirror.com/micromark-extension-gfm-tagfilter 78ms (cache miss)
+488 http fetch GET 200 https://registry.npmmirror.com/mdast-util-gfm-footnote 84ms (cache miss)
+489 http fetch GET 200 https://registry.npmmirror.com/micromark-extension-gfm-footnote 81ms (cache miss)
+490 http fetch GET 200 https://registry.npmmirror.com/micromark-extension-gfm-strikethrough 81ms (cache miss)
+491 http fetch GET 200 https://registry.npmmirror.com/mdast-util-gfm-autolink-literal 88ms (cache miss)
+492 http fetch GET 200 https://registry.npmmirror.com/mdast-util-gfm-task-list-item 87ms (cache miss)
+493 http fetch GET 200 https://registry.npmmirror.com/micromark-extension-gfm-table 86ms (cache miss)
+494 http fetch GET 200 https://registry.npmmirror.com/micromark-extension-gfm-autolink-literal 90ms (cache miss)
+495 silly placeDep ROOT mdast-util-gfm-autolink-literal@2.0.1 OK for: mdast-util-gfm@3.1.0 want: ^2.0.0
+496 silly placeDep ROOT mdast-util-gfm-footnote@2.1.0 OK for: mdast-util-gfm@3.1.0 want: ^2.0.0
+497 silly placeDep ROOT mdast-util-gfm-strikethrough@2.0.0 OK for: mdast-util-gfm@3.1.0 want: ^2.0.0
+498 silly placeDep ROOT mdast-util-gfm-table@2.0.0 OK for: mdast-util-gfm@3.1.0 want: ^2.0.0
+499 silly placeDep ROOT mdast-util-gfm-task-list-item@2.0.0 OK for: mdast-util-gfm@3.1.0 want: ^2.0.0
+500 silly fetch manifest mdast-util-find-and-replace@^3.0.0
+501 silly fetch manifest markdown-table@^3.0.0
+502 http fetch GET 200 https://registry.npmmirror.com/mdast-util-find-and-replace 36ms (cache miss)
+503 http fetch GET 200 https://registry.npmmirror.com/markdown-table 43ms (cache miss)
+504 silly placeDep ROOT mdast-util-find-and-replace@3.0.2 OK for: mdast-util-gfm-autolink-literal@2.0.1 want: ^3.0.0
+505 silly fetch manifest escape-string-regexp@^5.0.0
+506 http fetch GET 200 https://registry.npmmirror.com/escape-string-regexp 40ms (cache miss)
+507 silly placeDep ROOT escape-string-regexp@5.0.0 OK for: mdast-util-find-and-replace@3.0.2 want: ^5.0.0
+508 silly placeDep ROOT unist-util-visit-parents@6.0.2 OK for: mdast-util-find-and-replace@3.0.2 want: ^6.0.0
+509 silly placeDep ROOT markdown-table@3.0.4 OK for: mdast-util-gfm-table@2.0.0 want: ^3.0.0
+510 silly placeDep ROOT micromark-extension-gfm-autolink-literal@2.1.0 OK for: micromark-extension-gfm@3.0.0 want: ^2.0.0
+511 silly placeDep ROOT micromark-extension-gfm-footnote@2.1.0 OK for: micromark-extension-gfm@3.0.0 want: ^2.0.0
+512 silly placeDep ROOT micromark-extension-gfm-strikethrough@2.1.0 OK for: micromark-extension-gfm@3.0.0 want: ^2.0.0
+513 silly placeDep ROOT micromark-extension-gfm-table@2.1.1 OK for: micromark-extension-gfm@3.0.0 want: ^2.0.0
+514 silly placeDep ROOT micromark-extension-gfm-tagfilter@2.0.0 OK for: micromark-extension-gfm@3.0.0 want: ^2.0.0
+515 silly placeDep ROOT micromark-extension-gfm-task-list-item@2.1.0 OK for: micromark-extension-gfm@3.0.0 want: ^2.0.0
+516 silly placeDep ROOT character-entities-html4@2.1.0 OK for: stringify-entities@4.0.4 want: ^2.0.0
+517 silly placeDep ROOT style-to-object@1.0.14 OK for: style-to-js@1.1.21 want: 1.0.14
+518 silly fetch manifest inline-style-parser@0.2.7
+519 http fetch GET 200 https://registry.npmmirror.com/inline-style-parser 52ms (cache miss)
+520 silly placeDep ROOT inline-style-parser@0.2.7 OK for: style-to-object@1.0.14 want: 0.2.7
+521 silly placeDep ROOT bail@2.0.2 OK for: unified@11.0.5 want: ^2.0.0
+522 silly placeDep ROOT extend@3.0.2 OK for: unified@11.0.5 want: ^3.0.0
+523 silly placeDep ROOT is-plain-obj@4.1.0 OK for: unified@11.0.5 want: ^4.0.0
+524 silly placeDep ROOT trough@2.2.0 OK for: unified@11.0.5 want: ^2.0.0
+525 silly placeDep ROOT escalade@3.2.0 OK for: update-browserslist-db@1.2.3 want: ^3.2.0
+526 silly placeDep ROOT esbuild@0.21.5 OK for: vite@5.4.21 want: ^0.21.3
+527 silly placeDep ROOT fsevents@2.3.3 OK for: vite@5.4.21 want: ~2.3.3
+528 silly placeDep ROOT postcss@8.5.14 OK for: vite@5.4.21 want: ^8.4.43
+529 silly placeDep ROOT rollup@4.60.3 OK for: vite@5.4.21 want: ^4.20.0
+530 silly fetch manifest @esbuild/aix-ppc64@0.21.5
+531 silly fetch manifest @esbuild/android-arm@0.21.5
+532 silly fetch manifest @esbuild/android-arm64@0.21.5
+533 silly fetch manifest @esbuild/android-x64@0.21.5
+534 silly fetch manifest @esbuild/darwin-arm64@0.21.5
+535 silly fetch manifest @esbuild/darwin-x64@0.21.5
+536 silly fetch manifest @esbuild/freebsd-arm64@0.21.5
+537 silly fetch manifest @esbuild/freebsd-x64@0.21.5
+538 silly fetch manifest @esbuild/linux-arm@0.21.5
+539 silly fetch manifest @esbuild/linux-arm64@0.21.5
+540 silly fetch manifest @esbuild/linux-ia32@0.21.5
+541 silly fetch manifest @esbuild/linux-loong64@0.21.5
+542 silly fetch manifest @esbuild/linux-mips64el@0.21.5
+543 silly fetch manifest @esbuild/linux-ppc64@0.21.5
+544 silly fetch manifest @esbuild/linux-riscv64@0.21.5
+545 http fetch GET 200 https://registry.npmmirror.com/@esbuild%2faix-ppc64 104ms (cache miss)
+546 silly fetch manifest @esbuild/linux-s390x@0.21.5
+547 http fetch GET 200 https://registry.npmmirror.com/@esbuild%2ffreebsd-arm64 120ms (cache miss)
+548 silly fetch manifest @esbuild/linux-x64@0.21.5
+549 http fetch GET 200 https://registry.npmmirror.com/@esbuild%2fandroid-x64 126ms (cache miss)
+550 silly fetch manifest @esbuild/netbsd-x64@0.21.5
+551 http fetch GET 200 https://registry.npmmirror.com/@esbuild%2fdarwin-x64 130ms (cache miss)
+552 silly fetch manifest @esbuild/openbsd-x64@0.21.5
+553 http fetch GET 200 https://registry.npmmirror.com/@esbuild%2flinux-riscv64 129ms (cache miss)
+554 silly fetch manifest @esbuild/sunos-x64@0.21.5
+555 http fetch GET 200 https://registry.npmmirror.com/@esbuild%2ffreebsd-x64 138ms (cache miss)
+556 silly fetch manifest @esbuild/win32-arm64@0.21.5
+557 http fetch GET 200 https://registry.npmmirror.com/@esbuild%2flinux-mips64el 136ms (cache miss)
+558 silly fetch manifest @esbuild/win32-ia32@0.21.5
+559 http fetch GET 200 https://registry.npmmirror.com/@esbuild%2fdarwin-arm64 147ms (cache miss)
+560 silly fetch manifest @esbuild/win32-x64@0.21.5
+561 http fetch GET 200 https://registry.npmmirror.com/@esbuild%2flinux-loong64 148ms (cache miss)
+562 silly fetch manifest nanoid@^3.3.11
+563 http fetch GET 200 https://registry.npmmirror.com/@esbuild%2flinux-arm64 157ms (cache miss)
+564 silly fetch manifest source-map-js@^1.2.1
+565 http fetch GET 200 https://registry.npmmirror.com/@esbuild%2flinux-ia32 160ms (cache miss)
+566 silly fetch manifest @types/estree@1.0.8
+567 silly fetch manifest @rollup/rollup-darwin-arm64@4.60.3
+568 http fetch GET 200 https://registry.npmmirror.com/@esbuild%2fandroid-arm 170ms (cache miss)
+569 silly fetch manifest @rollup/rollup-android-arm64@4.60.3
+570 http fetch GET 200 https://registry.npmmirror.com/@esbuild%2flinux-ppc64 176ms (cache miss)
+571 silly fetch manifest @rollup/rollup-win32-arm64-msvc@4.60.3
+572 http fetch GET 200 https://registry.npmmirror.com/@esbuild%2flinux-arm 194ms (cache miss)
+573 silly fetch manifest @rollup/rollup-freebsd-arm64@4.60.3
+574 http fetch GET 200 https://registry.npmmirror.com/@esbuild%2fandroid-arm64 234ms (cache miss)
+575 silly fetch manifest @rollup/rollup-linux-arm64-gnu@4.60.3
+576 http fetch GET 200 https://registry.npmmirror.com/source-map-js 89ms (cache miss)
+577 silly fetch manifest @rollup/rollup-linux-arm64-musl@4.60.3
+578 http fetch GET 200 https://registry.npmmirror.com/@esbuild%2flinux-x64 133ms (cache miss)
+579 silly fetch manifest @rollup/rollup-android-arm-eabi@4.60.3
+580 http fetch GET 200 https://registry.npmmirror.com/@esbuild%2flinux-s390x 162ms (cache miss)
+581 silly fetch manifest @rollup/rollup-linux-arm-gnueabihf@4.60.3
+582 http fetch GET 200 https://registry.npmmirror.com/@esbuild%2fnetbsd-x64 138ms (cache miss)
+583 silly fetch manifest @rollup/rollup-linux-arm-musleabihf@4.60.3
+584 http fetch GET 200 https://registry.npmmirror.com/@esbuild%2fsunos-x64 133ms (cache miss)
+585 silly fetch manifest @rollup/rollup-win32-ia32-msvc@4.60.3
+586 http fetch GET 200 https://registry.npmmirror.com/@esbuild%2fopenbsd-x64 140ms (cache miss)
+587 silly fetch manifest @rollup/rollup-linux-loong64-gnu@4.60.3
+588 http fetch GET 200 https://registry.npmmirror.com/@esbuild%2fwin32-arm64 135ms (cache miss)
+589 silly fetch manifest @rollup/rollup-linux-loong64-musl@4.60.3
+590 http fetch GET 200 https://registry.npmmirror.com/@esbuild%2fwin32-ia32 141ms (cache miss)
+591 silly fetch manifest @rollup/rollup-linux-riscv64-gnu@4.60.3
+592 http fetch GET 200 https://registry.npmmirror.com/@esbuild%2fwin32-x64 142ms (cache miss)
+593 silly fetch manifest @rollup/rollup-linux-riscv64-musl@4.60.3
+594 http fetch GET 200 https://registry.npmmirror.com/nanoid 145ms (cache miss)
+595 silly fetch manifest @rollup/rollup-linux-ppc64-gnu@4.60.3
+596 http fetch GET 200 https://registry.npmmirror.com/@rollup%2frollup-darwin-arm64 151ms (cache miss)
+597 silly fetch manifest @rollup/rollup-linux-ppc64-musl@4.60.3
+598 http fetch GET 200 https://registry.npmmirror.com/@rollup%2frollup-freebsd-arm64 125ms (cache miss)
+599 silly fetch manifest @rollup/rollup-linux-s390x-gnu@4.60.3
+600 http fetch GET 200 https://registry.npmmirror.com/@rollup%2frollup-android-arm64 157ms (cache miss)
+601 silly fetch manifest @rollup/rollup-darwin-x64@4.60.3
+602 http fetch GET 200 https://registry.npmmirror.com/@rollup%2frollup-linux-loong64-musl 93ms (cache miss)
+603 silly fetch manifest @rollup/rollup-win32-x64-gnu@4.60.3
+604 http fetch GET 200 https://registry.npmmirror.com/@rollup%2frollup-linux-loong64-gnu 100ms (cache miss)
+605 silly fetch manifest @rollup/rollup-win32-x64-msvc@4.60.3
+606 http fetch GET 200 https://registry.npmmirror.com/@rollup%2frollup-linux-ppc64-gnu 82ms (cache miss)
+607 silly fetch manifest @rollup/rollup-freebsd-x64@4.60.3
+608 http fetch GET 200 https://registry.npmmirror.com/@rollup%2frollup-linux-ppc64-musl 72ms (cache miss)
+609 silly fetch manifest @rollup/rollup-linux-x64-gnu@4.60.3
+610 http fetch GET 200 https://registry.npmmirror.com/@rollup%2frollup-linux-riscv64-musl 102ms (cache miss)
+611 silly fetch manifest @rollup/rollup-linux-x64-musl@4.60.3
+612 http fetch GET 200 https://registry.npmmirror.com/@rollup%2frollup-win32-arm64-msvc 212ms (cache miss)
+613 silly fetch manifest @rollup/rollup-openbsd-x64@4.60.3
+614 http fetch GET 200 https://registry.npmmirror.com/@rollup%2frollup-linux-arm64-musl 170ms (cache miss)
+615 silly fetch manifest @rollup/rollup-openharmony-arm64@4.60.3
+616 http fetch GET 200 https://registry.npmmirror.com/@rollup%2frollup-linux-arm64-gnu 191ms (cache miss)
+617 http fetch GET 200 https://registry.npmmirror.com/@rollup%2frollup-android-arm-eabi 177ms (cache miss)
+618 http fetch GET 200 https://registry.npmmirror.com/@rollup%2frollup-linux-arm-gnueabihf 177ms (cache miss)
+619 http fetch GET 200 https://registry.npmmirror.com/@rollup%2frollup-linux-arm-musleabihf 178ms (cache miss)
+620 http fetch GET 200 https://registry.npmmirror.com/@rollup%2frollup-linux-riscv64-gnu 164ms (cache miss)
+621 http fetch GET 200 https://registry.npmmirror.com/@rollup%2frollup-win32-ia32-msvc 183ms (cache miss)
+622 http fetch GET 200 https://registry.npmmirror.com/@rollup%2frollup-win32-x64-gnu 91ms (cache miss)
+623 http fetch GET 200 https://registry.npmmirror.com/@rollup%2frollup-openbsd-x64 71ms (cache miss)
+624 http fetch GET 200 https://registry.npmmirror.com/@rollup%2frollup-freebsd-x64 86ms (cache miss)
+625 http fetch GET 200 https://registry.npmmirror.com/@rollup%2frollup-linux-s390x-gnu 154ms (cache miss)
+626 http fetch GET 200 https://registry.npmmirror.com/@rollup%2frollup-openharmony-arm64 59ms (cache miss)
+627 http fetch GET 200 https://registry.npmmirror.com/@rollup%2frollup-darwin-x64 161ms (cache miss)
+628 http fetch GET 200 https://registry.npmmirror.com/@rollup%2frollup-win32-x64-msvc 119ms (cache miss)
+629 http fetch GET 200 https://registry.npmmirror.com/@rollup%2frollup-linux-x64-gnu 116ms (cache miss)
+630 http fetch GET 200 https://registry.npmmirror.com/@rollup%2frollup-linux-x64-musl 123ms (cache miss)
+631 silly placeDep ROOT @esbuild/aix-ppc64@0.21.5 OK for: esbuild@0.21.5 want: 0.21.5
+632 silly placeDep ROOT @esbuild/android-arm@0.21.5 OK for: esbuild@0.21.5 want: 0.21.5
+633 silly placeDep ROOT @esbuild/android-arm64@0.21.5 OK for: esbuild@0.21.5 want: 0.21.5
+634 silly placeDep ROOT @esbuild/android-x64@0.21.5 OK for: esbuild@0.21.5 want: 0.21.5
+635 silly placeDep ROOT @esbuild/darwin-arm64@0.21.5 OK for: esbuild@0.21.5 want: 0.21.5
+636 silly placeDep ROOT @esbuild/darwin-x64@0.21.5 OK for: esbuild@0.21.5 want: 0.21.5
+637 silly placeDep ROOT @esbuild/freebsd-arm64@0.21.5 OK for: esbuild@0.21.5 want: 0.21.5
+638 silly placeDep ROOT @esbuild/freebsd-x64@0.21.5 OK for: esbuild@0.21.5 want: 0.21.5
+639 silly placeDep ROOT @esbuild/linux-arm@0.21.5 OK for: esbuild@0.21.5 want: 0.21.5
+640 silly placeDep ROOT @esbuild/linux-arm64@0.21.5 OK for: esbuild@0.21.5 want: 0.21.5
+641 silly placeDep ROOT @esbuild/linux-ia32@0.21.5 OK for: esbuild@0.21.5 want: 0.21.5
+642 silly placeDep ROOT @esbuild/linux-loong64@0.21.5 OK for: esbuild@0.21.5 want: 0.21.5
+643 silly placeDep ROOT @esbuild/linux-mips64el@0.21.5 OK for: esbuild@0.21.5 want: 0.21.5
+644 silly placeDep ROOT @esbuild/linux-ppc64@0.21.5 OK for: esbuild@0.21.5 want: 0.21.5
+645 silly placeDep ROOT @esbuild/linux-riscv64@0.21.5 OK for: esbuild@0.21.5 want: 0.21.5
+646 silly placeDep ROOT @esbuild/linux-s390x@0.21.5 OK for: esbuild@0.21.5 want: 0.21.5
+647 silly placeDep ROOT @esbuild/linux-x64@0.21.5 OK for: esbuild@0.21.5 want: 0.21.5
+648 silly placeDep ROOT @esbuild/netbsd-x64@0.21.5 OK for: esbuild@0.21.5 want: 0.21.5
+649 silly placeDep ROOT @esbuild/openbsd-x64@0.21.5 OK for: esbuild@0.21.5 want: 0.21.5
+650 silly placeDep ROOT @esbuild/sunos-x64@0.21.5 OK for: esbuild@0.21.5 want: 0.21.5
+651 silly placeDep ROOT @esbuild/win32-arm64@0.21.5 OK for: esbuild@0.21.5 want: 0.21.5
+652 silly placeDep ROOT @esbuild/win32-ia32@0.21.5 OK for: esbuild@0.21.5 want: 0.21.5
+653 silly placeDep ROOT @esbuild/win32-x64@0.21.5 OK for: esbuild@0.21.5 want: 0.21.5
+654 silly placeDep ROOT nanoid@3.3.12 OK for: postcss@8.5.14 want: ^3.3.11
+655 silly placeDep ROOT source-map-js@1.2.1 OK for: postcss@8.5.14 want: ^1.2.1
+656 silly placeDep ROOT @rollup/rollup-android-arm-eabi@4.60.3 OK for: rollup@4.60.3 want: 4.60.3
+657 silly placeDep ROOT @rollup/rollup-android-arm64@4.60.3 OK for: rollup@4.60.3 want: 4.60.3
+658 silly placeDep ROOT @rollup/rollup-darwin-arm64@4.60.3 OK for: rollup@4.60.3 want: 4.60.3
+659 silly placeDep ROOT @rollup/rollup-darwin-x64@4.60.3 OK for: rollup@4.60.3 want: 4.60.3
+660 silly placeDep ROOT @rollup/rollup-freebsd-arm64@4.60.3 OK for: rollup@4.60.3 want: 4.60.3
+661 silly placeDep ROOT @rollup/rollup-freebsd-x64@4.60.3 OK for: rollup@4.60.3 want: 4.60.3
+662 silly placeDep ROOT @rollup/rollup-linux-arm-gnueabihf@4.60.3 OK for: rollup@4.60.3 want: 4.60.3
+663 silly placeDep ROOT @rollup/rollup-linux-arm-musleabihf@4.60.3 OK for: rollup@4.60.3 want: 4.60.3
+664 silly placeDep ROOT @rollup/rollup-linux-arm64-gnu@4.60.3 OK for: rollup@4.60.3 want: 4.60.3
+665 silly placeDep ROOT @rollup/rollup-linux-arm64-musl@4.60.3 OK for: rollup@4.60.3 want: 4.60.3
+666 silly placeDep ROOT @rollup/rollup-linux-loong64-gnu@4.60.3 OK for: rollup@4.60.3 want: 4.60.3
+667 silly placeDep ROOT @rollup/rollup-linux-loong64-musl@4.60.3 OK for: rollup@4.60.3 want: 4.60.3
+668 silly placeDep ROOT @rollup/rollup-linux-ppc64-gnu@4.60.3 OK for: rollup@4.60.3 want: 4.60.3
+669 silly placeDep ROOT @rollup/rollup-linux-ppc64-musl@4.60.3 OK for: rollup@4.60.3 want: 4.60.3
+670 silly placeDep ROOT @rollup/rollup-linux-riscv64-gnu@4.60.3 OK for: rollup@4.60.3 want: 4.60.3
+671 silly placeDep ROOT @rollup/rollup-linux-riscv64-musl@4.60.3 OK for: rollup@4.60.3 want: 4.60.3
+672 silly placeDep ROOT @rollup/rollup-linux-s390x-gnu@4.60.3 OK for: rollup@4.60.3 want: 4.60.3
+673 silly placeDep ROOT @rollup/rollup-linux-x64-gnu@4.60.3 OK for: rollup@4.60.3 want: 4.60.3
+674 silly placeDep ROOT @rollup/rollup-linux-x64-musl@4.60.3 OK for: rollup@4.60.3 want: 4.60.3
+675 silly placeDep ROOT @rollup/rollup-openbsd-x64@4.60.3 OK for: rollup@4.60.3 want: 4.60.3
+676 silly placeDep ROOT @rollup/rollup-openharmony-arm64@4.60.3 OK for: rollup@4.60.3 want: 4.60.3
+677 silly placeDep ROOT @rollup/rollup-win32-arm64-msvc@4.60.3 OK for: rollup@4.60.3 want: 4.60.3
+678 silly placeDep ROOT @rollup/rollup-win32-ia32-msvc@4.60.3 OK for: rollup@4.60.3 want: 4.60.3
+679 silly placeDep ROOT @rollup/rollup-win32-x64-gnu@4.60.3 OK for: rollup@4.60.3 want: 4.60.3
+680 silly placeDep ROOT @rollup/rollup-win32-x64-msvc@4.60.3 OK for: rollup@4.60.3 want: 4.60.3
+681 silly placeDep node_modules/rollup @types/estree@1.0.8 OK for: rollup@4.60.3 want: 1.0.8
+682 silly reify moves {}
+683 silly audit bulk request {
+683 silly audit   '@types/react': [ '18.3.28' ],
+683 silly audit   '@types/react-dom': [ '18.3.7' ],
+683 silly audit   '@vitejs/plugin-react': [ '4.7.0' ],
+683 silly audit   vite: [ '5.4.21' ],
+683 silly audit   react: [ '18.3.1' ],
+683 silly audit   'react-dom': [ '18.3.1' ],
+683 silly audit   'react-markdown': [ '9.1.0' ],
+683 silly audit   'remark-gfm': [ '4.0.1' ],
+683 silly audit   typescript: [ '5.9.3' ],
+683 silly audit   '@types/prop-types': [ '15.7.15' ],
+683 silly audit   csstype: [ '3.2.3' ],
+683 silly audit   '@babel/core': [ '7.29.0' ],
+683 silly audit   '@babel/plugin-transform-react-jsx-self': [ '7.27.1' ],
+683 silly audit   '@babel/plugin-transform-react-jsx-source': [ '7.27.1' ],
+683 silly audit   '@rolldown/pluginutils': [ '1.0.0-beta.27' ],
+683 silly audit   '@types/babel__core': [ '7.20.5' ],
+683 silly audit   'react-refresh': [ '0.17.0' ],
+683 silly audit   '@babel/code-frame': [ '7.29.0' ],
+683 silly audit   '@babel/generator': [ '7.29.1' ],
+683 silly audit   '@babel/helper-compilation-targets': [ '7.28.6' ],
+683 silly audit   '@babel/helper-module-transforms': [ '7.28.6' ],
+683 silly audit   '@babel/helpers': [ '7.29.2' ],
+683 silly audit   '@babel/parser': [ '7.29.3' ],
+683 silly audit   '@babel/template': [ '7.28.6' ],
+683 silly audit   '@babel/traverse': [ '7.29.0' ],
+683 silly audit   '@babel/types': [ '7.29.0' ],
+683 silly audit   '@jridgewell/remapping': [ '2.3.5' ],
+683 silly audit   'convert-source-map': [ '2.0.0' ],
+683 silly audit   debug: [ '4.4.3' ],
+683 silly audit   gensync: [ '1.0.0-beta.2' ],
+683 silly audit   json5: [ '2.2.3' ],
+683 silly audit   semver: [ '6.3.1' ],
+683 silly audit   '@babel/helper-validator-identifier': [ '7.28.5' ],
+683 silly audit   'js-tokens': [ '4.0.0' ],
+683 silly audit   picocolors: [ '1.1.1' ],
+683 silly audit   '@jridgewell/gen-mapping': [ '0.3.13' ],
+683 silly audit   '@jridgewell/trace-mapping': [ '0.3.31' ],
+683 silly audit   jsesc: [ '3.1.0' ],
+683 silly audit   '@babel/compat-data': [ '7.29.3' ],
+683 silly audit   '@babel/helper-validator-option': [ '7.27.1' ],
+683 silly audit   browserslist: [ '4.28.2' ],
+683 silly audit   'lru-cache': [ '5.1.1' ],
+683 silly audit   '@babel/helper-module-imports': [ '7.28.6' ],
+683 silly audit   '@babel/helper-plugin-utils': [ '7.28.6' ],
+683 silly audit   '@babel/helper-globals': [ '7.28.0' ],
+683 silly audit   '@babel/helper-string-parser': [ '7.27.1' ],
+683 silly audit   '@jridgewell/sourcemap-codec': [ '1.5.5' ],
+683 silly audit   '@jridgewell/resolve-uri': [ '3.1.2' ],
+683 silly audit   '@types/babel__generator': [ '7.27.0' ],
+683 silly audit   '@types/babel__template': [ '7.4.4' ],
+683 silly audit   '@types/babel__traverse': [ '7.28.0' ],
+683 silly audit   'baseline-browser-mapping': [ '2.10.29' ],
+683 silly audit   'caniuse-lite': [ '1.0.30001792' ],
+683 silly audit   'electron-to-chromium': [ '1.5.353' ],
+683 silly audit   'node-releases': [ '2.0.44' ],
+683 silly audit   'update-browserslist-db': [ '1.2.3' ],
+683 silly audit   ms: [ '2.1.3' ],
+683 silly audit   yallist: [ '3.1.1' ],
+683 silly audit   'loose-envify': [ '1.4.0' ],
+683 silly audit   scheduler: [ '0.23.2' ],
+683 silly audit   '@types/hast': [ '3.0.4' ],
+683 silly audit   '@types/mdast': [ '4.0.4' ],
+683 silly audit   devlop: [ '1.1.0' ],
+683 silly audit   'hast-util-to-jsx-runtime': [ '2.3.6' ],
+683 silly audit   'html-url-attributes': [ '3.0.1' ],
+683 silly audit   'mdast-util-to-hast': [ '13.2.1' ],
+683 silly audit   'remark-parse': [ '11.0.0' ],
+683 silly audit   'remark-rehype': [ '11.1.2' ],
+683 silly audit   unified: [ '11.0.5' ],
+683 silly audit   'unist-util-visit': [ '5.1.0' ],
+683 silly audit   vfile: [ '6.0.3' ],
+683 silly audit   '@types/unist': [ '3.0.3', '2.0.11' ],
+683 silly audit   dequal: [ '2.0.3' ],
+683 silly audit   '@types/estree': [ '1.0.9', '1.0.8' ],
+683 silly audit   'comma-separated-tokens': [ '2.0.3' ],
+683 silly audit   'estree-util-is-identifier-name': [ '3.0.0' ],
+683 silly audit   'hast-util-whitespace': [ '3.0.0' ],
+683 silly audit   'mdast-util-mdx-expression': [ '2.0.1' ],
+683 silly audit   'mdast-util-mdx-jsx': [ '3.2.0' ],
+683 silly audit   'mdast-util-mdxjs-esm': [ '2.0.1' ],
+683 silly audit   'property-information': [ '7.1.0' ],
+683 silly audit   'space-separated-tokens': [ '2.0.2' ],
+683 silly audit   'style-to-js': [ '1.1.21' ],
+683 silly audit   'unist-util-position': [ '5.0.0' ],
+683 silly audit   'vfile-message': [ '4.0.3' ],
+683 silly audit   '@types/estree-jsx': [ '1.0.5' ],
+683 silly audit   'mdast-util-from-markdown': [ '2.0.3' ],
+683 silly audit   'mdast-util-to-markdown': [ '2.1.2' ],
+683 silly audit   'decode-named-character-reference': [ '1.3.0' ],
+683 silly audit   'mdast-util-to-string': [ '4.0.0' ],
+683 silly audit   micromark: [ '4.0.2' ],
+683 silly audit   'micromark-util-decode-numeric-character-reference': [ '2.0.2' ],
+683 silly audit   'micromark-util-decode-string': [ '2.0.1' ],
+683 silly audit   'micromark-util-normalize-identifier': [ '2.0.1' ],
+683 silly audit   'micromark-util-symbol': [ '2.0.1' ],
+683 silly audit   'micromark-util-types': [ '2.0.2' ],
+683 silly audit   'unist-util-stringify-position': [ '4.0.0' ],
+683 silly audit   'character-entities': [ '2.0.2' ],
+683 silly audit   ccount: [ '2.0.1' ],
+683 silly audit   'parse-entities': [ '4.0.2' ],
+683 silly audit   'stringify-entities': [ '4.0.4' ],
+683 silly audit   '@ungap/structured-clone': [ '1.3.1' ],
+683 silly audit   'micromark-util-sanitize-uri': [ '2.0.1' ],
+683 silly audit   'trim-lines': [ '3.0.1' ],
+683 silly audit   'longest-streak': [ '3.1.0' ],
+683 silly audit   'mdast-util-phrasing': [ '4.1.0' ],
+683 silly audit   'micromark-util-classify-character': [ '2.0.1' ],
+683 silly audit   zwitch: [ '2.0.4' ],
+683 silly audit   'unist-util-is': [ '6.0.1' ],
+683 silly audit   '@types/debug': [ '4.1.13' ],
+683 silly audit   'micromark-core-commonmark': [ '2.0.3' ],
+683 silly audit   'micromark-factory-space': [ '2.0.1' ],
+683 silly audit   'micromark-util-character': [ '2.1.1' ],
+683 silly audit   'micromark-util-chunked': [ '2.0.1' ],
+683 silly audit   'micromark-util-combine-extensions': [ '2.0.1' ],
+683 silly audit   'micromark-util-encode': [ '2.0.1' ],
+683 silly audit   'micromark-util-resolve-all': [ '2.0.1' ],
+683 silly audit   'micromark-util-subtokenize': [ '2.1.0' ],
+683 silly audit   '@types/ms': [ '2.1.0' ],
+683 silly audit   'micromark-factory-destination': [ '2.0.1' ],
+683 silly audit   'micromark-factory-label': [ '2.0.1' ],
+683 silly audit   'micromark-factory-title': [ '2.0.1' ],
+683 silly audit   'micromark-factory-whitespace': [ '2.0.1' ],
+683 silly audit   'micromark-util-html-tag-name': [ '2.0.1' ],
+683 silly audit   'character-entities-legacy': [ '3.0.0' ],
+683 silly audit   'character-reference-invalid': [ '2.0.1' ],
+683 silly audit   'is-alphanumerical': [ '2.0.1' ],
+683 silly audit   'is-decimal': [ '2.0.1' ],
+683 silly audit   'is-hexadecimal': [ '2.0.1' ],
+683 silly audit   'is-alphabetical': [ '2.0.1' ],
+683 silly audit   'mdast-util-gfm': [ '3.1.0' ],
+683 silly audit   'micromark-extension-gfm': [ '3.0.0' ],
+683 silly audit   'remark-stringify': [ '11.0.0' ],
+683 silly audit   'mdast-util-gfm-autolink-literal': [ '2.0.1' ],
+683 silly audit   'mdast-util-gfm-footnote': [ '2.1.0' ],
+683 silly audit   'mdast-util-gfm-strikethrough': [ '2.0.0' ],
+683 silly audit   'mdast-util-gfm-table': [ '2.0.0' ],
+683 silly audit   'mdast-util-gfm-task-list-item': [ '2.0.0' ],
+683 silly audit   'mdast-util-find-and-replace': [ '3.0.2' ],
+683 silly audit   'escape-string-regexp': [ '5.0.0' ],
+683 silly audit   'unist-util-visit-parents': [ '6.0.2' ],
+683 silly audit   'markdown-table': [ '3.0.4' ],
+683 silly audit   'micromark-extension-gfm-autolink-literal': [ '2.1.0' ],
+683 silly audit   'micromark-extension-gfm-footnote': [ '2.1.0' ],
+683 silly audit   'micromark-extension-gfm-strikethrough': [ '2.1.0' ],
+683 silly audit   'micromark-extension-gfm-table': [ '2.1.1' ],
+683 silly audit   'micromark-extension-gfm-tagfilter': [ '2.0.0' ],
+683 silly audit   'micromark-extension-gfm-task-list-item': [ '2.1.0' ],
+683 silly audit   'character-entities-html4': [ '2.1.0' ],
+683 silly audit   'style-to-object': [ '1.0.14' ],
+683 silly audit   'inline-style-parser': [ '0.2.7' ],
+683 silly audit   bail: [ '2.0.2' ],
+683 silly audit   extend: [ '3.0.2' ],
+683 silly audit   'is-plain-obj': [ '4.1.0' ],
+683 silly audit   trough: [ '2.2.0' ],
+683 silly audit   escalade: [ '3.2.0' ],
+683 silly audit   esbuild: [ '0.21.5' ],
+683 silly audit   fsevents: [ '2.3.3' ],
+683 silly audit   postcss: [ '8.5.14' ],
+683 silly audit   rollup: [ '4.60.3' ],
+683 silly audit   '@esbuild/aix-ppc64': [ '0.21.5' ],
+683 silly audit   '@esbuild/android-arm': [ '0.21.5' ],
+683 silly audit   '@esbuild/android-arm64': [ '0.21.5' ],
+683 silly audit   '@esbuild/android-x64': [ '0.21.5' ],
+683 silly audit   '@esbuild/darwin-arm64': [ '0.21.5' ],
+683 silly audit   '@esbuild/darwin-x64': [ '0.21.5' ],
+683 silly audit   '@esbuild/freebsd-arm64': [ '0.21.5' ],
+683 silly audit   '@esbuild/freebsd-x64': [ '0.21.5' ],
+683 silly audit   '@esbuild/linux-arm': [ '0.21.5' ],
+683 silly audit   '@esbuild/linux-arm64': [ '0.21.5' ],
+683 silly audit   '@esbuild/linux-ia32': [ '0.21.5' ],
+683 silly audit   '@esbuild/linux-loong64': [ '0.21.5' ],
+683 silly audit   '@esbuild/linux-mips64el': [ '0.21.5' ],
+683 silly audit   '@esbuild/linux-ppc64': [ '0.21.5' ],
+683 silly audit   '@esbuild/linux-riscv64': [ '0.21.5' ],
+683 silly audit   '@esbuild/linux-s390x': [ '0.21.5' ],
+683 silly audit   '@esbuild/linux-x64': [ '0.21.5' ],
+683 silly audit   '@esbuild/netbsd-x64': [ '0.21.5' ],
+683 silly audit   '@esbuild/openbsd-x64': [ '0.21.5' ],
+683 silly audit   '@esbuild/sunos-x64': [ '0.21.5' ],
+683 silly audit   '@esbuild/win32-arm64': [ '0.21.5' ],
+683 silly audit   '@esbuild/win32-ia32': [ '0.21.5' ],
+683 silly audit   '@esbuild/win32-x64': [ '0.21.5' ],
+683 silly audit   nanoid: [ '3.3.12' ],
+683 silly audit   'source-map-js': [ '1.2.1' ],
+683 silly audit   '@rollup/rollup-android-arm-eabi': [ '4.60.3' ],
+683 silly audit   '@rollup/rollup-android-arm64': [ '4.60.3' ],
+683 silly audit   '@rollup/rollup-darwin-arm64': [ '4.60.3' ],
+683 silly audit   '@rollup/rollup-darwin-x64': [ '4.60.3' ],
+683 silly audit   '@rollup/rollup-freebsd-arm64': [ '4.60.3' ],
+683 silly audit   '@rollup/rollup-freebsd-x64': [ '4.60.3' ],
+683 silly audit   '@rollup/rollup-linux-arm-gnueabihf': [ '4.60.3' ],
+683 silly audit   '@rollup/rollup-linux-arm-musleabihf': [ '4.60.3' ],
+683 silly audit   '@rollup/rollup-linux-arm64-gnu': [ '4.60.3' ],
+683 silly audit   '@rollup/rollup-linux-arm64-musl': [ '4.60.3' ],
+683 silly audit   '@rollup/rollup-linux-loong64-gnu': [ '4.60.3' ],
+683 silly audit   '@rollup/rollup-linux-loong64-musl': [ '4.60.3' ],
+683 silly audit   '@rollup/rollup-linux-ppc64-gnu': [ '4.60.3' ],
+683 silly audit   '@rollup/rollup-linux-ppc64-musl': [ '4.60.3' ],
+683 silly audit   '@rollup/rollup-linux-riscv64-gnu': [ '4.60.3' ],
+683 silly audit   '@rollup/rollup-linux-riscv64-musl': [ '4.60.3' ],
+683 silly audit   '@rollup/rollup-linux-s390x-gnu': [ '4.60.3' ],
+683 silly audit   '@rollup/rollup-linux-x64-gnu': [ '4.60.3' ],
+683 silly audit   '@rollup/rollup-linux-x64-musl': [ '4.60.3' ],
+683 silly audit   '@rollup/rollup-openbsd-x64': [ '4.60.3' ],
+683 silly audit   '@rollup/rollup-openharmony-arm64': [ '4.60.3' ],
+683 silly audit   '@rollup/rollup-win32-arm64-msvc': [ '4.60.3' ],
+683 silly audit   '@rollup/rollup-win32-ia32-msvc': [ '4.60.3' ],
+683 silly audit   '@rollup/rollup-win32-x64-gnu': [ '4.60.3' ],
+683 silly audit   '@rollup/rollup-win32-x64-msvc': [ '4.60.3' ]
+683 silly audit }
+684 verbose reify failed optional dependency E:\IDEA\multi-Agent-Inv\web\node_modules\@rollup\rollup-win32-ia32-msvc
+685 silly reify mark deleted [
+685 silly reify   'E:\\IDEA\\multi-Agent-Inv\\web\\node_modules\\@rollup\\rollup-win32-ia32-msvc'
+685 silly reify ]
+686 verbose reify failed optional dependency E:\IDEA\multi-Agent-Inv\web\node_modules\@rollup\rollup-win32-arm64-msvc
+687 silly reify mark deleted [
+687 silly reify   'E:\\IDEA\\multi-Agent-Inv\\web\\node_modules\\@rollup\\rollup-win32-arm64-msvc'
+687 silly reify ]
+688 verbose reify failed optional dependency E:\IDEA\multi-Agent-Inv\web\node_modules\@rollup\rollup-openharmony-arm64
+689 silly reify mark deleted [
+689 silly reify   'E:\\IDEA\\multi-Agent-Inv\\web\\node_modules\\@rollup\\rollup-openharmony-arm64'
+689 silly reify ]
+690 verbose reify failed optional dependency E:\IDEA\multi-Agent-Inv\web\node_modules\@rollup\rollup-openbsd-x64
+691 silly reify mark deleted [
+691 silly reify   'E:\\IDEA\\multi-Agent-Inv\\web\\node_modules\\@rollup\\rollup-openbsd-x64'
+691 silly reify ]
+692 verbose reify failed optional dependency E:\IDEA\multi-Agent-Inv\web\node_modules\@rollup\rollup-linux-x64-musl
+693 silly reify mark deleted [
+693 silly reify   'E:\\IDEA\\multi-Agent-Inv\\web\\node_modules\\@rollup\\rollup-linux-x64-musl'
+693 silly reify ]
+694 verbose reify failed optional dependency E:\IDEA\multi-Agent-Inv\web\node_modules\@rollup\rollup-linux-x64-gnu
+695 silly reify mark deleted [
+695 silly reify   'E:\\IDEA\\multi-Agent-Inv\\web\\node_modules\\@rollup\\rollup-linux-x64-gnu'
+695 silly reify ]
+696 verbose reify failed optional dependency E:\IDEA\multi-Agent-Inv\web\node_modules\@rollup\rollup-linux-s390x-gnu
+697 silly reify mark deleted [
+697 silly reify   'E:\\IDEA\\multi-Agent-Inv\\web\\node_modules\\@rollup\\rollup-linux-s390x-gnu'
+697 silly reify ]
+698 verbose reify failed optional dependency E:\IDEA\multi-Agent-Inv\web\node_modules\@rollup\rollup-linux-riscv64-musl
+699 silly reify mark deleted [
+699 silly reify   'E:\\IDEA\\multi-Agent-Inv\\web\\node_modules\\@rollup\\rollup-linux-riscv64-musl'
+699 silly reify ]
+700 verbose reify failed optional dependency E:\IDEA\multi-Agent-Inv\web\node_modules\@rollup\rollup-linux-riscv64-gnu
+701 silly reify mark deleted [
+701 silly reify   'E:\\IDEA\\multi-Agent-Inv\\web\\node_modules\\@rollup\\rollup-linux-riscv64-gnu'
+701 silly reify ]
+702 verbose reify failed optional dependency E:\IDEA\multi-Agent-Inv\web\node_modules\@rollup\rollup-linux-ppc64-musl
+703 silly reify mark deleted [
+703 silly reify   'E:\\IDEA\\multi-Agent-Inv\\web\\node_modules\\@rollup\\rollup-linux-ppc64-musl'
+703 silly reify ]
+704 verbose reify failed optional dependency E:\IDEA\multi-Agent-Inv\web\node_modules\@rollup\rollup-linux-ppc64-gnu
+705 silly reify mark deleted [
+705 silly reify   'E:\\IDEA\\multi-Agent-Inv\\web\\node_modules\\@rollup\\rollup-linux-ppc64-gnu'
+705 silly reify ]
+706 verbose reify failed optional dependency E:\IDEA\multi-Agent-Inv\web\node_modules\@rollup\rollup-linux-loong64-musl
+707 silly reify mark deleted [
+707 silly reify   'E:\\IDEA\\multi-Agent-Inv\\web\\node_modules\\@rollup\\rollup-linux-loong64-musl'
+707 silly reify ]
+708 verbose reify failed optional dependency E:\IDEA\multi-Agent-Inv\web\node_modules\@rollup\rollup-linux-loong64-gnu
+709 silly reify mark deleted [
+709 silly reify   'E:\\IDEA\\multi-Agent-Inv\\web\\node_modules\\@rollup\\rollup-linux-loong64-gnu'
+709 silly reify ]
+710 verbose reify failed optional dependency E:\IDEA\multi-Agent-Inv\web\node_modules\@rollup\rollup-linux-arm64-musl
+711 silly reify mark deleted [
+711 silly reify   'E:\\IDEA\\multi-Agent-Inv\\web\\node_modules\\@rollup\\rollup-linux-arm64-musl'
+711 silly reify ]
+712 verbose reify failed optional dependency E:\IDEA\multi-Agent-Inv\web\node_modules\@rollup\rollup-linux-arm64-gnu
+713 silly reify mark deleted [
+713 silly reify   'E:\\IDEA\\multi-Agent-Inv\\web\\node_modules\\@rollup\\rollup-linux-arm64-gnu'
+713 silly reify ]
+714 verbose reify failed optional dependency E:\IDEA\multi-Agent-Inv\web\node_modules\@rollup\rollup-linux-arm-musleabihf
+715 silly reify mark deleted [
+715 silly reify   'E:\\IDEA\\multi-Agent-Inv\\web\\node_modules\\@rollup\\rollup-linux-arm-musleabihf'
+715 silly reify ]
+716 verbose reify failed optional dependency E:\IDEA\multi-Agent-Inv\web\node_modules\@rollup\rollup-linux-arm-gnueabihf
+717 silly reify mark deleted [
+717 silly reify   'E:\\IDEA\\multi-Agent-Inv\\web\\node_modules\\@rollup\\rollup-linux-arm-gnueabihf'
+717 silly reify ]
+718 verbose reify failed optional dependency E:\IDEA\multi-Agent-Inv\web\node_modules\@rollup\rollup-freebsd-x64
+719 silly reify mark deleted [
+719 silly reify   'E:\\IDEA\\multi-Agent-Inv\\web\\node_modules\\@rollup\\rollup-freebsd-x64'
+719 silly reify ]
+720 verbose reify failed optional dependency E:\IDEA\multi-Agent-Inv\web\node_modules\@rollup\rollup-freebsd-arm64
+721 silly reify mark deleted [
+721 silly reify   'E:\\IDEA\\multi-Agent-Inv\\web\\node_modules\\@rollup\\rollup-freebsd-arm64'
+721 silly reify ]
+722 verbose reify failed optional dependency E:\IDEA\multi-Agent-Inv\web\node_modules\@rollup\rollup-darwin-x64
+723 silly reify mark deleted [
+723 silly reify   'E:\\IDEA\\multi-Agent-Inv\\web\\node_modules\\@rollup\\rollup-darwin-x64'
+723 silly reify ]
+724 verbose reify failed optional dependency E:\IDEA\multi-Agent-Inv\web\node_modules\@rollup\rollup-darwin-arm64
+725 silly reify mark deleted [
+725 silly reify   'E:\\IDEA\\multi-Agent-Inv\\web\\node_modules\\@rollup\\rollup-darwin-arm64'
+725 silly reify ]
+726 verbose reify failed optional dependency E:\IDEA\multi-Agent-Inv\web\node_modules\@rollup\rollup-android-arm64
+727 silly reify mark deleted [
+727 silly reify   'E:\\IDEA\\multi-Agent-Inv\\web\\node_modules\\@rollup\\rollup-android-arm64'
+727 silly reify ]
+728 verbose reify failed optional dependency E:\IDEA\multi-Agent-Inv\web\node_modules\@rollup\rollup-android-arm-eabi
+729 silly reify mark deleted [
+729 silly reify   'E:\\IDEA\\multi-Agent-Inv\\web\\node_modules\\@rollup\\rollup-android-arm-eabi'
+729 silly reify ]
+730 verbose reify failed optional dependency E:\IDEA\multi-Agent-Inv\web\node_modules\@esbuild\win32-ia32
+731 silly reify mark deleted [
+731 silly reify   'E:\\IDEA\\multi-Agent-Inv\\web\\node_modules\\@esbuild\\win32-ia32'
+731 silly reify ]
+732 verbose reify failed optional dependency E:\IDEA\multi-Agent-Inv\web\node_modules\@esbuild\win32-arm64
+733 silly reify mark deleted [
+733 silly reify   'E:\\IDEA\\multi-Agent-Inv\\web\\node_modules\\@esbuild\\win32-arm64'
+733 silly reify ]
+734 verbose reify failed optional dependency E:\IDEA\multi-Agent-Inv\web\node_modules\@esbuild\sunos-x64
+735 silly reify mark deleted [ 'E:\\IDEA\\multi-Agent-Inv\\web\\node_modules\\@esbuild\\sunos-x64' ]
+736 verbose reify failed optional dependency E:\IDEA\multi-Agent-Inv\web\node_modules\@esbuild\openbsd-x64
+737 silly reify mark deleted [
+737 silly reify   'E:\\IDEA\\multi-Agent-Inv\\web\\node_modules\\@esbuild\\openbsd-x64'
+737 silly reify ]
+738 verbose reify failed optional dependency E:\IDEA\multi-Agent-Inv\web\node_modules\@esbuild\netbsd-x64
+739 silly reify mark deleted [
+739 silly reify   'E:\\IDEA\\multi-Agent-Inv\\web\\node_modules\\@esbuild\\netbsd-x64'
+739 silly reify ]
+740 verbose reify failed optional dependency E:\IDEA\multi-Agent-Inv\web\node_modules\@esbuild\linux-x64
+741 silly reify mark deleted [ 'E:\\IDEA\\multi-Agent-Inv\\web\\node_modules\\@esbuild\\linux-x64' ]
+742 verbose reify failed optional dependency E:\IDEA\multi-Agent-Inv\web\node_modules\@esbuild\linux-s390x
+743 silly reify mark deleted [
+743 silly reify   'E:\\IDEA\\multi-Agent-Inv\\web\\node_modules\\@esbuild\\linux-s390x'
+743 silly reify ]
+744 verbose reify failed optional dependency E:\IDEA\multi-Agent-Inv\web\node_modules\@esbuild\linux-riscv64
+745 silly reify mark deleted [
+745 silly reify   'E:\\IDEA\\multi-Agent-Inv\\web\\node_modules\\@esbuild\\linux-riscv64'
+745 silly reify ]
+746 verbose reify failed optional dependency E:\IDEA\multi-Agent-Inv\web\node_modules\@esbuild\linux-ppc64
+747 silly reify mark deleted [
+747 silly reify   'E:\\IDEA\\multi-Agent-Inv\\web\\node_modules\\@esbuild\\linux-ppc64'
+747 silly reify ]
+748 verbose reify failed optional dependency E:\IDEA\multi-Agent-Inv\web\node_modules\@esbuild\linux-mips64el
+749 silly reify mark deleted [
+749 silly reify   'E:\\IDEA\\multi-Agent-Inv\\web\\node_modules\\@esbuild\\linux-mips64el'
+749 silly reify ]
+750 verbose reify failed optional dependency E:\IDEA\multi-Agent-Inv\web\node_modules\@esbuild\linux-loong64
+751 silly reify mark deleted [
+751 silly reify   'E:\\IDEA\\multi-Agent-Inv\\web\\node_modules\\@esbuild\\linux-loong64'
+751 silly reify ]
+752 verbose reify failed optional dependency E:\IDEA\multi-Agent-Inv\web\node_modules\@esbuild\linux-ia32
+753 silly reify mark deleted [
+753 silly reify   'E:\\IDEA\\multi-Agent-Inv\\web\\node_modules\\@esbuild\\linux-ia32'
+753 silly reify ]
+754 verbose reify failed optional dependency E:\IDEA\multi-Agent-Inv\web\node_modules\@esbuild\linux-arm64
+755 silly reify mark deleted [
+755 silly reify   'E:\\IDEA\\multi-Agent-Inv\\web\\node_modules\\@esbuild\\linux-arm64'
+755 silly reify ]
+756 verbose reify failed optional dependency E:\IDEA\multi-Agent-Inv\web\node_modules\@esbuild\linux-arm
+757 silly reify mark deleted [ 'E:\\IDEA\\multi-Agent-Inv\\web\\node_modules\\@esbuild\\linux-arm' ]
+758 verbose reify failed optional dependency E:\IDEA\multi-Agent-Inv\web\node_modules\@esbuild\freebsd-x64
+759 silly reify mark deleted [
+759 silly reify   'E:\\IDEA\\multi-Agent-Inv\\web\\node_modules\\@esbuild\\freebsd-x64'
+759 silly reify ]
+760 verbose reify failed optional dependency E:\IDEA\multi-Agent-Inv\web\node_modules\@esbuild\freebsd-arm64
+761 silly reify mark deleted [
+761 silly reify   'E:\\IDEA\\multi-Agent-Inv\\web\\node_modules\\@esbuild\\freebsd-arm64'
+761 silly reify ]
+762 verbose reify failed optional dependency E:\IDEA\multi-Agent-Inv\web\node_modules\@esbuild\darwin-x64
+763 silly reify mark deleted [
+763 silly reify   'E:\\IDEA\\multi-Agent-Inv\\web\\node_modules\\@esbuild\\darwin-x64'
+763 silly reify ]
+764 verbose reify failed optional dependency E:\IDEA\multi-Agent-Inv\web\node_modules\@esbuild\darwin-arm64
+765 silly reify mark deleted [
+765 silly reify   'E:\\IDEA\\multi-Agent-Inv\\web\\node_modules\\@esbuild\\darwin-arm64'
+765 silly reify ]
+766 verbose reify failed optional dependency E:\IDEA\multi-Agent-Inv\web\node_modules\@esbuild\android-x64
+767 silly reify mark deleted [
+767 silly reify   'E:\\IDEA\\multi-Agent-Inv\\web\\node_modules\\@esbuild\\android-x64'
+767 silly reify ]
+768 verbose reify failed optional dependency E:\IDEA\multi-Agent-Inv\web\node_modules\@esbuild\android-arm64
+769 silly reify mark deleted [
+769 silly reify   'E:\\IDEA\\multi-Agent-Inv\\web\\node_modules\\@esbuild\\android-arm64'
+769 silly reify ]
+770 verbose reify failed optional dependency E:\IDEA\multi-Agent-Inv\web\node_modules\@esbuild\android-arm
+771 silly reify mark deleted [
+771 silly reify   'E:\\IDEA\\multi-Agent-Inv\\web\\node_modules\\@esbuild\\android-arm'
+771 silly reify ]
+772 verbose reify failed optional dependency E:\IDEA\multi-Agent-Inv\web\node_modules\@esbuild\aix-ppc64
+773 silly reify mark deleted [ 'E:\\IDEA\\multi-Agent-Inv\\web\\node_modules\\@esbuild\\aix-ppc64' ]
+774 verbose reify failed optional dependency E:\IDEA\multi-Agent-Inv\web\node_modules\fsevents
+775 silly reify mark deleted [ 'E:\\IDEA\\multi-Agent-Inv\\web\\node_modules\\fsevents' ]
+776 http fetch POST 404 https://registry.npmmirror.com/-/npm/v1/security/advisories/bulk 63ms
+777 silly audit bulk request failed [object Object]
+778 http fetch POST 404 https://registry.npmmirror.com/-/npm/v1/security/audits/quick 26ms
+779 verbose audit error HttpErrorGeneral: 404 Not Found - POST https://registry.npmmirror.com/-/npm/v1/security/audits/quick - [NOT_IMPLEMENTED] /-/npm/v1/security/* not implemented yet
+779 verbose audit error     at E:\nvm_git_change\v20.15.0\node_modules\npm\node_modules\npm-registry-fetch\lib\check-response.js:95:15
+779 verbose audit error     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+779 verbose audit error     at async [getReport] (E:\nvm_git_change\v20.15.0\node_modules\npm\node_modules\@npmcli\arborist\lib\audit-report.js:336:21)
+779 verbose audit error     at async AuditReport.run (E:\nvm_git_change\v20.15.0\node_modules\npm\node_modules\@npmcli\arborist\lib\audit-report.js:106:19) {
+779 verbose audit error   headers: [Object: null prototype] {
+779 verbose audit error     server: [ 'Tengine' ],
+779 verbose audit error     date: [ 'Tue, 12 May 2026 13:42:59 GMT' ],
+779 verbose audit error     'content-type': [ 'application/json' ],
+779 verbose audit error     'transfer-encoding': [ 'chunked' ],
+779 verbose audit error     connection: [ 'keep-alive' ],
+779 verbose audit error     'strict-transport-security': [ 'max-age=5184000' ],
+779 verbose audit error     via: [ 'kunlun16.cn8001[,404666]' ],
+779 verbose audit error     'timing-allow-origin': [ '*' ],
+779 verbose audit error     eagleid: [ 'dcb5a62417785933791385527e' ],
+779 verbose audit error     'x-fetch-attempts': [ '1' ]
+779 verbose audit error   },
+779 verbose audit error   statusCode: 404,
+779 verbose audit error   code: 'E404',
+779 verbose audit error   method: 'POST',
+779 verbose audit error   uri: 'https://registry.npmmirror.com/-/npm/v1/security/audits/quick',
+779 verbose audit error   body: {
+779 verbose audit error     error: '[NOT_IMPLEMENTED] /-/npm/v1/security/* not implemented yet'
+779 verbose audit error   },
+779 verbose audit error   pkgid: undefined
+779 verbose audit error }
+780 silly audit error [object Object]
+781 silly audit report null
+782 silly tarball no local data for @rollup/rollup-win32-x64-msvc@https://registry.npmmirror.com/@rollup/rollup-win32-x64-msvc/-/rollup-win32-x64-msvc-4.60.3.tgz. Extracting by manifest.
+783 silly tarball no local data for @rollup/rollup-win32-x64-gnu@https://registry.npmmirror.com/@rollup/rollup-win32-x64-gnu/-/rollup-win32-x64-gnu-4.60.3.tgz. Extracting by manifest.
+784 silly tarball no local data for @esbuild/win32-x64@https://registry.npmmirror.com/@esbuild/win32-x64/-/win32-x64-0.21.5.tgz. Extracting by manifest.
+785 silly tarball no local data for source-map-js@https://registry.npmmirror.com/source-map-js/-/source-map-js-1.2.1.tgz. Extracting by manifest.
+786 silly tarball no local data for nanoid@https://registry.npmmirror.com/nanoid/-/nanoid-3.3.12.tgz. Extracting by manifest.
+787 silly tarball no local data for postcss@https://registry.npmmirror.com/postcss/-/postcss-8.5.14.tgz. Extracting by manifest.
+788 silly tarball no local data for escalade@https://registry.npmmirror.com/escalade/-/escalade-3.2.0.tgz. Extracting by manifest.
+789 silly tarball no local data for esbuild@https://registry.npmmirror.com/esbuild/-/esbuild-0.21.5.tgz. Extracting by manifest.
+790 silly tarball no local data for trough@https://registry.npmmirror.com/trough/-/trough-2.2.0.tgz. Extracting by manifest.
+791 silly tarball no local data for rollup@https://registry.npmmirror.com/rollup/-/rollup-4.60.3.tgz. Extracting by manifest.
+792 silly tarball no local data for inline-style-parser@https://registry.npmmirror.com/inline-style-parser/-/inline-style-parser-0.2.7.tgz. Extracting by manifest.
+793 silly tarball no local data for is-plain-obj@https://registry.npmmirror.com/is-plain-obj/-/is-plain-obj-4.1.0.tgz. Extracting by manifest.
+794 silly tarball no local data for bail@https://registry.npmmirror.com/bail/-/bail-2.0.2.tgz. Extracting by manifest.
+795 silly tarball no local data for extend@https://registry.npmmirror.com/extend/-/extend-3.0.2.tgz. Extracting by manifest.
+796 silly tarball no local data for style-to-object@https://registry.npmmirror.com/style-to-object/-/style-to-object-1.0.14.tgz. Extracting by manifest.
+797 silly tarball no local data for character-entities-html4@https://registry.npmmirror.com/character-entities-html4/-/character-entities-html4-2.1.0.tgz. Extracting by manifest.
+798 silly tarball no local data for micromark-extension-gfm-tagfilter@https://registry.npmmirror.com/micromark-extension-gfm-tagfilter/-/micromark-extension-gfm-tagfilter-2.0.0.tgz. Extracting by manifest.
+799 silly tarball no local data for micromark-extension-gfm-task-list-item@https://registry.npmmirror.com/micromark-extension-gfm-task-list-item/-/micromark-extension-gfm-task-list-item-2.1.0.tgz. Extracting by manifest.
+800 silly tarball no local data for micromark-extension-gfm-strikethrough@https://registry.npmmirror.com/micromark-extension-gfm-strikethrough/-/micromark-extension-gfm-strikethrough-2.1.0.tgz. Extracting by manifest.
+801 silly tarball no local data for micromark-extension-gfm-table@https://registry.npmmirror.com/micromark-extension-gfm-table/-/micromark-extension-gfm-table-2.1.1.tgz. Extracting by manifest.
+802 silly tarball no local data for micromark-extension-gfm-autolink-literal@https://registry.npmmirror.com/micromark-extension-gfm-autolink-literal/-/micromark-extension-gfm-autolink-literal-2.1.0.tgz. Extracting by manifest.
+803 silly tarball no local data for micromark-extension-gfm-footnote@https://registry.npmmirror.com/micromark-extension-gfm-footnote/-/micromark-extension-gfm-footnote-2.1.0.tgz. Extracting by manifest.
+804 silly tarball no local data for markdown-table@https://registry.npmmirror.com/markdown-table/-/markdown-table-3.0.4.tgz. Extracting by manifest.
+805 silly tarball no local data for escape-string-regexp@https://registry.npmmirror.com/escape-string-regexp/-/escape-string-regexp-5.0.0.tgz. Extracting by manifest.
+806 silly tarball no local data for unist-util-visit-parents@https://registry.npmmirror.com/unist-util-visit-parents/-/unist-util-visit-parents-6.0.2.tgz. Extracting by manifest.
+807 silly tarball no local data for mdast-util-find-and-replace@https://registry.npmmirror.com/mdast-util-find-and-replace/-/mdast-util-find-and-replace-3.0.2.tgz. Extracting by manifest.
+808 silly tarball no local data for mdast-util-gfm-table@https://registry.npmmirror.com/mdast-util-gfm-table/-/mdast-util-gfm-table-2.0.0.tgz. Extracting by manifest.
+809 silly tarball no local data for mdast-util-gfm-task-list-item@https://registry.npmmirror.com/mdast-util-gfm-task-list-item/-/mdast-util-gfm-task-list-item-2.0.0.tgz. Extracting by manifest.
+810 silly tarball no local data for mdast-util-gfm-strikethrough@https://registry.npmmirror.com/mdast-util-gfm-strikethrough/-/mdast-util-gfm-strikethrough-2.0.0.tgz. Extracting by manifest.
+811 silly tarball no local data for mdast-util-gfm-footnote@https://registry.npmmirror.com/mdast-util-gfm-footnote/-/mdast-util-gfm-footnote-2.1.0.tgz. Extracting by manifest.
+812 silly tarball no local data for mdast-util-gfm-autolink-literal@https://registry.npmmirror.com/mdast-util-gfm-autolink-literal/-/mdast-util-gfm-autolink-literal-2.0.1.tgz. Extracting by manifest.
+813 silly tarball no local data for micromark-extension-gfm@https://registry.npmmirror.com/micromark-extension-gfm/-/micromark-extension-gfm-3.0.0.tgz. Extracting by manifest.
+814 silly tarball no local data for remark-stringify@https://registry.npmmirror.com/remark-stringify/-/remark-stringify-11.0.0.tgz. Extracting by manifest.
+815 silly tarball no local data for mdast-util-gfm@https://registry.npmmirror.com/mdast-util-gfm/-/mdast-util-gfm-3.1.0.tgz. Extracting by manifest.
+816 silly tarball no local data for is-hexadecimal@https://registry.npmmirror.com/is-hexadecimal/-/is-hexadecimal-2.0.1.tgz. Extracting by manifest.
+817 silly tarball no local data for is-decimal@https://registry.npmmirror.com/is-decimal/-/is-decimal-2.0.1.tgz. Extracting by manifest.
+818 silly tarball no local data for is-alphabetical@https://registry.npmmirror.com/is-alphabetical/-/is-alphabetical-2.0.1.tgz. Extracting by manifest.
+819 silly tarball no local data for character-reference-invalid@https://registry.npmmirror.com/character-reference-invalid/-/character-reference-invalid-2.0.1.tgz. Extracting by manifest.
+820 silly tarball no local data for is-alphanumerical@https://registry.npmmirror.com/is-alphanumerical/-/is-alphanumerical-2.0.1.tgz. Extracting by manifest.
+821 silly tarball no local data for micromark-factory-whitespace@https://registry.npmmirror.com/micromark-factory-whitespace/-/micromark-factory-whitespace-2.0.1.tgz. Extracting by manifest.
+822 silly tarball no local data for @types/ms@https://registry.npmmirror.com/@types/ms/-/ms-2.1.0.tgz. Extracting by manifest.
+823 silly tarball no local data for character-entities-legacy@https://registry.npmmirror.com/character-entities-legacy/-/character-entities-legacy-3.0.0.tgz. Extracting by manifest.
+824 silly tarball no local data for micromark-factory-title@https://registry.npmmirror.com/micromark-factory-title/-/micromark-factory-title-2.0.1.tgz. Extracting by manifest.
+825 silly tarball no local data for micromark-util-html-tag-name@https://registry.npmmirror.com/micromark-util-html-tag-name/-/micromark-util-html-tag-name-2.0.1.tgz. Extracting by manifest.
+826 silly tarball no local data for micromark-factory-label@https://registry.npmmirror.com/micromark-factory-label/-/micromark-factory-label-2.0.1.tgz. Extracting by manifest.
+827 silly tarball no local data for micromark-factory-destination@https://registry.npmmirror.com/micromark-factory-destination/-/micromark-factory-destination-2.0.1.tgz. Extracting by manifest.
+828 silly tarball no local data for micromark-util-subtokenize@https://registry.npmmirror.com/micromark-util-subtokenize/-/micromark-util-subtokenize-2.1.0.tgz. Extracting by manifest.
+829 silly tarball no local data for micromark-util-encode@https://registry.npmmirror.com/micromark-util-encode/-/micromark-util-encode-2.0.1.tgz. Extracting by manifest.
+830 silly tarball no local data for micromark-util-combine-extensions@https://registry.npmmirror.com/micromark-util-combine-extensions/-/micromark-util-combine-extensions-2.0.1.tgz. Extracting by manifest.
+831 silly tarball no local data for micromark-util-chunked@https://registry.npmmirror.com/micromark-util-chunked/-/micromark-util-chunked-2.0.1.tgz. Extracting by manifest.
+832 silly tarball no local data for micromark-util-resolve-all@https://registry.npmmirror.com/micromark-util-resolve-all/-/micromark-util-resolve-all-2.0.1.tgz. Extracting by manifest.
+833 silly tarball no local data for @types/debug@https://registry.npmmirror.com/@types/debug/-/debug-4.1.13.tgz. Extracting by manifest.
+834 silly tarball no local data for micromark-factory-space@https://registry.npmmirror.com/micromark-factory-space/-/micromark-factory-space-2.0.1.tgz. Extracting by manifest.
+835 silly tarball no local data for micromark-util-character@https://registry.npmmirror.com/micromark-util-character/-/micromark-util-character-2.1.1.tgz. Extracting by manifest.
+836 silly tarball no local data for zwitch@https://registry.npmmirror.com/zwitch/-/zwitch-2.0.4.tgz. Extracting by manifest.
+837 silly tarball no local data for micromark-core-commonmark@https://registry.npmmirror.com/micromark-core-commonmark/-/micromark-core-commonmark-2.0.3.tgz. Extracting by manifest.
+838 silly tarball no local data for unist-util-is@https://registry.npmmirror.com/unist-util-is/-/unist-util-is-6.0.1.tgz. Extracting by manifest.
+839 silly tarball no local data for micromark-util-classify-character@https://registry.npmmirror.com/micromark-util-classify-character/-/micromark-util-classify-character-2.0.1.tgz. Extracting by manifest.
+840 silly tarball no local data for @ungap/structured-clone@https://registry.npmmirror.com/@ungap/structured-clone/-/structured-clone-1.3.1.tgz. Extracting by manifest.
+841 silly tarball no local data for mdast-util-phrasing@https://registry.npmmirror.com/mdast-util-phrasing/-/mdast-util-phrasing-4.1.0.tgz. Extracting by manifest.
+842 silly tarball no local data for longest-streak@https://registry.npmmirror.com/longest-streak/-/longest-streak-3.1.0.tgz. Extracting by manifest.
+843 silly tarball no local data for trim-lines@https://registry.npmmirror.com/trim-lines/-/trim-lines-3.0.1.tgz. Extracting by manifest.
+844 silly tarball no local data for micromark-util-sanitize-uri@https://registry.npmmirror.com/micromark-util-sanitize-uri/-/micromark-util-sanitize-uri-2.0.1.tgz. Extracting by manifest.
+845 silly tarball no local data for parse-entities@https://registry.npmmirror.com/parse-entities/-/parse-entities-4.0.2.tgz. Extracting by manifest.
+846 silly tarball no local data for stringify-entities@https://registry.npmmirror.com/stringify-entities/-/stringify-entities-4.0.4.tgz. Extracting by manifest.
+847 silly tarball no local data for ccount@https://registry.npmmirror.com/ccount/-/ccount-2.0.1.tgz. Extracting by manifest.
+848 silly tarball no local data for character-entities@https://registry.npmmirror.com/character-entities/-/character-entities-2.0.2.tgz. Extracting by manifest.
+849 silly tarball no local data for unist-util-stringify-position@https://registry.npmmirror.com/unist-util-stringify-position/-/unist-util-stringify-position-4.0.0.tgz. Extracting by manifest.
+850 silly tarball no local data for micromark-util-normalize-identifier@https://registry.npmmirror.com/micromark-util-normalize-identifier/-/micromark-util-normalize-identifier-2.0.1.tgz. Extracting by manifest.
+851 silly tarball no local data for micromark-util-types@https://registry.npmmirror.com/micromark-util-types/-/micromark-util-types-2.0.2.tgz. Extracting by manifest.
+852 silly tarball no local data for micromark-util-symbol@https://registry.npmmirror.com/micromark-util-symbol/-/micromark-util-symbol-2.0.1.tgz. Extracting by manifest.
+853 silly tarball no local data for mdast-util-to-string@https://registry.npmmirror.com/mdast-util-to-string/-/mdast-util-to-string-4.0.0.tgz. Extracting by manifest.
+854 silly tarball no local data for micromark@https://registry.npmmirror.com/micromark/-/micromark-4.0.2.tgz. Extracting by manifest.
+855 silly tarball no local data for micromark-util-decode-string@https://registry.npmmirror.com/micromark-util-decode-string/-/micromark-util-decode-string-2.0.1.tgz. Extracting by manifest.
+856 silly tarball no local data for mdast-util-to-markdown@https://registry.npmmirror.com/mdast-util-to-markdown/-/mdast-util-to-markdown-2.1.2.tgz. Extracting by manifest.
+857 silly tarball no local data for @types/estree-jsx@https://registry.npmmirror.com/@types/estree-jsx/-/estree-jsx-1.0.5.tgz. Extracting by manifest.
+858 silly tarball no local data for micromark-util-decode-numeric-character-reference@https://registry.npmmirror.com/micromark-util-decode-numeric-character-reference/-/micromark-util-decode-numeric-character-reference-2.0.2.tgz. Extracting by manifest.
+859 silly tarball no local data for mdast-util-from-markdown@https://registry.npmmirror.com/mdast-util-from-markdown/-/mdast-util-from-markdown-2.0.3.tgz. Extracting by manifest.
+860 silly tarball no local data for decode-named-character-reference@https://registry.npmmirror.com/decode-named-character-reference/-/decode-named-character-reference-1.3.0.tgz. Extracting by manifest.
+861 silly tarball no local data for space-separated-tokens@https://registry.npmmirror.com/space-separated-tokens/-/space-separated-tokens-2.0.2.tgz. Extracting by manifest.
+862 silly tarball no local data for unist-util-position@https://registry.npmmirror.com/unist-util-position/-/unist-util-position-5.0.0.tgz. Extracting by manifest.
+863 silly tarball no local data for property-information@https://registry.npmmirror.com/property-information/-/property-information-7.1.0.tgz. Extracting by manifest.
+864 silly tarball no local data for vfile-message@https://registry.npmmirror.com/vfile-message/-/vfile-message-4.0.3.tgz. Extracting by manifest.
+865 silly tarball no local data for mdast-util-mdx-jsx@https://registry.npmmirror.com/mdast-util-mdx-jsx/-/mdast-util-mdx-jsx-3.2.0.tgz. Extracting by manifest.
+866 silly tarball no local data for style-to-js@https://registry.npmmirror.com/style-to-js/-/style-to-js-1.1.21.tgz. Extracting by manifest.
+867 silly tarball no local data for mdast-util-mdxjs-esm@https://registry.npmmirror.com/mdast-util-mdxjs-esm/-/mdast-util-mdxjs-esm-2.0.1.tgz. Extracting by manifest.
+868 silly tarball no local data for @types/estree@https://registry.npmmirror.com/@types/estree/-/estree-1.0.9.tgz. Extracting by manifest.
+869 silly tarball no local data for mdast-util-mdx-expression@https://registry.npmmirror.com/mdast-util-mdx-expression/-/mdast-util-mdx-expression-2.0.1.tgz. Extracting by manifest.
+870 silly tarball no local data for comma-separated-tokens@https://registry.npmmirror.com/comma-separated-tokens/-/comma-separated-tokens-2.0.3.tgz. Extracting by manifest.
+871 silly tarball no local data for @types/unist@https://registry.npmmirror.com/@types/unist/-/unist-3.0.3.tgz. Extracting by manifest.
+872 silly tarball no local data for hast-util-whitespace@https://registry.npmmirror.com/hast-util-whitespace/-/hast-util-whitespace-3.0.0.tgz. Extracting by manifest.
+873 silly tarball no local data for estree-util-is-identifier-name@https://registry.npmmirror.com/estree-util-is-identifier-name/-/estree-util-is-identifier-name-3.0.0.tgz. Extracting by manifest.
+874 silly tarball no local data for dequal@https://registry.npmmirror.com/dequal/-/dequal-2.0.3.tgz. Extracting by manifest.
+875 silly tarball no local data for unist-util-visit@https://registry.npmmirror.com/unist-util-visit/-/unist-util-visit-5.1.0.tgz. Extracting by manifest.
+876 silly tarball no local data for remark-rehype@https://registry.npmmirror.com/remark-rehype/-/remark-rehype-11.1.2.tgz. Extracting by manifest.
+877 silly tarball no local data for vfile@https://registry.npmmirror.com/vfile/-/vfile-6.0.3.tgz. Extracting by manifest.
+878 silly tarball no local data for unified@https://registry.npmmirror.com/unified/-/unified-11.0.5.tgz. Extracting by manifest.
+879 silly tarball no local data for remark-parse@https://registry.npmmirror.com/remark-parse/-/remark-parse-11.0.0.tgz. Extracting by manifest.
+880 silly tarball no local data for hast-util-to-jsx-runtime@https://registry.npmmirror.com/hast-util-to-jsx-runtime/-/hast-util-to-jsx-runtime-2.3.6.tgz. Extracting by manifest.
+881 silly tarball no local data for @types/hast@https://registry.npmmirror.com/@types/hast/-/hast-3.0.4.tgz. Extracting by manifest.
+882 silly tarball no local data for html-url-attributes@https://registry.npmmirror.com/html-url-attributes/-/html-url-attributes-3.0.1.tgz. Extracting by manifest.
+883 silly tarball no local data for @types/mdast@https://registry.npmmirror.com/@types/mdast/-/mdast-4.0.4.tgz. Extracting by manifest.
+884 silly tarball no local data for devlop@https://registry.npmmirror.com/devlop/-/devlop-1.1.0.tgz. Extracting by manifest.
+885 silly tarball no local data for mdast-util-to-hast@https://registry.npmmirror.com/mdast-util-to-hast/-/mdast-util-to-hast-13.2.1.tgz. Extracting by manifest.
+886 silly tarball no local data for loose-envify@https://registry.npmmirror.com/loose-envify/-/loose-envify-1.4.0.tgz. Extracting by manifest.
+887 silly tarball no local data for @types/babel__traverse@https://registry.npmmirror.com/@types/babel__traverse/-/babel__traverse-7.28.0.tgz. Extracting by manifest.
+888 silly tarball no local data for ms@https://registry.npmmirror.com/ms/-/ms-2.1.3.tgz. Extracting by manifest.
+889 silly tarball no local data for scheduler@https://registry.npmmirror.com/scheduler/-/scheduler-0.23.2.tgz. Extracting by manifest.
+890 silly tarball no local data for yallist@https://registry.npmmirror.com/yallist/-/yallist-3.1.1.tgz. Extracting by manifest.
+891 silly tarball no local data for update-browserslist-db@https://registry.npmmirror.com/update-browserslist-db/-/update-browserslist-db-1.2.3.tgz. Extracting by manifest.
+892 silly tarball no local data for node-releases@https://registry.npmmirror.com/node-releases/-/node-releases-2.0.44.tgz. Extracting by manifest.
+893 silly tarball no local data for baseline-browser-mapping@https://registry.npmmirror.com/baseline-browser-mapping/-/baseline-browser-mapping-2.10.29.tgz. Extracting by manifest.
+894 silly tarball no local data for caniuse-lite@https://registry.npmmirror.com/caniuse-lite/-/caniuse-lite-1.0.30001792.tgz. Extracting by manifest.
+895 silly tarball no local data for @types/babel__template@https://registry.npmmirror.com/@types/babel__template/-/babel__template-7.4.4.tgz. Extracting by manifest.
+896 silly tarball no local data for @jridgewell/resolve-uri@https://registry.npmmirror.com/@jridgewell/resolve-uri/-/resolve-uri-3.1.2.tgz. Extracting by manifest.
+897 silly tarball no local data for electron-to-chromium@https://registry.npmmirror.com/electron-to-chromium/-/electron-to-chromium-1.5.353.tgz. Extracting by manifest.
+898 silly tarball no local data for @types/babel__generator@https://registry.npmmirror.com/@types/babel__generator/-/babel__generator-7.27.0.tgz. Extracting by manifest.
+899 silly tarball no local data for @jridgewell/sourcemap-codec@https://registry.npmmirror.com/@jridgewell/sourcemap-codec/-/sourcemap-codec-1.5.5.tgz. Extracting by manifest.
+900 silly tarball no local data for @babel/helper-string-parser@https://registry.npmmirror.com/@babel/helper-string-parser/-/helper-string-parser-7.27.1.tgz. Extracting by manifest.
+901 silly tarball no local data for @babel/helper-globals@https://registry.npmmirror.com/@babel/helper-globals/-/helper-globals-7.28.0.tgz. Extracting by manifest.
+902 silly tarball no local data for @babel/helper-module-imports@https://registry.npmmirror.com/@babel/helper-module-imports/-/helper-module-imports-7.28.6.tgz. Extracting by manifest.
+903 silly tarball no local data for @babel/helper-plugin-utils@https://registry.npmmirror.com/@babel/helper-plugin-utils/-/helper-plugin-utils-7.28.6.tgz. Extracting by manifest.
+904 silly tarball no local data for @babel/compat-data@https://registry.npmmirror.com/@babel/compat-data/-/compat-data-7.29.3.tgz. Extracting by manifest.
+905 silly tarball no local data for @babel/helper-validator-option@https://registry.npmmirror.com/@babel/helper-validator-option/-/helper-validator-option-7.27.1.tgz. Extracting by manifest.
+906 silly tarball no local data for lru-cache@https://registry.npmmirror.com/lru-cache/-/lru-cache-5.1.1.tgz. Extracting by manifest.
+907 silly tarball no local data for jsesc@https://registry.npmmirror.com/jsesc/-/jsesc-3.1.0.tgz. Extracting by manifest.
+908 silly tarball no local data for browserslist@https://registry.npmmirror.com/browserslist/-/browserslist-4.28.2.tgz. Extracting by manifest.
+909 silly tarball no local data for @jridgewell/gen-mapping@https://registry.npmmirror.com/@jridgewell/gen-mapping/-/gen-mapping-0.3.13.tgz. Extracting by manifest.
+910 silly tarball no local data for @babel/helper-validator-identifier@https://registry.npmmirror.com/@babel/helper-validator-identifier/-/helper-validator-identifier-7.28.5.tgz. Extracting by manifest.
+911 silly tarball no local data for @jridgewell/trace-mapping@https://registry.npmmirror.com/@jridgewell/trace-mapping/-/trace-mapping-0.3.31.tgz. Extracting by manifest.
+912 silly tarball no local data for semver@https://registry.npmmirror.com/semver/-/semver-6.3.1.tgz. Extracting by manifest.
+913 silly tarball no local data for picocolors@https://registry.npmmirror.com/picocolors/-/picocolors-1.1.1.tgz. Extracting by manifest.
+914 silly tarball no local data for json5@https://registry.npmmirror.com/json5/-/json5-2.2.3.tgz. Extracting by manifest.
+915 silly tarball no local data for js-tokens@https://registry.npmmirror.com/js-tokens/-/js-tokens-4.0.0.tgz. Extracting by manifest.
+916 silly tarball no local data for gensync@https://registry.npmmirror.com/gensync/-/gensync-1.0.0-beta.2.tgz. Extracting by manifest.
+917 silly tarball no local data for @babel/traverse@https://registry.npmmirror.com/@babel/traverse/-/traverse-7.29.0.tgz. Extracting by manifest.
+918 silly tarball no local data for debug@https://registry.npmmirror.com/debug/-/debug-4.4.3.tgz. Extracting by manifest.
+919 silly tarball no local data for @babel/types@https://registry.npmmirror.com/@babel/types/-/types-7.29.0.tgz. Extracting by manifest.
+920 silly tarball no local data for convert-source-map@https://registry.npmmirror.com/convert-source-map/-/convert-source-map-2.0.0.tgz. Extracting by manifest.
+921 silly tarball no local data for @jridgewell/remapping@https://registry.npmmirror.com/@jridgewell/remapping/-/remapping-2.3.5.tgz. Extracting by manifest.
+922 silly tarball no local data for @babel/parser@https://registry.npmmirror.com/@babel/parser/-/parser-7.29.3.tgz. Extracting by manifest.
+923 silly tarball no local data for @babel/helpers@https://registry.npmmirror.com/@babel/helpers/-/helpers-7.29.2.tgz. Extracting by manifest.
+924 silly tarball no local data for @babel/helper-compilation-targets@https://registry.npmmirror.com/@babel/helper-compilation-targets/-/helper-compilation-targets-7.28.6.tgz. Extracting by manifest.
+925 silly tarball no local data for @babel/template@https://registry.npmmirror.com/@babel/template/-/template-7.28.6.tgz. Extracting by manifest.
+926 silly tarball no local data for @types/babel__core@https://registry.npmmirror.com/@types/babel__core/-/babel__core-7.20.5.tgz. Extracting by manifest.
+927 silly tarball no local data for @babel/helper-module-transforms@https://registry.npmmirror.com/@babel/helper-module-transforms/-/helper-module-transforms-7.28.6.tgz. Extracting by manifest.
+928 silly tarball no local data for @babel/generator@https://registry.npmmirror.com/@babel/generator/-/generator-7.29.1.tgz. Extracting by manifest.
+929 silly tarball no local data for @rolldown/pluginutils@https://registry.npmmirror.com/@rolldown/pluginutils/-/pluginutils-1.0.0-beta.27.tgz. Extracting by manifest.
+930 silly tarball no local data for react-refresh@https://registry.npmmirror.com/react-refresh/-/react-refresh-0.17.0.tgz. Extracting by manifest.
+931 silly tarball no local data for @babel/code-frame@https://registry.npmmirror.com/@babel/code-frame/-/code-frame-7.29.0.tgz. Extracting by manifest.
+932 silly tarball no local data for csstype@https://registry.npmmirror.com/csstype/-/csstype-3.2.3.tgz. Extracting by manifest.
+933 silly tarball no local data for @babel/plugin-transform-react-jsx-source@https://registry.npmmirror.com/@babel/plugin-transform-react-jsx-source/-/plugin-transform-react-jsx-source-7.27.1.tgz. Extracting by manifest.
+934 silly tarball no local data for @babel/plugin-transform-react-jsx-self@https://registry.npmmirror.com/@babel/plugin-transform-react-jsx-self/-/plugin-transform-react-jsx-self-7.27.1.tgz. Extracting by manifest.
+935 silly tarball no local data for @types/prop-types@https://registry.npmmirror.com/@types/prop-types/-/prop-types-15.7.15.tgz. Extracting by manifest.
+936 silly tarball no local data for @babel/core@https://registry.npmmirror.com/@babel/core/-/core-7.29.0.tgz. Extracting by manifest.
+937 silly tarball no local data for react-markdown@https://registry.npmmirror.com/react-markdown/-/react-markdown-9.1.0.tgz. Extracting by manifest.
+938 silly tarball no local data for remark-gfm@https://registry.npmmirror.com/remark-gfm/-/remark-gfm-4.0.1.tgz. Extracting by manifest.
+939 silly tarball no local data for @vitejs/plugin-react@https://registry.npmmirror.com/@vitejs/plugin-react/-/plugin-react-4.7.0.tgz. Extracting by manifest.
+940 silly tarball no local data for react-dom@https://registry.npmmirror.com/react-dom/-/react-dom-18.3.1.tgz. Extracting by manifest.
+941 silly tarball no local data for typescript@https://registry.npmmirror.com/typescript/-/typescript-5.9.3.tgz. Extracting by manifest.
+942 silly tarball no local data for react@https://registry.npmmirror.com/react/-/react-18.3.1.tgz. Extracting by manifest.
+943 silly tarball no local data for @types/react-dom@https://registry.npmmirror.com/@types/react-dom/-/react-dom-18.3.7.tgz. Extracting by manifest.
+944 silly tarball no local data for vite@https://registry.npmmirror.com/vite/-/vite-5.4.21.tgz. Extracting by manifest.
+945 silly tarball no local data for @types/unist@https://registry.npmmirror.com/@types/unist/-/unist-2.0.11.tgz. Extracting by manifest.
+946 silly tarball no local data for @types/react@https://registry.npmmirror.com/@types/react/-/react-18.3.28.tgz. Extracting by manifest.
+947 silly tarball no local data for @types/estree@https://registry.npmmirror.com/@types/estree/-/estree-1.0.8.tgz. Extracting by manifest.
+948 http fetch GET 200 https://cdn.npmmirror.com/packages/micromark-extension-gfm-strikethrough/2.1.0/micromark-extension-gfm-strikethrough-2.1.0.tgz 789ms (cache miss)
+949 http fetch GET 200 https://cdn.npmmirror.com/packages/extend/3.0.2/extend-3.0.2.tgz 818ms (cache miss)
+950 http fetch GET 200 https://cdn.npmmirror.com/packages/bail/2.0.2/bail-2.0.2.tgz 839ms (cache miss)
+951 http fetch GET 200 https://cdn.npmmirror.com/packages/mdast-util-gfm-strikethrough/2.0.0/mdast-util-gfm-strikethrough-2.0.0.tgz 829ms (cache miss)
+952 http fetch GET 200 https://cdn.npmmirror.com/packages/character-entities-html4/2.1.0/character-entities-html4-2.1.0.tgz 839ms (cache miss)
+953 http fetch GET 200 https://cdn.npmmirror.com/packages/micromark-extension-gfm-autolink-literal/2.1.0/micromark-extension-gfm-autolink-literal-2.1.0.tgz 837ms (cache miss)
+954 http fetch GET 200 https://cdn.npmmirror.com/packages/is-plain-obj/4.1.0/is-plain-obj-4.1.0.tgz 867ms (cache miss)
+955 http fetch GET 200 https://cdn.npmmirror.com/packages/escape-string-regexp/5.0.0/escape-string-regexp-5.0.0.tgz 859ms (cache miss)
+956 http fetch GET 200 https://cdn.npmmirror.com/packages/mdast-util-gfm-task-list-item/2.0.0/mdast-util-gfm-task-list-item-2.0.0.tgz 857ms (cache miss)
+957 http fetch GET 200 https://cdn.npmmirror.com/packages/is-alphanumerical/2.0.1/is-alphanumerical-2.0.1.tgz 847ms (cache miss)
+958 http fetch GET 200 https://cdn.npmmirror.com/packages/is-hexadecimal/2.0.1/is-hexadecimal-2.0.1.tgz 850ms (cache miss)
+959 http fetch GET 200 https://cdn.npmmirror.com/packages/micromark-factory-label/2.0.1/micromark-factory-label-2.0.1.tgz 904ms (cache miss)
+960 http fetch GET 200 https://cdn.npmmirror.com/packages/micromark-util-html-tag-name/2.0.1/micromark-util-html-tag-name-2.0.1.tgz 910ms (cache miss)
+961 http fetch GET 200 https://cdn.npmmirror.com/packages/unist-util-visit-parents/6.0.2/unist-util-visit-parents-6.0.2.tgz 974ms (cache miss)
+962 http fetch GET 200 https://cdn.npmmirror.com/packages/mdast-util-gfm-table/2.0.0/mdast-util-gfm-table-2.0.0.tgz 974ms (cache miss)
+963 http fetch GET 200 https://cdn.npmmirror.com/packages/remark-stringify/11.0.0/remark-stringify-11.0.0.tgz 966ms (cache miss)
+964 http fetch GET 200 https://cdn.npmmirror.com/packages/%40types/ms/2.1.0/ms-2.1.0.tgz 962ms (cache miss)
+965 http fetch GET 200 https://cdn.npmmirror.com/packages/micromark-factory-whitespace/2.0.1/micromark-factory-whitespace-2.0.1.tgz 996ms (cache miss)
+966 http fetch GET 200 https://cdn.npmmirror.com/packages/character-entities-legacy/3.0.0/character-entities-legacy-3.0.0.tgz 1017ms (cache miss)
+967 http fetch GET 200 https://cdn.npmmirror.com/packages/is-decimal/2.0.1/is-decimal-2.0.1.tgz 1021ms (cache miss)
+968 http fetch GET 200 https://cdn.npmmirror.com/packages/character-reference-invalid/2.0.1/character-reference-invalid-2.0.1.tgz 1021ms (cache miss)
+969 http fetch GET 200 https://cdn.npmmirror.com/packages/micromark-util-resolve-all/2.0.1/micromark-util-resolve-all-2.0.1.tgz 1012ms (cache miss)
+970 http fetch GET 200 https://cdn.npmmirror.com/packages/micromark-extension-gfm/3.0.0/micromark-extension-gfm-3.0.0.tgz 1055ms (cache miss)
+971 http fetch GET 200 https://cdn.npmmirror.com/packages/micromark-util-encode/2.0.1/micromark-util-encode-2.0.1.tgz 1046ms (cache miss)
+972 http fetch GET 200 https://cdn.npmmirror.com/packages/%40types/debug/4.1.13/debug-4.1.13.tgz 1043ms (cache miss)
+973 http fetch GET 200 https://cdn.npmmirror.com/packages/is-alphabetical/2.0.1/is-alphabetical-2.0.1.tgz 1080ms (cache miss)
+974 http fetch GET 200 https://cdn.npmmirror.com/packages/markdown-table/3.0.4/markdown-table-3.0.4.tgz 1120ms (cache miss)
+975 http fetch GET 200 https://cdn.npmmirror.com/packages/micromark-util-chunked/2.0.1/micromark-util-chunked-2.0.1.tgz 1099ms (cache miss)
+976 http fetch GET 200 https://cdn.npmmirror.com/packages/zwitch/2.0.4/zwitch-2.0.4.tgz 1143ms (cache miss)
+977 http fetch GET 200 https://cdn.npmmirror.com/packages/micromark-extension-gfm-tagfilter/2.0.0/micromark-extension-gfm-tagfilter-2.0.0.tgz 1209ms (cache miss)
+978 http fetch GET 200 https://cdn.npmmirror.com/packages/micromark-util-classify-character/2.0.1/micromark-util-classify-character-2.0.1.tgz 1174ms (cache miss)
+979 http fetch GET 200 https://cdn.npmmirror.com/packages/micromark-util-combine-extensions/2.0.1/micromark-util-combine-extensions-2.0.1.tgz 1214ms (cache miss)
+980 http fetch GET 200 https://cdn.npmmirror.com/packages/mdast-util-to-string/4.0.0/mdast-util-to-string-4.0.0.tgz 1227ms (cache miss)
+981 http fetch GET 200 https://cdn.npmmirror.com/packages/ccount/2.0.1/ccount-2.0.1.tgz 1236ms (cache miss)
+982 http fetch GET 200 https://cdn.npmmirror.com/packages/trim-lines/3.0.1/trim-lines-3.0.1.tgz 1238ms (cache miss)
+983 http fetch GET 200 https://cdn.npmmirror.com/packages/micromark-util-decode-string/2.0.1/micromark-util-decode-string-2.0.1.tgz 1233ms (cache miss)
+984 http fetch GET 200 https://cdn.npmmirror.com/packages/parse-entities/4.0.2/parse-entities-4.0.2.tgz 1299ms (cache miss)
+985 http fetch GET 200 https://cdn.npmmirror.com/packages/mdast-util-gfm-footnote/2.1.0/mdast-util-gfm-footnote-2.1.0.tgz 1330ms (cache miss)
+986 http fetch GET 200 https://cdn.npmmirror.com/packages/longest-streak/3.1.0/longest-streak-3.1.0.tgz 1303ms (cache miss)
+987 http fetch GET 200 https://cdn.npmmirror.com/packages/%40types/estree-jsx/1.0.5/estree-jsx-1.0.5.tgz 1294ms (cache miss)
+988 http fetch GET 200 https://cdn.npmmirror.com/packages/space-separated-tokens/2.0.2/space-separated-tokens-2.0.2.tgz 1291ms (cache miss)
+989 http fetch GET 200 https://cdn.npmmirror.com/packages/mdast-util-gfm-autolink-literal/2.0.1/mdast-util-gfm-autolink-literal-2.0.1.tgz 1362ms (cache miss)
+990 http fetch GET 200 https://cdn.npmmirror.com/packages/micromark-util-types/2.0.2/micromark-util-types-2.0.2.tgz 1330ms (cache miss)
+991 http fetch GET 200 https://cdn.npmmirror.com/packages/%40types/estree/1.0.9/estree-1.0.9.tgz 1321ms (cache miss)
+992 http fetch GET 200 https://cdn.npmmirror.com/packages/vfile-message/4.0.3/vfile-message-4.0.3.tgz 1323ms (cache miss)
+993 http fetch GET 200 https://cdn.npmmirror.com/packages/esbuild/0.21.5/esbuild-0.21.5.tgz 1410ms (cache miss)
+994 http fetch GET 200 https://cdn.npmmirror.com/packages/character-entities/2.0.2/character-entities-2.0.2.tgz 1361ms (cache miss)
+995 http fetch GET 200 https://cdn.npmmirror.com/packages/decode-named-character-reference/1.3.0/decode-named-character-reference-1.3.0.tgz 1354ms (cache miss)
+996 http fetch GET 200 https://cdn.npmmirror.com/packages/comma-separated-tokens/2.0.3/comma-separated-tokens-2.0.3.tgz 1344ms (cache miss)
+997 http fetch GET 200 https://cdn.npmmirror.com/packages/trough/2.2.0/trough-2.2.0.tgz 1435ms (cache miss)
+998 http fetch GET 200 https://cdn.npmmirror.com/packages/mdast-util-gfm/3.1.0/mdast-util-gfm-3.1.0.tgz 1414ms (cache miss)
+999 http fetch GET 200 https://cdn.npmmirror.com/packages/remark-rehype/11.1.2/remark-rehype-11.1.2.tgz 1384ms (cache miss)
+1000 http fetch GET 200 https://cdn.npmmirror.com/packages/%40types/mdast/4.0.4/mdast-4.0.4.tgz 1378ms (cache miss)
+1001 http fetch GET 200 https://cdn.npmmirror.com/packages/mdast-util-find-and-replace/3.0.2/mdast-util-find-and-replace-3.0.2.tgz 1468ms (cache miss)
+1002 http fetch GET 200 https://cdn.npmmirror.com/packages/mdast-util-phrasing/4.1.0/mdast-util-phrasing-4.1.0.tgz 1437ms (cache miss)
+1003 http fetch GET 200 https://cdn.npmmirror.com/packages/%40types/unist/3.0.3/unist-3.0.3.tgz 1414ms (cache miss)
+1004 http fetch GET 200 https://cdn.npmmirror.com/packages/unist-util-visit/5.1.0/unist-util-visit-5.1.0.tgz 1410ms (cache miss)
+1005 http fetch GET 200 https://cdn.npmmirror.com/packages/estree-util-is-identifier-name/3.0.0/estree-util-is-identifier-name-3.0.0.tgz 1413ms (cache miss)
+1006 http fetch GET 200 https://cdn.npmmirror.com/packages/remark-parse/11.0.0/remark-parse-11.0.0.tgz 1406ms (cache miss)
+1007 http fetch GET 200 https://cdn.npmmirror.com/packages/html-url-attributes/3.0.1/html-url-attributes-3.0.1.tgz 1404ms (cache miss)
+1008 http fetch GET 200 https://cdn.npmmirror.com/packages/%40types/hast/3.0.4/hast-3.0.4.tgz 1462ms (cache miss)
+1009 http fetch GET 200 https://cdn.npmmirror.com/packages/micromark-factory-title/2.0.1/micromark-factory-title-2.0.1.tgz 1533ms (cache miss)
+1010 http fetch GET 200 https://cdn.npmmirror.com/packages/unist-util-stringify-position/4.0.0/unist-util-stringify-position-4.0.0.tgz 1512ms (cache miss)
+1011 http fetch GET 200 https://cdn.npmmirror.com/packages/ms/2.1.3/ms-2.1.3.tgz 1477ms (cache miss)
+1012 http fetch GET 200 https://cdn.npmmirror.com/packages/%40types/babel__template/7.4.4/babel__template-7.4.4.tgz 1485ms (cache miss)
+1013 http fetch GET 200 https://cdn.npmmirror.com/packages/loose-envify/1.4.0/loose-envify-1.4.0.tgz 1507ms (cache miss)
+1014 http fetch GET 200 https://cdn.npmmirror.com/packages/%40types/babel__generator/7.27.0/babel__generator-7.27.0.tgz 1500ms (cache miss)
+1015 http fetch GET 200 https://cdn.npmmirror.com/packages/%40babel/helper-plugin-utils/7.28.6/helper-plugin-utils-7.28.6.tgz 1497ms (cache miss)
+1016 http fetch GET 200 https://cdn.npmmirror.com/packages/%40types/babel__traverse/7.28.0/babel__traverse-7.28.0.tgz 1531ms (cache miss)
+1017 http fetch GET 200 https://cdn.npmmirror.com/packages/yallist/3.1.1/yallist-3.1.1.tgz 1530ms (cache miss)
+1018 http fetch GET 200 https://cdn.npmmirror.com/packages/update-browserslist-db/1.2.3/update-browserslist-db-1.2.3.tgz 1530ms (cache miss)
+1019 http fetch GET 200 https://cdn.npmmirror.com/packages/escalade/3.2.0/escalade-3.2.0.tgz 1635ms (cache miss)
+1020 http fetch GET 200 https://cdn.npmmirror.com/packages/micromark-factory-space/2.0.1/micromark-factory-space-2.0.1.tgz 1602ms (cache miss)
+1021 http fetch GET 200 https://cdn.npmmirror.com/packages/micromark-factory-destination/2.0.1/micromark-factory-destination-2.0.1.tgz 1608ms (cache miss)
+1022 http fetch GET 200 https://cdn.npmmirror.com/packages/jsesc/3.1.0/jsesc-3.1.0.tgz 1553ms (cache miss)
+1023 http fetch GET 200 https://cdn.npmmirror.com/packages/unist-util-is/6.0.1/unist-util-is-6.0.1.tgz 1631ms (cache miss)
+1024 http fetch GET 200 https://cdn.npmmirror.com/packages/micromark-util-character/2.1.1/micromark-util-character-2.1.1.tgz 1639ms (cache miss)
+1025 http fetch GET 200 https://cdn.npmmirror.com/packages/unist-util-position/5.0.0/unist-util-position-5.0.0.tgz 1617ms (cache miss)
+1026 http fetch GET 200 https://cdn.npmmirror.com/packages/mdast-util-mdxjs-esm/2.0.1/mdast-util-mdxjs-esm-2.0.1.tgz 1631ms (cache miss)
+1027 http fetch GET 200 https://cdn.npmmirror.com/packages/devlop/1.1.0/devlop-1.1.0.tgz 1611ms (cache miss)
+1028 http fetch GET 200 https://cdn.npmmirror.com/packages/lru-cache/5.1.1/lru-cache-5.1.1.tgz 1591ms (cache miss)
+1029 http fetch GET 200 https://cdn.npmmirror.com/packages/convert-source-map/2.0.0/convert-source-map-2.0.0.tgz 1583ms (cache miss)
+1030 http fetch GET 200 https://cdn.npmmirror.com/packages/micromark-util-sanitize-uri/2.0.1/micromark-util-sanitize-uri-2.0.1.tgz 1662ms (cache miss)
+1031 http fetch GET 200 https://cdn.npmmirror.com/packages/%40babel/helper-string-parser/7.27.1/helper-string-parser-7.27.1.tgz 1613ms (cache miss)
+1032 http fetch GET 200 https://cdn.npmmirror.com/packages/picocolors/1.1.1/picocolors-1.1.1.tgz 1606ms (cache miss)
+1033 http fetch GET 200 https://cdn.npmmirror.com/packages/hast-util-whitespace/3.0.0/hast-util-whitespace-3.0.0.tgz 1649ms (cache miss)
+1034 http fetch GET 200 https://cdn.npmmirror.com/packages/micromark-util-normalize-identifier/2.0.1/micromark-util-normalize-identifier-2.0.1.tgz 1675ms (cache miss)
+1035 http fetch GET 200 https://cdn.npmmirror.com/packages/gensync/1.0.0-beta.2/gensync-1.0.0-beta.2.tgz 1619ms (cache miss)
+1036 http fetch GET 200 https://cdn.npmmirror.com/packages/%40babel/code-frame/7.29.0/code-frame-7.29.0.tgz 1605ms (cache miss)
+1037 http fetch GET 200 https://cdn.npmmirror.com/packages/%40types/babel__core/7.20.5/babel__core-7.20.5.tgz 1625ms (cache miss)
+1038 http fetch GET 200 https://cdn.npmmirror.com/packages/js-tokens/4.0.0/js-tokens-4.0.0.tgz 1637ms (cache miss)
+1039 http fetch GET 200 https://cdn.npmmirror.com/packages/%40babel/plugin-transform-react-jsx-source/7.27.1/plugin-transform-react-jsx-source-7.27.1.tgz 1615ms (cache miss)
+1040 http fetch GET 200 https://cdn.npmmirror.com/packages/mdast-util-mdx-expression/2.0.1/mdast-util-mdx-expression-2.0.1.tgz 1690ms (cache miss)
+1041 http fetch GET 200 https://cdn.npmmirror.com/packages/%40babel/plugin-transform-react-jsx-self/7.27.1/plugin-transform-react-jsx-self-7.27.1.tgz 1623ms (cache miss)
+1042 http fetch GET 200 https://cdn.npmmirror.com/packages/react-markdown/9.1.0/react-markdown-9.1.0.tgz 1621ms (cache miss)
+1043 http fetch GET 200 https://cdn.npmmirror.com/packages/%40babel/helper-globals/7.28.0/helper-globals-7.28.0.tgz 1665ms (cache miss)
+1044 http fetch GET 200 https://cdn.npmmirror.com/packages/node-releases/2.0.44/node-releases-2.0.44.tgz 1680ms (cache miss)
+1045 http fetch GET 200 https://cdn.npmmirror.com/packages/react-refresh/0.17.0/react-refresh-0.17.0.tgz 1641ms (cache miss)
+1046 http fetch GET 200 https://cdn.npmmirror.com/packages/micromark-util-decode-numeric-character-reference/2.0.2/micromark-util-decode-numeric-character-reference-2.0.2.tgz 1719ms (cache miss)
+1047 http fetch GET 200 https://cdn.npmmirror.com/packages/%40types/react-dom/18.3.7/react-dom-18.3.7.tgz 1640ms (cache miss)
+1048 http fetch GET 200 https://cdn.npmmirror.com/packages/mdast-util-mdx-jsx/3.2.0/mdast-util-mdx-jsx-3.2.0.tgz 1724ms (cache miss)
+1049 http fetch GET 200 https://cdn.npmmirror.com/packages/%40types/estree/1.0.8/estree-1.0.8.tgz 1642ms (cache miss)
+1050 http fetch GET 200 https://cdn.npmmirror.com/packages/%40types/prop-types/15.7.15/prop-types-15.7.15.tgz 1665ms (cache miss)
+1051 http fetch GET 200 https://cdn.npmmirror.com/packages/%40types/unist/2.0.11/unist-2.0.11.tgz 1659ms (cache miss)
+1052 http fetch GET 200 https://cdn.npmmirror.com/packages/semver/6.3.1/semver-6.3.1.tgz 1715ms (cache miss)
+1053 http fetch GET 200 https://cdn.npmmirror.com/packages/inline-style-parser/0.2.7/inline-style-parser-0.2.7.tgz 1826ms (cache miss)
+1054 http fetch GET 200 https://cdn.npmmirror.com/packages/%40jridgewell/resolve-uri/3.1.2/resolve-uri-3.1.2.tgz 1743ms (cache miss)
+1055 http fetch GET 200 https://cdn.npmmirror.com/packages/%40rolldown/pluginutils/1.0.0-beta.27/pluginutils-1.0.0-beta.27.tgz 1711ms (cache miss)
+1056 http fetch GET 200 https://cdn.npmmirror.com/packages/debug/4.4.3/debug-4.4.3.tgz 1727ms (cache miss)
+1057 http fetch GET 200 https://cdn.npmmirror.com/packages/micromark-extension-gfm-task-list-item/2.1.0/micromark-extension-gfm-task-list-item-2.1.0.tgz 1857ms (cache miss)
+1058 http fetch GET 200 https://cdn.npmmirror.com/packages/dequal/2.0.3/dequal-2.0.3.tgz 1792ms (cache miss)
+1059 http fetch GET 200 https://cdn.npmmirror.com/packages/hast-util-to-jsx-runtime/2.3.6/hast-util-to-jsx-runtime-2.3.6.tgz 1785ms (cache miss)
+1060 http fetch GET 200 https://cdn.npmmirror.com/packages/%40babel/helper-validator-option/7.27.1/helper-validator-option-7.27.1.tgz 1763ms (cache miss)
+1061 http fetch GET 200 https://cdn.npmmirror.com/packages/%40babel/helper-validator-identifier/7.28.5/helper-validator-identifier-7.28.5.tgz 1782ms (cache miss)
+1062 http fetch GET 200 https://cdn.npmmirror.com/packages/micromark-extension-gfm-footnote/2.1.0/micromark-extension-gfm-footnote-2.1.0.tgz 1887ms (cache miss)
+1063 http fetch GET 200 https://cdn.npmmirror.com/packages/remark-gfm/4.0.1/remark-gfm-4.0.1.tgz 1759ms (cache miss)
+1064 http fetch GET 200 https://cdn.npmmirror.com/packages/micromark-util-subtokenize/2.1.0/micromark-util-subtokenize-2.1.0.tgz 1875ms (cache miss)
+1065 http fetch GET 200 https://cdn.npmmirror.com/packages/%40vitejs/plugin-react/4.7.0/plugin-react-4.7.0.tgz 1770ms (cache miss)
+1066 http fetch GET 200 https://cdn.npmmirror.com/packages/%40babel/helper-module-imports/7.28.6/helper-module-imports-7.28.6.tgz 1811ms (cache miss)
+1067 http fetch GET 200 https://cdn.npmmirror.com/packages/baseline-browser-mapping/2.10.29/baseline-browser-mapping-2.10.29.tgz 1823ms (cache miss)
+1068 http fetch GET 200 https://cdn.npmmirror.com/packages/style-to-object/1.0.14/style-to-object-1.0.14.tgz 1925ms (cache miss)
+1069 http fetch GET 200 https://cdn.npmmirror.com/packages/unified/11.0.5/unified-11.0.5.tgz 1851ms (cache miss)
+1070 http fetch GET 200 https://cdn.npmmirror.com/packages/%40ungap/structured-clone/1.3.1/structured-clone-1.3.1.tgz 1890ms (cache miss)
+1071 http fetch GET 200 https://cdn.npmmirror.com/packages/browserslist/4.28.2/browserslist-4.28.2.tgz 1827ms (cache miss)
+1072 http fetch GET 200 https://cdn.npmmirror.com/packages/source-map-js/1.2.1/source-map-js-1.2.1.tgz 1942ms (cache miss)
+1073 http fetch GET 200 https://cdn.npmmirror.com/packages/electron-to-chromium/1.5.353/electron-to-chromium-1.5.353.tgz 1863ms (cache miss)
+1074 http fetch GET 200 https://cdn.npmmirror.com/packages/micromark-util-symbol/2.0.1/micromark-util-symbol-2.0.1.tgz 1922ms (cache miss)
+1075 http fetch GET 200 https://cdn.npmmirror.com/packages/%40babel/compat-data/7.29.3/compat-data-7.29.3.tgz 1883ms (cache miss)
+1076 http fetch GET 200 https://cdn.npmmirror.com/packages/mdast-util-from-markdown/2.0.3/mdast-util-from-markdown-2.0.3.tgz 1939ms (cache miss)
+1077 http fetch GET 200 https://cdn.npmmirror.com/packages/style-to-js/1.1.21/style-to-js-1.1.21.tgz 1950ms (cache miss)
+1078 http fetch GET 200 https://cdn.npmmirror.com/packages/scheduler/0.23.2/scheduler-0.23.2.tgz 1929ms (cache miss)
+1079 http fetch GET 200 https://cdn.npmmirror.com/packages/stringify-entities/4.0.4/stringify-entities-4.0.4.tgz 1974ms (cache miss)
+1080 http fetch GET 200 https://cdn.npmmirror.com/packages/%40babel/helper-compilation-targets/7.28.6/helper-compilation-targets-7.28.6.tgz 1913ms (cache miss)
+1081 http fetch GET 200 https://cdn.npmmirror.com/packages/nanoid/3.3.12/nanoid-3.3.12.tgz 2049ms (cache miss)
+1082 http fetch GET 200 https://cdn.npmmirror.com/packages/%40babel/helper-module-transforms/7.28.6/helper-module-transforms-7.28.6.tgz 1927ms (cache miss)
+1083 http fetch GET 200 https://cdn.npmmirror.com/packages/%40babel/template/7.28.6/template-7.28.6.tgz 1936ms (cache miss)
+1084 http fetch GET 200 https://cdn.npmmirror.com/packages/json5/2.2.3/json5-2.2.3.tgz 1988ms (cache miss)
+1085 http fetch GET 200 https://cdn.npmmirror.com/packages/csstype/3.2.3/csstype-3.2.3.tgz 1972ms (cache miss)
+1086 http fetch GET 200 https://cdn.npmmirror.com/packages/%40types/react/18.3.28/react-18.3.28.tgz 1961ms (cache miss)
+1087 http fetch GET 200 https://cdn.npmmirror.com/packages/micromark-extension-gfm-table/2.1.1/micromark-extension-gfm-table-2.1.1.tgz 2104ms (cache miss)
+1088 http fetch GET 200 https://cdn.npmmirror.com/packages/react/18.3.1/react-18.3.1.tgz 1989ms (cache miss)
+1089 http fetch GET 200 https://cdn.npmmirror.com/packages/%40jridgewell/sourcemap-codec/1.5.5/sourcemap-codec-1.5.5.tgz 2037ms (cache miss)
+1090 http fetch GET 200 https://cdn.npmmirror.com/packages/vfile/6.0.3/vfile-6.0.3.tgz 2070ms (cache miss)
+1091 http fetch GET 200 https://cdn.npmmirror.com/packages/%40jridgewell/gen-mapping/0.3.13/gen-mapping-0.3.13.tgz 2080ms (cache miss)
+1092 http fetch GET 200 https://cdn.npmmirror.com/packages/%40jridgewell/remapping/2.3.5/remapping-2.3.5.tgz 2072ms (cache miss)
+1093 http fetch GET 200 https://cdn.npmmirror.com/packages/%40rollup/rollup-win32-x64-gnu/4.60.3/rollup-win32-x64-gnu-4.60.3.tgz 2201ms (cache miss)
+1094 http fetch GET 200 https://cdn.npmmirror.com/packages/%40rollup/rollup-win32-x64-msvc/4.60.3/rollup-win32-x64-msvc-4.60.3.tgz 2245ms (cache miss)
+1095 http fetch GET 200 https://cdn.npmmirror.com/packages/%40babel/parser/7.29.3/parser-7.29.3.tgz 2123ms (cache miss)
+1096 http fetch GET 200 https://cdn.npmmirror.com/packages/postcss/8.5.14/postcss-8.5.14.tgz 2313ms (cache miss)
+1097 http fetch GET 200 https://cdn.npmmirror.com/packages/%40jridgewell/trace-mapping/0.3.31/trace-mapping-0.3.31.tgz 2233ms (cache miss)
+1098 http fetch GET 200 https://cdn.npmmirror.com/packages/property-information/7.1.0/property-information-7.1.0.tgz 2284ms (cache miss)
+1099 http fetch GET 200 https://cdn.npmmirror.com/packages/%40babel/generator/7.29.1/generator-7.29.1.tgz 2224ms (cache miss)
+1100 http fetch GET 200 https://cdn.npmmirror.com/packages/rollup/4.60.3/rollup-4.60.3.tgz 2398ms (cache miss)
+1101 http fetch GET 200 https://cdn.npmmirror.com/packages/micromark/4.0.2/micromark-4.0.2.tgz 2398ms (cache miss)
+1102 http fetch GET 200 https://cdn.npmmirror.com/packages/%40babel/traverse/7.29.0/traverse-7.29.0.tgz 2352ms (cache miss)
+1103 http fetch GET 200 https://cdn.npmmirror.com/packages/vite/5.4.21/vite-5.4.21.tgz 2363ms (cache miss)
+1104 http fetch GET 200 https://cdn.npmmirror.com/packages/mdast-util-to-hast/13.2.1/mdast-util-to-hast-13.2.1.tgz 2426ms (cache miss)
+1105 http fetch GET 200 https://cdn.npmmirror.com/packages/react-dom/18.3.1/react-dom-18.3.1.tgz 2427ms (cache miss)
+1106 http fetch GET 200 https://cdn.npmmirror.com/packages/micromark-core-commonmark/2.0.3/micromark-core-commonmark-2.0.3.tgz 2638ms (cache miss)
+1107 http fetch GET 200 https://cdn.npmmirror.com/packages/%40esbuild/win32-x64/0.21.5/win32-x64-0.21.5.tgz 2708ms (cache miss)
+1108 http fetch GET 200 https://cdn.npmmirror.com/packages/mdast-util-to-markdown/2.1.2/mdast-util-to-markdown-2.1.2.tgz 2650ms (cache miss)
+1109 http fetch GET 200 https://cdn.npmmirror.com/packages/%40babel/core/7.29.0/core-7.29.0.tgz 2567ms (cache miss)
+1110 http fetch GET 200 https://cdn.npmmirror.com/packages/%40babel/types/7.29.0/types-7.29.0.tgz 2820ms (cache miss)
+1111 http fetch GET 200 https://cdn.npmmirror.com/packages/%40babel/helpers/7.29.2/helpers-7.29.2.tgz 2878ms (cache miss)
+1112 http fetch GET 200 https://cdn.npmmirror.com/packages/typescript/5.9.3/typescript-5.9.3.tgz 3113ms (cache miss)
+1113 http fetch GET 200 https://cdn.npmmirror.com/packages/caniuse-lite/1.0.30001792/caniuse-lite-1.0.30001792.tgz 4116ms (cache miss)
+1114 info run esbuild@0.21.5 postinstall node_modules/esbuild node install.js
+1115 info run esbuild@0.21.5 postinstall { code: 0, signal: null }
+1116 silly ADD node_modules/@rollup/rollup-win32-x64-msvc
+1117 silly ADD node_modules/@rollup/rollup-win32-x64-gnu
+1118 silly ADD
+1119 silly ADD
+1120 silly ADD
+1121 silly ADD
+1122 silly ADD
+1123 silly ADD
+1124 silly ADD
+1125 silly ADD
+1126 silly ADD
+1127 silly ADD
+1128 silly ADD
+1129 silly ADD
+1130 silly ADD
+1131 silly ADD
+1132 silly ADD
+1133 silly ADD
+1134 silly ADD
+1135 silly ADD
+1136 silly ADD
+1137 silly ADD
+1138 silly ADD
+1139 silly ADD
+1140 silly ADD
+1141 silly ADD node_modules/source-map-js
+1142 silly ADD node_modules/nanoid
+1143 silly ADD node_modules/@esbuild/win32-x64
+1144 silly ADD
+1145 silly ADD
+1146 silly ADD
+1147 silly ADD
+1148 silly ADD
+1149 silly ADD
+1150 silly ADD
+1151 silly ADD
+1152 silly ADD
+1153 silly ADD
+1154 silly ADD
+1155 silly ADD
+1156 silly ADD
+1157 silly ADD
+1158 silly ADD
+1159 silly ADD
+1160 silly ADD
+1161 silly ADD
+1162 silly ADD
+1163 silly ADD
+1164 silly ADD
+1165 silly ADD
+1166 silly ADD node_modules/rollup
+1167 silly ADD node_modules/rollup/node_modules/@types/estree
+1168 silly ADD node_modules/postcss
+1169 silly ADD
+1170 silly ADD node_modules/esbuild
+1171 silly ADD node_modules/escalade
+1172 silly ADD node_modules/trough
+1173 silly ADD node_modules/is-plain-obj
+1174 silly ADD node_modules/extend
+1175 silly ADD node_modules/bail
+1176 silly ADD node_modules/inline-style-parser
+1177 silly ADD node_modules/style-to-object
+1178 silly ADD node_modules/character-entities-html4
+1179 silly ADD node_modules/micromark-extension-gfm-task-list-item
+1180 silly ADD node_modules/micromark-extension-gfm-tagfilter
+1181 silly ADD node_modules/micromark-extension-gfm-table
+1182 silly ADD node_modules/micromark-extension-gfm-strikethrough
+1183 silly ADD node_modules/micromark-extension-gfm-footnote
+1184 silly ADD node_modules/micromark-extension-gfm-autolink-literal
+1185 silly ADD node_modules/markdown-table
+1186 silly ADD node_modules/unist-util-visit-parents
+1187 silly ADD node_modules/escape-string-regexp
+1188 silly ADD node_modules/mdast-util-find-and-replace
+1189 silly ADD node_modules/mdast-util-gfm-task-list-item
+1190 silly ADD node_modules/mdast-util-gfm-table
+1191 silly ADD node_modules/mdast-util-gfm-strikethrough
+1192 silly ADD node_modules/mdast-util-gfm-footnote
+1193 silly ADD node_modules/mdast-util-gfm-autolink-literal
+1194 silly ADD node_modules/remark-stringify
+1195 silly ADD node_modules/micromark-extension-gfm
+1196 silly ADD node_modules/mdast-util-gfm
+1197 silly ADD node_modules/is-alphabetical
+1198 silly ADD node_modules/is-hexadecimal
+1199 silly ADD node_modules/is-decimal
+1200 silly ADD node_modules/is-alphanumerical
+1201 silly ADD node_modules/character-reference-invalid
+1202 silly ADD node_modules/character-entities-legacy
+1203 silly ADD node_modules/micromark-util-html-tag-name
+1204 silly ADD node_modules/micromark-factory-whitespace
+1205 silly ADD node_modules/micromark-factory-title
+1206 silly ADD node_modules/micromark-factory-label
+1207 silly ADD node_modules/micromark-factory-destination
+1208 silly ADD node_modules/@types/ms
+1209 silly ADD node_modules/micromark-util-subtokenize
+1210 silly ADD node_modules/micromark-util-resolve-all
+1211 silly ADD node_modules/micromark-util-encode
+1212 silly ADD node_modules/micromark-util-combine-extensions
+1213 silly ADD node_modules/micromark-util-chunked
+1214 silly ADD node_modules/micromark-util-character
+1215 silly ADD node_modules/micromark-factory-space
+1216 silly ADD node_modules/micromark-core-commonmark
+1217 silly ADD node_modules/@types/debug
+1218 silly ADD node_modules/unist-util-is
+1219 silly ADD node_modules/zwitch
+1220 silly ADD node_modules/micromark-util-classify-character
+1221 silly ADD node_modules/mdast-util-phrasing
+1222 silly ADD node_modules/longest-streak
+1223 silly ADD node_modules/trim-lines
+1224 silly ADD node_modules/micromark-util-sanitize-uri
+1225 silly ADD node_modules/@ungap/structured-clone
+1226 silly ADD node_modules/stringify-entities
+1227 silly ADD node_modules/parse-entities
+1228 silly ADD node_modules/parse-entities/node_modules/@types/unist
+1229 silly ADD node_modules/ccount
+1230 silly ADD node_modules/character-entities
+1231 silly ADD node_modules/unist-util-stringify-position
+1232 silly ADD node_modules/micromark-util-types
+1233 silly ADD node_modules/micromark-util-symbol
+1234 silly ADD node_modules/micromark-util-normalize-identifier
+1235 silly ADD node_modules/micromark-util-decode-string
+1236 silly ADD node_modules/micromark-util-decode-numeric-character-reference
+1237 silly ADD node_modules/micromark
+1238 silly ADD node_modules/mdast-util-to-string
+1239 silly ADD node_modules/decode-named-character-reference
+1240 silly ADD node_modules/mdast-util-to-markdown
+1241 silly ADD node_modules/mdast-util-from-markdown
+1242 silly ADD node_modules/@types/estree-jsx
+1243 silly ADD node_modules/vfile-message
+1244 silly ADD node_modules/unist-util-position
+1245 silly ADD node_modules/style-to-js
+1246 silly ADD node_modules/space-separated-tokens
+1247 silly ADD node_modules/property-information
+1248 silly ADD node_modules/mdast-util-mdxjs-esm
+1249 silly ADD node_modules/mdast-util-mdx-jsx
+1250 silly ADD node_modules/mdast-util-mdx-expression
+1251 silly ADD node_modules/hast-util-whitespace
+1252 silly ADD node_modules/estree-util-is-identifier-name
+1253 silly ADD node_modules/comma-separated-tokens
+1254 silly ADD node_modules/@types/estree
+1255 silly ADD node_modules/dequal
+1256 silly ADD node_modules/@types/unist
+1257 silly ADD node_modules/vfile
+1258 silly ADD node_modules/unist-util-visit
+1259 silly ADD node_modules/unified
+1260 silly ADD node_modules/remark-rehype
+1261 silly ADD node_modules/remark-parse
+1262 silly ADD node_modules/mdast-util-to-hast
+1263 silly ADD node_modules/html-url-attributes
+1264 silly ADD node_modules/hast-util-to-jsx-runtime
+1265 silly ADD node_modules/devlop
+1266 silly ADD node_modules/@types/mdast
+1267 silly ADD node_modules/@types/hast
+1268 silly ADD node_modules/scheduler
+1269 silly ADD node_modules/loose-envify
+1270 silly ADD node_modules/yallist
+1271 silly ADD node_modules/ms
+1272 silly ADD node_modules/update-browserslist-db
+1273 silly ADD node_modules/node-releases
+1274 silly ADD node_modules/electron-to-chromium
+1275 silly ADD node_modules/caniuse-lite
+1276 silly ADD node_modules/baseline-browser-mapping
+1277 silly ADD node_modules/@types/babel__traverse
+1278 silly ADD node_modules/@types/babel__template
+1279 silly ADD node_modules/@types/babel__generator
+1280 silly ADD node_modules/@jridgewell/resolve-uri
+1281 silly ADD node_modules/@jridgewell/sourcemap-codec
+1282 silly ADD node_modules/@babel/helper-string-parser
+1283 silly ADD node_modules/@babel/helper-globals
+1284 silly ADD node_modules/@babel/helper-plugin-utils
+1285 silly ADD node_modules/@babel/helper-module-imports
+1286 silly ADD node_modules/lru-cache
+1287 silly ADD node_modules/browserslist
+1288 silly ADD node_modules/@babel/helper-validator-option
+1289 silly ADD node_modules/@babel/compat-data
+1290 silly ADD node_modules/jsesc
+1291 silly ADD node_modules/@jridgewell/trace-mapping
+1292 silly ADD node_modules/@jridgewell/gen-mapping
+1293 silly ADD node_modules/picocolors
+1294 silly ADD node_modules/js-tokens
+1295 silly ADD node_modules/@babel/helper-validator-identifier
+1296 silly ADD node_modules/semver
+1297 silly ADD node_modules/json5
+1298 silly ADD node_modules/gensync
+1299 silly ADD node_modules/debug
+1300 silly ADD node_modules/convert-source-map
+1301 silly ADD node_modules/@jridgewell/remapping
+1302 silly ADD node_modules/@babel/types
+1303 silly ADD node_modules/@babel/traverse
+1304 silly ADD node_modules/@babel/template
+1305 silly ADD node_modules/@babel/parser
+1306 silly ADD node_modules/@babel/helpers
+1307 silly ADD node_modules/@babel/helper-module-transforms
+1308 silly ADD node_modules/@babel/helper-compilation-targets
+1309 silly ADD node_modules/@babel/generator
+1310 silly ADD node_modules/@babel/code-frame
+1311 silly ADD node_modules/react-refresh
+1312 silly ADD node_modules/@types/babel__core
+1313 silly ADD node_modules/@rolldown/pluginutils
+1314 silly ADD node_modules/@babel/plugin-transform-react-jsx-source
+1315 silly ADD node_modules/@babel/plugin-transform-react-jsx-self
+1316 silly ADD node_modules/@babel/core
+1317 silly ADD node_modules/csstype
+1318 silly ADD node_modules/@types/prop-types
+1319 silly ADD node_modules/typescript
+1320 silly ADD node_modules/remark-gfm
+1321 silly ADD node_modules/react-markdown
+1322 silly ADD node_modules/react-dom
+1323 silly ADD node_modules/react
+1324 silly ADD node_modules/vite
+1325 silly ADD node_modules/@vitejs/plugin-react
+1326 silly ADD node_modules/@types/react-dom
+1327 silly ADD node_modules/@types/react
+1328 notice
+1328 notice New major version of npm available! 10.7.0 -> 11.14.1
+1328 notice Changelog: https://github.com/npm/cli/releases/tag/v11.14.1
+1328 notice To update run: npm install -g npm@11.14.1
+1328 notice  { force: true, [Symbol(proc-log.meta)]: true }
+1329 verbose exit 0
+1330 info ok
