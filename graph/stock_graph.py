@@ -7,6 +7,7 @@ from langgraph.graph import END, START, StateGraph
 from agents.bear_agent import BearAgent
 from agents.bull_agent import BullAgent
 from agents.judge_agent import JudgeAgent
+from agents.question_planning_agent import QuestionPlanningAgent
 from agents.risk_agent import RiskAgent
 from agents.information_agent import InformationCollectionAgent
 from agents.trace_logger import log_agent_output, log_agent_start
@@ -51,6 +52,10 @@ def build_stock_graph(
 
     builder = StateGraph(MarketDecisionState)
     builder.add_node(
+        "question_planning",
+        QuestionPlanningAgent(configs.get("information", {})),
+    )
+    builder.add_node(
         "information_analysis",
         information_agent or InformationCollectionAgent(configs["information"]),
     )
@@ -60,7 +65,8 @@ def build_stock_graph(
     builder.add_node("risk_review", RiskAgent(configs["risk"]))
     builder.add_node("format_output", format_output)
 
-    builder.add_edge(START, "information_analysis")
+    builder.add_edge(START, "question_planning")
+    builder.add_edge("question_planning", "information_analysis")
     builder.add_edge("information_analysis", "bull_debate")
     builder.add_edge("information_analysis", "bear_debate")
     builder.add_edge(["bull_debate", "bear_debate"], "judge_decision")

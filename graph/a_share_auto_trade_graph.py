@@ -13,6 +13,7 @@ from agents.bull_agent import BullAgent
 from agents.information_agent import InformationCollectionAgent
 from agents.judge_agent import JudgeAgent
 from agents.portfolio_manager_agent import PortfolioManagerAgent
+from agents.question_planning_agent import QuestionPlanningAgent
 from agents.risk_agent import RiskAgent
 from agents.trace_logger import log_agent_output, log_agent_start
 from graph.stock_graph import DEFAULT_AGENT_CONFIGS
@@ -52,6 +53,10 @@ def build_a_share_auto_trade_graph(
 
     builder = StateGraph(AShareAutoPurchaseState)
     builder.add_node(
+        "question_planning",
+        QuestionPlanningAgent(configs.get("information", {})),
+    )
+    builder.add_node(
         "information_analysis",
         information_agent or InformationCollectionAgent(configs["information"]),
     )
@@ -68,7 +73,8 @@ def build_a_share_auto_trade_graph(
     builder.add_node("skip_trade_plan", skip_trade_plan)
     builder.add_node("format_output", format_a_share_output)
 
-    builder.add_edge(START, "information_analysis")
+    builder.add_edge(START, "question_planning")
+    builder.add_edge("question_planning", "information_analysis")
     builder.add_edge("information_analysis", "a_share_context")
     builder.add_edge("a_share_context", "bull_debate")
     builder.add_edge("a_share_context", "bear_debate")
