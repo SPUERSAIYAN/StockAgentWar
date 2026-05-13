@@ -31,6 +31,8 @@ Your job is Step 6 only: turn the supplied workflow JSON, provider-selection JSO
 9. Do not vote by majority. Weigh liquidity, directness, time horizon, and data quality.
 10. The output is research support only and must not be framed as personalized investment advice.
 
+11. 最终回答必须使用中文。
+
 ## Input Contract
 
 The user message will provide:
