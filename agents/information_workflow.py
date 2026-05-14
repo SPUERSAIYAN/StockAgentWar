@@ -142,6 +142,8 @@ def infer_core_variable(task: str, symbols: list[str]) -> str:
 
 def infer_time_window(task: str) -> str:
     lowered = task.lower()
+    if any(token in lowered for token in ("明天", "tomorrow", "1-5", "next few days", "几天", "短线")):
+        return "very_short_term_1_to_5_trading_days"
     if any(token in lowered for token in ("3-5", "5 year", "5 years", "long-term", "长期", "五年")):
         return "long_term_3_to_5_years"
     if any(token in lowered for token in ("1-3", "1 year", "3 year", "medium-term", "中期", "一年", "三年")):
@@ -156,6 +158,8 @@ def infer_question_type(task: str, symbols: list[str]) -> str:
     if any(is_a_share_symbol_text(symbol) for symbol in symbols) or any(
         token in lowered for token in ("大a", "a股", "沪深", "中国股票", "china a-share", "a-share")
     ):
+        return "china_a_share_analysis"
+    if any(token in lowered for token in ("明天", "哪只股票", "哪一只", "买哪只")) and not symbols:
         return "china_a_share_analysis"
     if any(token in lowered for token in ("war", "conflict", "ceasefire", "invasion", "战争", "冲突", "台海")):
         return "geopolitical_conflict_or_war_risk"
