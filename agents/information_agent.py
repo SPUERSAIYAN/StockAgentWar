@@ -386,12 +386,11 @@ def extract_symbol_metrics(sources: dict[str, Any]) -> dict[str, dict[str, Any]]
     for label, value in sources.items():
         if not label.startswith("equity.") or not isinstance(value, dict):
             continue
-        parts = label.split(".")
-        if len(parts) < 3:
+        parsed_label = parse_equity_source_label(label)
+        if not parsed_label:
             continue
-        symbol = normalize_symbol(parts[1])
+        symbol, data_key = parsed_label
         row = metrics.setdefault(symbol, {})
-        data_key = ".".join(parts[2:])
         if data_key == "tencent_metrics":
             for item in value.get("items", []) or []:
                 if not isinstance(item, dict):
@@ -415,6 +414,15 @@ def extract_symbol_metrics(sources: dict[str, Any]) -> dict[str, dict[str, Any]]
         elif data_key in {"edgar_form4", "edgar_filings"}:
             row["name"] = row.get("name") or value.get("company_name")
     return metrics
+
+
+def parse_equity_source_label(label: str) -> tuple[str, str] | None:
+    parts = label.split(".")
+    if len(parts) < 3 or parts[0] != "equity":
+        return None
+    if len(parts) >= 4 and parts[2].upper() in {"SH", "SZ", "BJ"}:
+        return normalize_symbol(f"{parts[1]}.{parts[2]}"), ".".join(parts[3:])
+    return normalize_symbol(parts[1]), ".".join(parts[2:])
 
 
 def build_information_stock_pool(
@@ -494,7 +502,7 @@ def infer_information_data_gaps(
     discovery = dict(raw_data.get("candidate_discovery", {}) or {})
     if discovery.get("mode") == "provider_sector_discovery" and not discovery.get("candidates"):
         gaps.append(
-            "当前未接入板块成分股数据源，无法按板块限定候选："
+            "本地概念板块表未形成可用候选，无法按板块限定候选："
             f"{discovery.get('requested_sectors', [])}。"
         )
     if not stock_pool:
@@ -586,11 +594,15 @@ def normalize_symbol(symbol: str) -> str:
         return f"{normalized[2:]}.SH"
     if re.fullmatch(r"SZ\d{6}", normalized):
         return f"{normalized[2:]}.SZ"
-    if re.fullmatch(r"\d{6}\.(SH|SZ)", normalized):
+    if re.fullmatch(r"BJ\d{6}", normalized):
+        return f"{normalized[2:]}.BJ"
+    if re.fullmatch(r"\d{6}\.(SH|SZ|BJ)", normalized):
         return normalized
     if re.fullmatch(r"\d{6}", normalized):
         if normalized.startswith(("600", "601", "603", "605", "688")):
             return f"{normalized}.SH"
+        if normalized.startswith(("4", "8", "9")):
+            return f"{normalized}.BJ"
         return f"{normalized}.SZ"
     return normalized
 
@@ -1073,8 +1085,8 @@ def build_signal_divergences(rows: list[dict[str, Any]]) -> list[dict[str, str]]
 def is_a_share_symbol_text(symbol: str) -> bool:
     normalized = symbol.strip().upper()
     return bool(
-        re.fullmatch(r"(SH|SZ)?\d{6}", normalized)
-        or re.fullmatch(r"\d{6}\.(SH|SZ)", normalized)
+        re.fullmatch(r"(SH|SZ|BJ)?\d{6}", normalized)
+        or re.fullmatch(r"\d{6}\.(SH|SZ|BJ)", normalized)
     )
 
 
@@ -1326,6 +1338,7 @@ def mock_question_planning_report(user_message: str) -> str:
     else:
         selected_groups = ["us_equity", "macro"]
         market_scope = "US/global listed assets"
+    sector_terms = infer_mock_sector_terms(planning_input) if is_china else []
     providers = {
         group: {
             "enabled": group in selected_groups,
@@ -1352,6 +1365,7 @@ def mock_question_planning_report(user_message: str) -> str:
                 "market_scope": market_scope,
                 "time_window": "short_to_medium_term",
                 "candidate_scope": "User supplied or provider discovered candidates",
+                "sector_terms": sector_terms,
             },
             "provider_selection": {
                 "selected_groups": selected_groups,
@@ -1361,6 +1375,20 @@ def mock_question_planning_report(user_message: str) -> str:
         },
         ensure_ascii=False,
     )
+
+
+def infer_mock_sector_terms(text: str) -> list[str]:
+    known_terms = ("半导体", "白酒", "新能源", "人工智能", "机器人", "传媒")
+    terms = [term for term in known_terms if term in text]
+    if terms:
+        return terms
+    matches = re.findall(r"([\u4e00-\u9fa5A-Za-z0-9]{2,12})(?:板块|概念|行业)", text)
+    cleaned: list[str] = []
+    for match in matches:
+        term = re.sub(r"^(分析|指定|A股|大A|中国|沪深)+", "", match).strip()
+        if term and term not in cleaned:
+            cleaned.append(term)
+    return cleaned
 
 
 def mock_bull_case(user_message: str) -> str:

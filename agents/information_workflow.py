@@ -78,7 +78,7 @@ SIGNAL_MENU: dict[str, list[dict[str, Any]]] = {
         signal("web.leverage_stress", "web_search", "short_term", "Margin debt, MOVE, OAS and leveraged ETF concentration when needed."),
     ],
     "china_a_share_analysis": [
-        signal("china.candidate_discovery", "china_equity", "short_term", "Mootdx stock-list scan plus Tencent realtime trading and valuation metrics when symbols are absent."),
+        signal("china.candidate_discovery", "china_equity", "short_term", "Local Excel concept-board membership for requested A-share sectors; otherwise MooTDX stock-list scan plus Tencent realtime trading and valuation metrics."),
         signal("china.realtime_metrics", "china_equity", "short_term", "Tencent realtime price, PE, PB, market cap, turnover and volume ratio."),
         signal("china.kline_and_intraday", "china_equity", "short_term", "Mootdx bars, realtime quotes, intraday points, transactions and order book when enabled."),
         signal("china.fundamentals", "china_equity", "medium_term", "Mootdx EPS, financial summary, share capital, shareholders and F10 profile."),
@@ -407,6 +407,6 @@ def apply_provider_selection(
 def is_a_share_symbol_text(symbol: str) -> bool:
     normalized = symbol.strip().upper()
     return bool(
-        re.fullmatch(r"(SH|SZ)?\d{6}", normalized)
-        or re.fullmatch(r"\d{6}\.(SH|SZ)", normalized)
+        re.fullmatch(r"(SH|SZ|BJ)?\d{6}", normalized)
+        or re.fullmatch(r"\d{6}\.(SH|SZ|BJ)", normalized)
     )

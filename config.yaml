@@ -26,6 +26,7 @@ agents:
         max_candidates: 15
         scan_limit: 5000
         batch_size: 80
+        local_concept_board_path: astockdate/全部A股20264.xlsx
         a_share_filters:
           exclude_st: true
           exclude_new_days: 60

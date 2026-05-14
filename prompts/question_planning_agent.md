@@ -19,7 +19,8 @@ Use exactly this top-level shape:
     "core_intent": "",
     "market_scope": "",
     "time_window": "",
-    "candidate_scope": ""
+    "candidate_scope": "",
+    "sector_terms": []
   }},
   "provider_selection": {{
     "selected_groups": [],
@@ -39,7 +40,7 @@ Use exactly this top-level shape:
 Allowed provider groups:
 
 - `us_equity`: US stocks, ETFs, Yahoo-compatible tickers, price history, options, EDGAR filings and insider activity.
-- `china_equity`: China A-share tasks, Tencent realtime metrics, PE/PB, market cap, turnover, volume ratio, Mootdx bars, intraday, order book, financial summaries and company profile. Current data sources do not include external sector board lists or board constituent membership.
+- `china_equity`: China A-share tasks, local Excel concept-board membership, Tencent realtime metrics, PE/PB, market cap, turnover, volume ratio, Mootdx bars, intraday, order book, financial summaries and company profile.
 - `macro`: rates, yield curves, exchange rates, USDCNY, SPY, QQQ, VIX, gold, Fear & Greed, FedWatch, CFTC, broad risk appetite and liquidity context.
 - `prediction_markets`: Kalshi and Polymarket event probabilities, policy-event pricing, geopolitical event risk and real-money expectation checks.
 - `crypto`: crypto assets, BTC/ETH spot, Deribit derivatives, futures curves, options and crypto-linked risk appetite.
@@ -50,7 +51,7 @@ Planning rules:
 1. Select at least one provider group.
 2. Read the data-source reference before selecting groups; use its market ownership and provider role descriptions in your reasons.
 3. For China A-share questions, select `china_equity`; usually also select `macro` for risk-pricing context.
-4. For A-share sector, industry, concept, region, Tongdaxin board, or sector-rotation questions, select `china_equity`; usually also select `macro`; mention that current providers lack external sector constituent data and the collector must record this gap instead of fabricating sector members.
+4. For A-share sector, industry, concept, region, Tongdaxin board, or sector-rotation questions, select `china_equity`; usually also select `macro`; write the extracted board/concept names into `question_understanding.sector_terms` so the collector can use the local Excel concept-board source when the UI did not pass sectors.
 5. For US/global ticker questions, select `us_equity`; usually also select `macro`.
 6. Select `prediction_markets` only when event probabilities are directly relevant.
 7. Select `crypto` only for crypto assets or explicitly crypto-linked risk appetite.

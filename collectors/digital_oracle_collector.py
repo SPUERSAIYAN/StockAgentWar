@@ -16,6 +16,7 @@ from collectors.connectors.equity import build_equity_tasks
 from collectors.connectors.macro import build_macro_tasks
 from collectors.connectors.prediction import build_prediction_market_tasks
 from collectors.connectors.web_search import build_web_search_tasks
+from collectors.local_a_share_concepts import discover_local_concept_board_candidates
 from agents.trace_logger import (
     log_collector_summary,
     log_data_source_error,
@@ -107,6 +108,7 @@ DEFAULT_COLLECTOR_CONFIG: dict[str, Any] = {
         "max_candidates": 8,
         "scan_limit": 0,
         "batch_size": 80,
+        "local_concept_board_path": "astockdate/全部A股20264.xlsx",
     },
 }
 
@@ -409,23 +411,21 @@ def discover_candidate_universe(
 
     requested_sectors = extract_requested_sectors(state)
     if requested_sectors:
+        discovery = discover_local_concept_board_candidates(
+            requested_sectors,
+            discovery_config,
+        )
+        candidates = discovery.pop("candidates")
         return {
             "mode": "provider_sector_discovery",
             "universe": "china_a_share_sector",
-            "method": "sector_constituent_source_unavailable",
+            "method": discovery.pop("method"),
             "reason": (
-                "当前未接入外部股票板块列表或板块成分股数据源，"
-                "无法按用户指定板块限定候选。"
+                "A 股指定概念板块候选来自本地 Excel 概念板块表；"
+                "后续行情和估值字段继续使用已启用的 A 股行情源补充。"
             ),
-            "requested_sectors": requested_sectors,
-            "matched_sectors": [],
-            "sources": {},
-            "errors": {
-                "candidate_discovery.board_membership": RuntimeError(
-                    "当前未接入板块成分股数据源，无法按板块限定候选。"
-                )
-            },
-            "candidates": [],
+            "candidates": candidates,
+            **discovery,
         }
 
     universe_name = infer_auto_candidate_universe(state.get("task", ""))
@@ -454,9 +454,18 @@ def discover_candidate_universe(
 def extract_requested_sectors(state: MarketDecisionState) -> list[str]:
     scan_scope = dict(state.get("scan_scope", {}) or {})
     sectors = scan_scope.get("sectors") or []
-    if not isinstance(sectors, list):
+    if isinstance(sectors, list):
+        normalized = [str(item).strip() for item in sectors if str(item).strip()]
+        if normalized:
+            return normalized
+
+    question_understanding = dict(state.get("question_understanding", {}) or {})
+    sector_terms = question_understanding.get("sector_terms") or []
+    if isinstance(sector_terms, str):
+        sector_terms = re.split(r"[,，、]", sector_terms)
+    if not isinstance(sector_terms, list):
         return []
-    return [str(item).strip() for item in sectors if str(item).strip()]
+    return [str(item).strip() for item in sector_terms if str(item).strip()]
 
 
 def infer_auto_candidate_universe(task: str) -> str | None:
@@ -725,6 +734,8 @@ def tencent_symbol_to_a_share_symbol(symbol: str) -> str | None:
         return f"{normalized[2:].upper()}.SH"
     if re.fullmatch(r"sz\d{6}", normalized):
         return f"{normalized[2:].upper()}.SZ"
+    if re.fullmatch(r"bj\d{6}", normalized):
+        return f"{normalized[2:].upper()}.BJ"
     return None
 
 
@@ -1145,8 +1156,8 @@ def is_plain_us_equity(symbol: str) -> bool:
 def is_a_share_symbol(symbol: str) -> bool:
     normalized = symbol.strip().upper()
     return bool(
-        re.fullmatch(r"(SH|SZ)?\d{6}", normalized)
-        or re.fullmatch(r"\d{6}\.(SH|SZ)", normalized)
+        re.fullmatch(r"(SH|SZ|BJ)?\d{6}", normalized)
+        or re.fullmatch(r"\d{6}\.(SH|SZ|BJ)", normalized)
     )
 
 

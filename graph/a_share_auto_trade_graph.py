@@ -54,10 +54,6 @@ def build_a_share_auto_trade_graph(
     builder = StateGraph(AShareAutoPurchaseState)
     builder.add_node("question_planning", QuestionPlanningAgent(configs["question_planning"]))
     builder.add_node(
-        "question_planning",
-        QuestionPlanningAgent(configs.get("information", {})),
-    )
-    builder.add_node(
         "information_analysis",
         information_agent or InformationCollectionAgent(configs["information"]),
     )

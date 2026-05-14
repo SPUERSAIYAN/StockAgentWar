@@ -10,7 +10,7 @@ export function ControlPanel() {
   const status = state.running ? "运行中" : state.paused ? "已暂停" : state.error ? "失败" : state.finalOutput ? "完成" : "已就绪";
 
   return (
-    <aside className="control-panel">
+    <aside className="control-panel" id="control-panel">
       <div className="panel-header">
         <h2>决策参数</h2>
       </div>

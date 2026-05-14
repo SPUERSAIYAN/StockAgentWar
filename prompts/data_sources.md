@@ -29,9 +29,9 @@
 ### 候选标的与价格
 
 - 非 A 股候选标的走 `us_equity` 分组；A 股候选标的走 `china_equity` 分组。
-- A 股板块、行业、概念、地域、通达信板块或板块轮动任务仍走 `china_equity` 分组；当前未接入外部板块列表或板块成分股数据源，只能使用个股/指数/全市场 A 股数据并记录数据缺口。
+- A 股板块、行业、概念、地域、通达信板块或板块轮动任务仍走 `china_equity` 分组；指定概念板块成分股优先从本地 Excel `astockdate/全部A股20264.xlsx` 的 `Sheet1.概念板块` 获取，后续实时行情和估值继续由 Tencent/MooTDX 等 A 股行情源补充。
 - A 股任务没有显式候选股票时，会启用自动候选发现：`MooTDX.list_stocks()` 扫描沪深 A 股列表，再用 `TencentFinanceProvider.get_stock_metrics()` 批量拉取实时指标并排序。
-- A 股指定板块任务没有显式候选股票时，不会伪造板块成分股；若没有其他明确股票候选，信息报告会说明当前缺少板块成分股数据源。
+- A 股指定板块任务没有显式候选股票时，前端 `sectors` 优先；若前端未传，问题规划 Agent 应把自然语言中识别出的板块/概念写入 `question_understanding.sector_terms`，供本地 Excel 概念板块源使用。
 - 当前 A 股自动候选发现配置：最多输出 15 个候选，扫描上限 5000，批量大小 80，过滤 ST、停牌、低于 50 亿市值、PE 高于 80 的标的。
 - 当前宏观代理价格由 Yahoo 拉取：`SPY`、`QQQ`、`^VIX`、`GC=F`、`USDCNY=X`。
 
@@ -215,8 +215,8 @@
 | 市场/数据域 | 当前主要数据源 |
 | --- | --- |
 | A 股个股与指数 | Tencent Finance、MooTDX |
-| A 股板块与成分股 | 当前未接入外部数据源 |
-| A 股候选发现 | 全市场：MooTDX 股票列表 + Tencent Finance 实时指标；指定板块：记录数据缺口，不伪造成分股 |
+| A 股板块与成分股 | 本地 Excel 概念板块表 `astockdate/全部A股20264.xlsx` |
+| A 股候选发现 | 全市场：MooTDX 股票列表 + Tencent Finance 实时指标；指定概念板块：本地 Excel 成分股 + Excel 静态评分 |
 | 美股价格与 ETF | Yahoo Finance Prices |
 | 美股期权 | Yahoo Finance Options |
 | 美国上市公司公告 | SEC EDGAR |

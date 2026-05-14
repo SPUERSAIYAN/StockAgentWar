@@ -135,6 +135,7 @@ def normalize_question_understanding(value: Any) -> dict[str, Any]:
         "market_scope": str(value.get("market_scope") or "").strip(),
         "time_window": str(value.get("time_window") or value.get("primary_time_window") or "").strip(),
         "candidate_scope": str(value.get("candidate_scope") or "").strip(),
+        "sector_terms": normalize_text_terms(value.get("sector_terms")),
     }
 
 
@@ -192,6 +193,23 @@ def normalize_group_list(value: Any, field_name: str) -> list[str]:
     return groups
 
 
+def normalize_text_terms(value: Any) -> list[str]:
+    if value is None:
+        return []
+    if isinstance(value, str):
+        values = re.split(r"[,，、;；\n]", value)
+    elif isinstance(value, list):
+        values = value
+    else:
+        return []
+    terms: list[str] = []
+    for item in values:
+        term = str(item).strip()
+        if term and term not in terms:
+            terms.append(term)
+    return terms
+
+
 def default_provider_reason(group: str, enabled: bool) -> str:
     action = "Selected" if enabled else "Rejected"
     return f"{action} by QuestionPlanningAgent."
@@ -210,6 +228,7 @@ def render_question_plan_report(plan: dict[str, Any]) -> str:
         f"- 市场范围：{understanding.get('market_scope', '')}",
         f"- 时间窗口：{understanding.get('time_window', '')}",
         f"- 候选范围：{understanding.get('candidate_scope', '')}",
+        f"- 板块/概念词：{', '.join(understanding.get('sector_terms', [])) or '无'}",
         "",
         "## 数据源选择",
         "",

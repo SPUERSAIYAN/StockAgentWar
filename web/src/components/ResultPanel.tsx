@@ -10,7 +10,7 @@ export function ResultPanel() {
   const { state, copyFinal } = useAppContext();
 
   return (
-    <section className="result-panel">
+    <section className="result-panel" id="result-panel">
       <div className="panel-header">
         <h2>输出分析</h2>
         <button className="icon-button" type="button" title="复制最终输出" aria-label="复制最终输出" onClick={copyFinal}>

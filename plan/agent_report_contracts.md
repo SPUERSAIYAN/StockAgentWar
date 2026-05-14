@@ -42,7 +42,7 @@ Agent 能读到什么，取决于最终塞进 prompt 的字段，而不是 `stat
 | `raw_market_data`（原始市场数据） | provider 返回的原始采集结果和错误信息，是信息分析报告和结构化市场上下文的证据来源。 |
 | `info_report`（信息分析报告） | 信息分析 Agent 产出的用户可读市场报告，给后续多头、空头、裁判和总经理提供基础事实背景。 |
 | `stock_pool`（结构化股票池） | 信息节点内部生成的候选股票结构化数据，包含价格、板块、评分、技术信号、风险提示等后续节点需要的字段。 |
-| `sector_summary`（板块摘要） | 信息节点内部由 `stock_pool` 聚合生成的弱行业/板块摘要，用于辅助多空分析理解候选分布；当前不来自外部板块列表或板块成分股数据源。 |
+| `sector_summary`（板块摘要） | 信息节点内部由 `stock_pool` 聚合生成的板块摘要，用于辅助多空分析理解候选分布；指定概念板块候选可来自本地 Excel 概念板块表。 |
 | `confidence_level`（信息置信度） | 信息节点对本次数据完整度和质量的总体置信判断，后续结构化裁判和交易决策会参考。 |
 | `data_gaps`（数据缺口） | 采集失败、字段缺失或证据不足的列表，用于提示后续 Agent 哪些结论需要保守处理。 |
 | `macro_context`（宏观上下文） | 信息节点整理出的宏观背景，例如利率、市场情绪、指数、流动性或风险偏好环境。 |
@@ -76,7 +76,7 @@ Agent 能读到什么，取决于最终塞进 prompt 的字段，而不是 `stat
 
 `a_share_context` 不再是独立节点。股票池、板块摘要、数据缺口、宏观上下文等结构化字段由 `InformationCollectionAgent` 在信息报告生成后内部构建，并随 `information_analysis` 节点输出传递给后续 Agent。
 
-当前未接入任何外部股票板块列表或板块成分股数据源。腾讯财经和 MooTDX 只保留个股/指数行情、估值、市值、换手率、K 线和基础资料等用途；用户输入指定板块但没有显式股票候选时，系统只记录 `data_gaps`，不会伪造板块或成分股数据。
+当前指定概念板块成分股来自本地 Excel `astockdate/全部A股20264.xlsx` 的 `Sheet1.概念板块`；腾讯财经和 MooTDX 继续用于个股/指数行情、估值、市值、换手率、K 线和基础资料等用途。前端传入 `scan_scope.sectors` 优先，未传时可使用 `question_understanding.sector_terms` 作为本地板块匹配词。
 
 前端可见阶段只包含：`question_planning`、`information_analysis`、`bull_debate`、`bear_debate`、`judge_decision`、`risk_review`、`portfolio_manager`、`save_trade_plan`。`bull_cases`、`bear_cases`、`judge_rulings`、`portfolio_decision` 是内部 graph 节点，只给后续 Agent、总经理结构化决策和交易计划保存逻辑使用，不作为 `/api/health` 阶段、不产生前端 `stage` 展示事件，也不在 `complete.state` 暴露原始结构。
 
