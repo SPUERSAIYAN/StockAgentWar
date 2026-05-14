@@ -116,6 +116,7 @@ from .cme_fedwatch import (
     CMEFedWatchProvider,
     FedMeetingProbability,
     FedRateProb,
+    FedWatchUnavailable,
 )
 from .yfinance_provider import (
     OptionContract,
@@ -166,6 +167,7 @@ __all__ = [
     "FearGreedSnapshot",
     "FedMeetingProbability",
     "FedRateProb",
+    "FedWatchUnavailable",
     "ExchangeRateQuery",
     "ExchangeRateRecord",
     "KalshiEvent",

@@ -1,19 +1,18 @@
 """Yahoo Finance price history provider.
 
-Requires ``yfinance``: ``pip install yfinance``
-
 Replaces the Stooq provider with Yahoo Finance as the data source for
 OHLCV price history.  Supports stocks, ETFs, futures, forex and indices.
 """
 
 from __future__ import annotations
 
-import importlib
+import json
 import math
-import os
-import sys
-from dataclasses import dataclass, field
+from datetime import datetime, timezone
 from typing import Any, Protocol
+from urllib.error import HTTPError, URLError
+from urllib.parse import quote, urlencode
+from urllib.request import Request, urlopen
 
 from .base import ProviderError, ProviderParseError, SignalProvider
 from .prices import PriceBar, PriceHistory, PriceHistoryQuery
@@ -78,31 +77,10 @@ class PriceFetcher(Protocol):
     ) -> list[dict[str, Any]]: ...
 
 
-class _YFinancePriceFetcher:
-    """Default fetcher backed by the *yfinance* library."""
+class _YahooChartPriceFetcher:
+    """Default fetcher backed by Yahoo's chart endpoint."""
 
-    def __init__(self) -> None:
-        try:
-            self._yf = importlib.import_module("yfinance")
-            return
-        except ImportError:
-            pass
-
-        # Fall back to a repo-local .deps install if the global environment
-        # does not have yfinance available.
-        _deps = os.path.join(
-            os.path.dirname(os.path.abspath(__file__)), os.pardir, os.pardir, ".deps"
-        )
-        if os.path.isdir(_deps) and _deps not in sys.path:
-            sys.path.insert(0, _deps)
-
-        try:
-            self._yf = importlib.import_module("yfinance")
-        except ImportError:
-            raise ImportError(
-                "yfinance is required for YahooPriceProvider but is not installed.\n"
-                "Install it with:  uv pip install --target .deps yfinance\n"
-            )
+    _BASE_URL = "https://query1.finance.yahoo.com/v8/finance/chart"
 
     def fetch_history(
         self,
@@ -111,20 +89,104 @@ class _YFinancePriceFetcher:
         period: str,
         interval: str,
     ) -> list[dict[str, Any]]:
-        df = guarded_yahoo_request(
-            lambda: self._yf.Ticker(symbol).history(period=period, interval=interval)
+        payload = guarded_yahoo_request(
+            lambda: self._fetch_chart_payload(symbol, period=period, interval=interval)
         )
+        return self._parse_chart_payload(payload, symbol=symbol)
 
+    def _fetch_chart_payload(
+        self,
+        symbol: str,
+        *,
+        period: str,
+        interval: str,
+    ) -> dict[str, Any]:
+        encoded_symbol = quote(symbol, safe="")
+        params = urlencode(
+            {
+                "range": period,
+                "interval": interval,
+                "events": "history",
+                "includePrePost": "false",
+            }
+        )
+        url = f"{self._BASE_URL}/{encoded_symbol}?{params}"
+        request = Request(
+            url,
+            headers={
+                "Accept": "application/json",
+                "User-Agent": (
+                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                    "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0 Safari/537.36"
+                ),
+            },
+        )
+        try:
+            with urlopen(request, timeout=20) as response:
+                return json.load(response)
+        except HTTPError as exc:
+            raise ProviderError(
+                f"Yahoo chart request failed with HTTP {exc.code}: {url}"
+            ) from exc
+        except (TimeoutError, URLError) as exc:
+            raise ProviderError(f"Yahoo chart request failed: {url}") from exc
+        except json.JSONDecodeError as exc:
+            raise ProviderParseError(f"invalid Yahoo chart JSON for {symbol}") from exc
+
+    def _parse_chart_payload(
+        self,
+        payload: dict[str, Any],
+        *,
+        symbol: str,
+    ) -> list[dict[str, Any]]:
+        chart = payload.get("chart")
+        if not isinstance(chart, dict):
+            raise ProviderParseError(f"invalid Yahoo chart payload for {symbol}")
+        errors = chart.get("error")
+        if errors:
+            raise ProviderError(f"Yahoo chart error for {symbol}: {errors}")
+        results = chart.get("result")
+        if not isinstance(results, list) or not results:
+            raise ProviderParseError(f"empty Yahoo chart result for {symbol}")
+
+        result = results[0]
+        if not isinstance(result, dict):
+            raise ProviderParseError(f"invalid Yahoo chart result for {symbol}")
+        timestamps = result.get("timestamp")
+        indicators = result.get("indicators")
+        if not isinstance(timestamps, list) or not isinstance(indicators, dict):
+            raise ProviderParseError(f"missing Yahoo chart bars for {symbol}")
+        quotes = indicators.get("quote")
+        if not isinstance(quotes, list) or not quotes or not isinstance(quotes[0], dict):
+            raise ProviderParseError(f"missing Yahoo chart quote data for {symbol}")
+
+        quote_data = quotes[0]
         rows: list[dict[str, Any]] = []
-        for idx, row in df.iterrows():
-            d: dict[str, Any] = {"Date": idx}
-            for col in df.columns:
-                val = row[col]
-                if isinstance(val, float) and math.isnan(val):
-                    val = None
-                d[col] = val
-            rows.append(d)
+        for index, timestamp in enumerate(timestamps):
+            if timestamp is None:
+                continue
+            rows.append(
+                {
+                    "Date": datetime.fromtimestamp(
+                        int(timestamp), timezone.utc
+                    ).date(),
+                    "Open": _list_get(quote_data.get("open"), index),
+                    "High": _list_get(quote_data.get("high"), index),
+                    "Low": _list_get(quote_data.get("low"), index),
+                    "Close": _list_get(quote_data.get("close"), index),
+                    "Volume": _list_get(quote_data.get("volume"), index),
+                }
+            )
         return rows
+
+
+def _list_get(values: Any, index: int) -> Any:
+    if not isinstance(values, list) or index >= len(values):
+        return None
+    value = values[index]
+    if isinstance(value, float) and math.isnan(value):
+        return None
+    return value
 
 
 # ---------------------------------------------------------------------------
@@ -139,7 +201,7 @@ class YahooPriceProvider(SignalProvider):
     (e.g. ``GC=F`` for gold, ``CL=F`` for crude oil, ``SPY`` for S&P 500
     ETF, ``EURUSD=X`` for EUR/USD forex).
 
-    Requires ``yfinance``: ``pip install yfinance``.
+    Uses Yahoo's chart endpoint directly instead of yfinance's cookie/crumb path.
     """
 
     provider_id = "yahoo"
@@ -147,7 +209,7 @@ class YahooPriceProvider(SignalProvider):
     capabilities = ("price_history",)
 
     def __init__(self, *, fetcher: PriceFetcher | None = None) -> None:
-        self._fetcher: PriceFetcher = fetcher or _YFinancePriceFetcher()
+        self._fetcher: PriceFetcher = fetcher or _YahooChartPriceFetcher()
 
     def get_history(self, query: PriceHistoryQuery) -> PriceHistory:
         interval = query.interval.lower().strip()
@@ -202,6 +264,11 @@ class YahooPriceProvider(SignalProvider):
 
         if query.limit is not None and query.limit >= 0:
             bars = bars[-query.limit:]
+
+        if not bars:
+            raise ProviderParseError(
+                f"Yahoo Finance returned no usable {interval} bars for {symbol}"
+            )
 
         return PriceHistory(
             symbol=symbol,

@@ -31,6 +31,7 @@ DEFAULT_COLLECTOR_CONFIG: dict[str, Any] = {
     "enabled": True,
     "timeout_seconds": 90,
     "max_workers": 12,
+    "yahoo_max_workers": 1,
     "price_history_limit": 90,
     "include_macro": True,
     "include_options": True,
@@ -123,6 +124,7 @@ def collect_market_information(
         enabled=collector_config.get("enabled", False) is not False,
         timeout_seconds=collector_config.get("timeout_seconds"),
         max_workers=collector_config.get("max_workers"),
+        yahoo_max_workers=collector_config.get("yahoo_max_workers"),
         providers=dict(collector_config.get("providers", {})),
     )
     if collector_config.get("enabled", False) is False:
@@ -174,6 +176,7 @@ def collect_market_information(
 
     timeout_seconds = float(collector_config.get("timeout_seconds", 35))
     max_workers = int(collector_config.get("max_workers", 12))
+    yahoo_max_workers = int(collector_config.get("yahoo_max_workers", 1))
 
     tasks: dict[str, Callable[[], Any]] = {}
     task_build_errors: dict[str, BaseException] = {}
@@ -239,22 +242,98 @@ def collect_market_information(
         },
     )
 
-    gathered = gather(
-        trace_data_source_tasks(tasks, task=state.get("task", ""), symbols=symbols),
-        max_workers=max_workers,
-        timeout_seconds=timeout_seconds,
-        fail_fast=False,
-    )
-    for label, exc in gathered.errors.items():
+    traced_tasks = trace_data_source_tasks(tasks, task=state.get("task", ""), symbols=symbols)
+    standard_tasks, yahoo_tasks = split_yahoo_tasks(traced_tasks)
+    gathered_results: dict[str, Any] = {}
+    gathered_errors: dict[str, BaseException] = {}
+
+    if standard_tasks:
+        gathered = gather(
+            standard_tasks,
+            max_workers=max_workers,
+            timeout_seconds=timeout_seconds,
+            fail_fast=False,
+        )
+        gathered_results.update(gathered.results)
+        gathered_errors.update(gathered.errors)
+
+    if yahoo_tasks:
+        yahoo_results, yahoo_errors = gather_yahoo_tasks(
+            yahoo_tasks,
+            gather=gather,
+            max_workers=yahoo_max_workers,
+            timeout_seconds=timeout_seconds,
+        )
+        gathered_results.update(yahoo_results)
+        gathered_errors.update(yahoo_errors)
+
+    for label, exc in gathered_errors.items():
         if isinstance(exc, TimeoutError):
             log_data_source_error(label, int(timeout_seconds * 1000), exc)
     return summarize_gathered_market_data(
         task=state.get("task", ""),
         symbols=symbols,
-        results=gathered.results,
-        errors={**task_build_errors, **gathered.errors},
+        results=gathered_results,
+        errors={**task_build_errors, **gathered_errors},
         discovery=discovery,
     )
+
+
+def gather_yahoo_tasks(
+    tasks: dict[str, Callable[[], Any]],
+    *,
+    gather: Callable[..., Any],
+    max_workers: int,
+    timeout_seconds: float,
+) -> tuple[dict[str, Any], dict[str, BaseException]]:
+    if max_workers > 1:
+        gathered = gather(
+            tasks,
+            max_workers=max_workers,
+            timeout_seconds=timeout_seconds,
+            fail_fast=False,
+        )
+        return gathered.results, gathered.errors
+
+    results: dict[str, Any] = {}
+    errors: dict[str, BaseException] = {}
+    for label, fn in tasks.items():
+        gathered = gather(
+            {label: fn},
+            max_workers=1,
+            timeout_seconds=timeout_seconds,
+            fail_fast=False,
+        )
+        results.update(gathered.results)
+        errors.update(gathered.errors)
+    return results, errors
+
+
+def split_yahoo_tasks(
+    tasks: dict[str, Callable[[], Any]],
+) -> tuple[dict[str, Callable[[], Any]], dict[str, Callable[[], Any]]]:
+    standard_tasks: dict[str, Callable[[], Any]] = {}
+    yahoo_tasks: dict[str, Callable[[], Any]] = {}
+    for label, fn in tasks.items():
+        if is_yahoo_backed_task(label):
+            yahoo_tasks[label] = fn
+        else:
+            standard_tasks[label] = fn
+    return standard_tasks, yahoo_tasks
+
+
+def is_yahoo_backed_task(label: str) -> bool:
+    if label.startswith("macro.price."):
+        return True
+    if not label.startswith("equity."):
+        return False
+    data_kind = label.split(".")[-1]
+    return data_kind in {
+        "price_daily",
+        "price_weekly",
+        "stooq_price_daily",
+        "options_nearest",
+    }
 
 
 def trace_data_source_tasks(

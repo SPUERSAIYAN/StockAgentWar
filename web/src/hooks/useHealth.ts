@@ -19,8 +19,8 @@ export function useHealth(): HealthState {
         if (!active) return;
         if (response.ok && data.ok) {
           setHealth({
-            status: data.openrouter_key_ready ? "ready" : "warn",
-            text: data.openrouter_key_ready ? "模型已就绪" : "Mock 可用",
+            status: "ready",
+            text: "服务已连接",
           });
         } else {
           setHealth({ status: "warn", text: "服务异常" });

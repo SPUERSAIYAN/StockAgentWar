@@ -18,6 +18,14 @@ export function Topbar() {
         <a href="#result-panel">输出</a>
       </nav>
       <div className="topbar-right">
+        <a
+          className="github-link"
+          href="https://github.com/SPUERSAIYAN/StockAgentWar"
+          target="_blank"
+          rel="noreferrer"
+        >
+          GitHub
+        </a>
         <div className={`health ${health.status}`}>
           <span className="dot" />
           <span>{health.text}</span>

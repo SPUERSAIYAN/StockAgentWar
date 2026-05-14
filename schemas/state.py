@@ -20,7 +20,7 @@ class ModelConfig(TypedDict, total=False):
     provider: str
     model: str
     temperature: float
-    api_key_env: str
+    api_key: str
     base_url: str
     site_url: str
     app_title: str

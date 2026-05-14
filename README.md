@@ -95,13 +95,14 @@ python -m schedulers.trade_monitor_scheduler `
 ```yaml
 provider: openrouter
 model: openai/gpt-5.2
-api_key_env: OPENROUTER_API_KEY
+site_url: http://localhost
+app_title: multi-Agent-Inv
 ```
 
-如果没有 `.env`，可以手动设置：
+Web 前端会在运行前提示填写 OpenRouter API Key。命令行运行时通过参数传入，未传时会提示安全输入：
 
 ```powershell
-$env:OPENROUTER_API_KEY="你的 OpenRouter API Key"
+python main.py --config .\config.yaml --openrouter-api-key "你的 OpenRouter API Key"
 ```
 
 ## 流程

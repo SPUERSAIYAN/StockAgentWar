@@ -108,12 +108,11 @@ export const STAGE_META: Record<string, StageMeta> = {
   save_trade_plan: { id: "save_trade_plan", agent: "交易计划", title: "计划落盘", color: "#62BFA2", icon: <ClipboardIcon /> },
 };
 
-export const COMMON_STAGE_ORDER = ["question_planning", "information_analysis", "bull_debate", "bear_debate", "judge_decision", "risk_review"];
+export const COMMON_STAGE_ORDER = ["question_planning", "information_analysis"];
 
 export const A_SHARE_STAGE_ORDER = [
   "question_planning",
   "information_analysis",
-  "a_share_context",
   "bull_debate",
   "bear_debate",
   "judge_decision",

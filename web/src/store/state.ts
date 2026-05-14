@@ -2,7 +2,7 @@ import type { AppState, StageState } from "./types";
 import { currentStageOrder } from "./stageMeta";
 
 export const commonTask =
-  "筛选未来 1-3 个月的候选股票，输出做多/观望/回避建议，并说明风险控制条件。";
+  "分析宏观与市场信息，输出信息分析报告。";
 
 export const dailyTask =
   "扫描市场，找出未来1个月最具投资价值的A股标的，并生成价格触发式交易计划。";
@@ -27,8 +27,9 @@ export function createStages(stageOrder: string[]): Record<string, StageState> {
 export const initialState: AppState = {
   runMode: "common",
   modelMode: "openrouter",
-  symbols: "AAPL,MSFT,NVDA",
+  symbols: "",
   sectors: "半导体,白酒,新能源",
+  openrouterApiKey: "",
   riskTolerance: "moderate",
   capital: 1000000,
   task: commonTask,

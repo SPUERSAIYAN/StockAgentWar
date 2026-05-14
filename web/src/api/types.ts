@@ -11,6 +11,7 @@ export interface DecisionRequest {
   task: string;
   symbols: string;
   sectors: string;
+  openrouter_api_key?: string;
   mode: "openrouter" | "mock" | "a_share_daily" | "a_share_sector" | "a_share_deep";
   risk_tolerance: RiskTolerance;
   capital: number;
@@ -35,7 +36,6 @@ export type NdjsonEvent =
 export interface HealthResponse {
   ok: boolean;
   config_exists: boolean;
-  openrouter_key_ready: boolean;
   stages: StageDescriptor[];
   stage_sets?: Record<string, StageDescriptor[]>;
 }

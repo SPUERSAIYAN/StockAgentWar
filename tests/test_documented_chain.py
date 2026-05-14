@@ -44,9 +44,13 @@ class DocumentedChainTests(unittest.TestCase):
             {
                 "bull_debate",
                 "bear_debate",
+                "bull_cases",
+                "bear_cases",
                 "judge_decision",
+                "judge_rulings",
                 "risk_review",
                 "portfolio_manager",
+                "portfolio_decision",
                 "save_trade_plan",
                 "final_output",
             }.isdisjoint(node_names)

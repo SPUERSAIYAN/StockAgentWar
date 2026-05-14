@@ -58,7 +58,7 @@ class UrllibJsonClient:
             with self._open(request_url) as response:
                 return json.load(response)
         except HTTPError as exc:
-            raise HttpClientError(f"request failed: {request_url.full_url}") from exc
+            raise HttpClientError(_format_http_error(exc, request_url.full_url)) from exc
         except json.JSONDecodeError as exc:
             raise HttpClientError(f"invalid json payload: {request_url.full_url}") from exc
 
@@ -68,7 +68,7 @@ class UrllibJsonClient:
             with self._open(request_url) as response:
                 return response.read().decode("utf-8")
         except HTTPError as exc:
-            raise HttpClientError(f"request failed: {request_url.full_url}") from exc
+            raise HttpClientError(_format_http_error(exc, request_url.full_url)) from exc
 
     def _build_request(self, url: str, params: Mapping[str, object] | None) -> Request:
         request_url = _build_url(url, params)
@@ -79,11 +79,31 @@ class UrllibJsonClient:
         for attempt in range(1, self.retry_attempts + 1):
             try:
                 return urlopen(request, timeout=self.timeout_seconds)
-            except HTTPError:
-                raise
-            except (URLError, TimeoutError) as exc:
+            except HTTPError as exc:
+                if exc.code not in (429, 500, 502, 503, 504) or attempt >= self.retry_attempts:
+                    raise
+                last_error = exc
+                time.sleep(self.retry_delay_seconds * attempt)
+                continue
+            except TimeoutError as exc:
                 last_error = exc
                 if attempt >= self.retry_attempts:
                     break
-                time.sleep(self.retry_delay_seconds)
+                time.sleep(self.retry_delay_seconds * attempt)
+            except URLError as exc:
+                last_error = exc
+                if attempt >= self.retry_attempts:
+                    break
+                time.sleep(self.retry_delay_seconds * attempt)
         raise HttpClientError(f"request failed: {request.full_url}") from last_error
+
+
+def _format_http_error(exc: HTTPError, url: str) -> str:
+    try:
+        body = exc.read(300).decode("utf-8", "replace").strip()
+    except Exception:
+        body = ""
+    message = f"request failed with HTTP {exc.code}: {url}"
+    if body:
+        message = f"{message}; {body}"
+    return message

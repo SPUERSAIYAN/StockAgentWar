@@ -16,6 +16,7 @@ function buildRequest(state: AppState): DecisionRequest {
     task: state.task.trim(),
     symbols: !isAShare || state.runMode === "a_share_deep" ? state.symbols.trim() : "",
     sectors: state.runMode === "a_share_sector" ? state.sectors.trim() : "",
+    openrouter_api_key: backendMode(state) === "mock" ? "" : state.openrouterApiKey.trim(),
     mode: backendMode(state),
     risk_tolerance: state.riskTolerance,
     capital: Number.isFinite(state.capital) ? state.capital : 1000000,

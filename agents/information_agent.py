@@ -256,9 +256,8 @@ def create_openai_model(config: ModelConfig) -> ChatModel:
         raise RuntimeError("OpenAI provider requires `pip install -r requirements.txt`.") from exc
 
     kwargs = dict(config.get("kwargs", {}))
-    api_key_env = config.get("api_key_env")
-    if api_key_env and os.getenv(api_key_env):
-        kwargs["api_key"] = os.getenv(api_key_env)
+    if config.get("api_key"):
+        kwargs["api_key"] = config["api_key"]
     return ChatOpenAI(
         model=config.get("model", "gpt-4o-mini"),
         temperature=float(config.get("temperature", 0.2)),
@@ -273,10 +272,9 @@ def create_openrouter_model(config: ModelConfig) -> ChatModel:
         raise RuntimeError("OpenRouter provider requires `pip install -r requirements.txt`.") from exc
 
     kwargs = dict(config.get("kwargs", {}))
-    api_key_env = config.get("api_key_env", "OPENROUTER_API_KEY")
-    api_key = os.getenv(api_key_env)
+    api_key = config.get("api_key")
     if not api_key:
-        raise RuntimeError(f"Missing OpenRouter API key. Set ${api_key_env} first.")
+        raise RuntimeError("Missing OpenRouter API key. Provide it at runtime.")
 
     default_headers = dict(config.get("default_headers", {}))
     site_url = config.get("site_url") or os.getenv("OPENROUTER_SITE_URL")

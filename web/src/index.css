@@ -221,7 +221,30 @@ h1 {
 
 .topbar-right {
   display: flex;
+  align-items: center;
   justify-content: flex-end;
+  gap: var(--space-3);
+}
+
+.github-link {
+  display: inline-flex;
+  min-height: 36px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--space-4);
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-full);
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  font-size: var(--text-caption);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.github-link:hover,
+.github-link:focus-visible {
+  background: var(--color-charcoal);
+  outline: none;
 }
 
 .health {
@@ -312,6 +335,40 @@ h1 {
   font-size: var(--text-subtitle);
   font-weight: 600;
   line-height: 1.35;
+}
+
+.share-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: 36px;
+  padding: 0 var(--space-4);
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-full);
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  line-height: 1.4;
+  white-space: nowrap;
+  transition: background 150ms ease, border-color 150ms ease, color 150ms ease;
+}
+
+.share-button:hover:not(:disabled) {
+  background: var(--color-charcoal);
+}
+
+.share-button:disabled {
+  border-color: var(--color-hairline);
+  background: var(--color-hairline);
+  color: var(--color-muted);
+}
+
+.share-button svg {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
 }
 
 /* ============================================================
@@ -422,6 +479,7 @@ textarea:focus-visible {
 .segment:focus-visible,
 .run-button:focus-visible,
 .pause-button:focus-visible,
+.share-button:focus-visible,
 .icon-button:focus-visible,
 .rtab:focus-visible,
 .view-tab:focus-visible,
@@ -635,17 +693,14 @@ textarea:focus-visible {
   grid-template-rows: auto auto minmax(0, 1fr);
   min-width: 0;
   overflow: hidden;
-  border: 1px solid var(--color-hairline);
+  border: 2px solid color-mix(in srgb, var(--card-brand, var(--color-primary)) 70%, var(--color-hairline));
   border-radius: var(--radius-xl);
   background: var(--color-canvas);
   box-shadow: var(--shadow-1);
 }
 
 .stage-card::before {
-  content: "";
-  display: block;
-  height: 4px;
-  background: var(--card-brand, var(--color-primary));
+  display: none;
 }
 
 .stage-head {

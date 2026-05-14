@@ -147,6 +147,7 @@ def log_collector_summary(
     enabled: bool,
     timeout_seconds: Any,
     max_workers: Any,
+    yahoo_max_workers: Any = None,
     providers: dict[str, Any],
 ) -> None:
     if not trace_enabled():
@@ -156,10 +157,15 @@ def log_collector_summary(
         for name, config in providers.items()
         if not isinstance(config, dict) or config.get("enabled", True) is not False
     ]
+    yahoo_text = (
+        f" yahoo_max_workers={yahoo_max_workers}"
+        if yahoo_max_workers is not None
+        else ""
+    )
     log_line(
         "COLLECTOR "
         f"enabled={enabled} timeout_seconds={timeout_seconds} "
-        f"max_workers={max_workers} providers={','.join(enabled_groups)}"
+        f"max_workers={max_workers}{yahoo_text} providers={','.join(enabled_groups)}"
     )
 
 

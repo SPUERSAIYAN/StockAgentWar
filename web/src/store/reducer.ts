@@ -1,5 +1,6 @@
 import type { AppAction, AppState, StageStatus } from "./types";
 import { commonTask, createStages, dailyTask, deepTask, sectorTask } from "./state";
+import { currentStageOrder } from "./stageMeta";
 
 function isLikelyAShareSymbolList(value: string): boolean {
   return value
@@ -20,23 +21,40 @@ function markRunningStages(state: AppState, status: StageStatus): AppState["stag
 
 export function appReducer(state: AppState, action: AppAction): AppState {
   switch (action.type) {
-    case "SET_RUN_MODE":
+    case "SET_RUN_MODE": {
+      const stageOrder = currentStageOrder(action.payload);
       if (action.payload === "common") {
         return {
           ...state,
           runMode: action.payload,
           task: commonTask,
-          symbols: !state.symbols.trim() || isLikelyAShareSymbolList(state.symbols) ? "AAPL,MSFT,NVDA" : state.symbols,
+          stageOrder,
+          stages: createStages(stageOrder),
+          activeStageTab: null,
+          symbols:
+            !state.symbols.trim() || state.symbols === "AAPL,MSFT,NVDA" || isLikelyAShareSymbolList(state.symbols)
+              ? ""
+              : state.symbols,
         };
       }
       if (action.payload === "a_share_daily") {
-        return { ...state, runMode: action.payload, task: dailyTask };
+        return {
+          ...state,
+          runMode: action.payload,
+          task: dailyTask,
+          stageOrder,
+          stages: createStages(stageOrder),
+          activeStageTab: null,
+        };
       }
       if (action.payload === "a_share_sector") {
         return {
           ...state,
           runMode: action.payload,
           task: sectorTask,
+          stageOrder,
+          stages: createStages(stageOrder),
+          activeStageTab: null,
           sectors: state.sectors.trim() ? state.sectors : "半导体,白酒,新能源",
         };
       }
@@ -44,14 +62,20 @@ export function appReducer(state: AppState, action: AppAction): AppState {
         ...state,
         runMode: action.payload,
         task: deepTask,
+        stageOrder,
+        stages: createStages(stageOrder),
+        activeStageTab: null,
         symbols: !state.symbols.trim() || !isLikelyAShareSymbolList(state.symbols) ? "600519,000858,300750" : state.symbols,
       };
+    }
     case "SET_MODEL_MODE":
       return { ...state, modelMode: action.payload };
     case "SET_SYMBOLS":
       return { ...state, symbols: action.payload };
     case "SET_SECTORS":
       return { ...state, sectors: action.payload };
+    case "SET_OPENROUTER_API_KEY":
+      return { ...state, openrouterApiKey: action.payload };
     case "SET_TASK":
       return { ...state, task: action.payload };
     case "SET_RISK":

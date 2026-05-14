@@ -7,6 +7,8 @@ import { Segmented } from "./Segmented";
 export function ControlPanel() {
   const { state, dispatch, runDecision, pauseRun } = useAppContext();
   const isAShare = state.runMode !== "common";
+  const needsOpenRouter = backendNeedsOpenRouter(isAShare, state.modelMode);
+  const canRun = !state.running && (!needsOpenRouter || Boolean(state.openrouterApiKey.trim()));
   const status = state.running ? "运行中" : state.paused ? "已暂停" : state.error ? "失败" : state.finalOutput ? "完成" : "已就绪";
 
   return (
@@ -40,6 +42,20 @@ export function ControlPanel() {
         />
       )}
 
+      {needsOpenRouter && (
+        <div className="field">
+          <label htmlFor="openrouterApiKey">OpenRouter API Key</label>
+          <input
+            id="openrouterApiKey"
+            type="password"
+            autoComplete="off"
+            value={state.openrouterApiKey}
+            placeholder="sk-or-v1-..."
+            onChange={(event) => dispatch({ type: "SET_OPENROUTER_API_KEY", payload: event.target.value })}
+          />
+        </div>
+      )}
+
       {state.runMode === "a_share_sector" && (
         <div className="field">
           <label htmlFor="sectors">股票板块</label>
@@ -58,7 +74,7 @@ export function ControlPanel() {
           <input
             id="symbols"
             value={state.symbols}
-            placeholder={isAShare ? "例如：600519,300750" : "例如：AAPL,MSFT,NVDA"}
+            placeholder={isAShare ? "例如：600519,300750" : "可选：AAPL,MSFT 或 000001,600519"}
             onChange={(event) => dispatch({ type: "SET_SYMBOLS", payload: event.target.value })}
           />
         </div>
@@ -101,7 +117,7 @@ export function ControlPanel() {
       </div>
 
       <div className="action-row">
-        <button className="run-button" type="button" disabled={state.running} onClick={runDecision}>
+        <button className="run-button" type="button" disabled={!canRun} onClick={runDecision}>
           {!state.running && <PlayIcon />}
           <span>{state.running ? "运行中" : "运行决策"}</span>
         </button>
@@ -123,4 +139,8 @@ export function ControlPanel() {
       </div>
     </aside>
   );
+}
+
+function backendNeedsOpenRouter(isAShare: boolean, modelMode: ModelMode): boolean {
+  return isAShare || modelMode === "openrouter";
 }

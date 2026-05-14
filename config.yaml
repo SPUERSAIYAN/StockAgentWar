@@ -7,7 +7,6 @@ agents:
       provider: openrouter
       model: qwen/qwen3.5-plus-20260420
       temperature: 0.1
-      api_key_env: OPENROUTER_API_KEY
       site_url: http://localhost
       app_title: multi-Agent-Inv
 
@@ -16,6 +15,7 @@ agents:
       enabled: true
       timeout_seconds: 90
       max_workers: 12
+      yahoo_max_workers: 1
       price_history_limit: 90
       include_macro: true
       include_options: true
@@ -182,7 +182,6 @@ agents:
       provider: openrouter
       model: deepseek/deepseek-v4-pro
       temperature: 0.2
-      api_key_env: OPENROUTER_API_KEY
       site_url: http://localhost
       app_title: multi-Agent-Inv
 
@@ -191,7 +190,6 @@ agents:
       provider: openrouter
       model: qwen/qwen3.5-plus-20260420
       temperature: 0.5
-      api_key_env: OPENROUTER_API_KEY
       site_url: http://localhost
       app_title: multi-Agent-Inv
 
@@ -200,7 +198,6 @@ agents:
       provider: openrouter
       model: qwen/qwen3.5-plus-20260420
       temperature: 0.5
-      api_key_env: OPENROUTER_API_KEY
       site_url: http://localhost
       app_title: multi-Agent-Inv
 
@@ -209,7 +206,6 @@ agents:
       provider: openrouter
       model: qwen/qwen3.5-plus-20260420
       temperature: 0.1
-      api_key_env: OPENROUTER_API_KEY
       site_url: http://localhost
       app_title: multi-Agent-Inv
 
@@ -218,7 +214,6 @@ agents:
       provider: openrouter
       model: qwen/qwen3.5-plus-20260420
       temperature: 0.1
-      api_key_env: OPENROUTER_API_KEY
       site_url: http://localhost
       app_title: multi-Agent-Inv
 
@@ -227,7 +222,6 @@ agents:
       provider: openrouter
       model: deepseek/deepseek-v4-pro
       temperature: 0.1
-      api_key_env: OPENROUTER_API_KEY
       site_url: http://localhost
       app_title: multi-Agent-Inv
     position_sizing:

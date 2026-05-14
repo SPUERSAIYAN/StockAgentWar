@@ -1,143 +1,143 @@
 {
-  "generated_at": "2026-05-14 18:07:16",
+  "generated_at": "2026-05-14 18:55:40",
   "monitored_stocks": [
     {
-      "symbol": "300456.SZ",
-      "name": "赛微电子",
+      "symbol": "600382.SH",
+      "name": "广东明珠",
       "allocation_pct": 16.0,
       "allocation_amount": 160000.0,
-      "quantity": 3000,
-      "buy_trigger_price": 51.83,
-      "sell_trigger_price": 58.63,
-      "stop_loss_price": 48.16,
-      "take_profit_price": 58.63,
+      "quantity": 18200,
+      "buy_trigger_price": 8.7,
+      "sell_trigger_price": 9.84,
+      "stop_loss_price": 8.09,
+      "take_profit_price": 9.84,
       "valid_from": "2026-05-14",
       "valid_until": "2026-06-13",
       "expiry_action": "REVIEW",
       "conditions": [
         {
           "type": "PRICE_BELOW",
-          "price": 51.83,
+          "price": 8.7,
           "action": "BUY",
-          "quantity": 3000
+          "quantity": 18200
         },
         {
           "type": "PRICE_ABOVE",
-          "price": 58.63,
+          "price": 9.84,
           "action": "SELL",
-          "quantity": 3000
+          "quantity": 18200
         }
       ]
     },
     {
-      "symbol": "603379.SH",
-      "name": "三美股份",
+      "symbol": "600809.SH",
+      "name": "山西汾酒",
       "allocation_pct": 16.0,
       "allocation_amount": 160000.0,
-      "quantity": 2600,
-      "buy_trigger_price": 60.41,
-      "sell_trigger_price": 68.34,
-      "stop_loss_price": 56.14,
-      "take_profit_price": 68.34,
+      "quantity": 1100,
+      "buy_trigger_price": 132.71,
+      "sell_trigger_price": 150.14,
+      "stop_loss_price": 123.33,
+      "take_profit_price": 150.14,
       "valid_from": "2026-05-14",
       "valid_until": "2026-06-13",
       "expiry_action": "REVIEW",
       "conditions": [
         {
           "type": "PRICE_BELOW",
-          "price": 60.41,
+          "price": 132.71,
           "action": "BUY",
-          "quantity": 2600
+          "quantity": 1100
         },
         {
           "type": "PRICE_ABOVE",
-          "price": 68.34,
+          "price": 150.14,
           "action": "SELL",
-          "quantity": 2600
+          "quantity": 1100
         }
       ]
     },
     {
-      "symbol": "600160.SH",
-      "name": "巨化股份",
+      "symbol": "600519.SH",
+      "name": "贵州茅台",
       "allocation_pct": 16.0,
       "allocation_amount": 160000.0,
-      "quantity": 4600,
-      "buy_trigger_price": 34.21,
-      "sell_trigger_price": 38.71,
-      "stop_loss_price": 31.8,
-      "take_profit_price": 38.71,
+      "quantity": 100,
+      "buy_trigger_price": 1328.75,
+      "sell_trigger_price": 1503.23,
+      "stop_loss_price": 1234.8,
+      "take_profit_price": 1503.23,
       "valid_from": "2026-05-14",
       "valid_until": "2026-06-13",
       "expiry_action": "REVIEW",
       "conditions": [
         {
           "type": "PRICE_BELOW",
-          "price": 34.21,
+          "price": 1328.75,
           "action": "BUY",
-          "quantity": 4600
+          "quantity": 100
         },
         {
           "type": "PRICE_ABOVE",
-          "price": 38.71,
+          "price": 1503.23,
           "action": "SELL",
-          "quantity": 4600
+          "quantity": 100
         }
       ]
     },
     {
-      "symbol": "000100.SZ",
-      "name": "TCL科技",
+      "symbol": "000568.SZ",
+      "name": "泸州老窖",
       "allocation_pct": 16.0,
       "allocation_amount": 160000.0,
-      "quantity": 37300,
-      "buy_trigger_price": 4.24,
-      "sell_trigger_price": 4.79,
-      "stop_loss_price": 3.94,
-      "take_profit_price": 4.79,
+      "quantity": 1600,
+      "buy_trigger_price": 93.41,
+      "sell_trigger_price": 105.67,
+      "stop_loss_price": 86.8,
+      "take_profit_price": 105.67,
       "valid_from": "2026-05-14",
       "valid_until": "2026-06-13",
       "expiry_action": "REVIEW",
       "conditions": [
         {
           "type": "PRICE_BELOW",
-          "price": 4.24,
+          "price": 93.41,
           "action": "BUY",
-          "quantity": 37300
+          "quantity": 1600
         },
         {
           "type": "PRICE_ABOVE",
-          "price": 4.79,
+          "price": 105.67,
           "action": "SELL",
-          "quantity": 37300
+          "quantity": 1600
         }
       ]
     },
     {
-      "symbol": "603499.SH",
-      "name": "翔港科技",
+      "symbol": "000596.SZ",
+      "name": "古井贡酒",
       "allocation_pct": 16.0,
       "allocation_amount": 160000.0,
-      "quantity": 7200,
-      "buy_trigger_price": 21.75,
-      "sell_trigger_price": 24.61,
-      "stop_loss_price": 20.21,
-      "take_profit_price": 24.61,
+      "quantity": 1500,
+      "buy_trigger_price": 100.03,
+      "sell_trigger_price": 113.16,
+      "stop_loss_price": 92.96,
+      "take_profit_price": 113.16,
       "valid_from": "2026-05-14",
       "valid_until": "2026-06-13",
       "expiry_action": "REVIEW",
       "conditions": [
         {
           "type": "PRICE_BELOW",
-          "price": 21.75,
+          "price": 100.03,
           "action": "BUY",
-          "quantity": 7200
+          "quantity": 1500
         },
         {
           "type": "PRICE_ABOVE",
-          "price": 24.61,
+          "price": 113.16,
           "action": "SELL",
-          "quantity": 7200
+          "quantity": 1500
         }
       ]
     }

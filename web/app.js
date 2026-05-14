@@ -158,10 +158,10 @@ async function loadHealth() {
   try {
     const res = await fetch("/api/health");
     const data = await res.json();
-    els.healthBadge.classList.toggle("ready", data.openrouter_key_ready);
-    els.healthBadge.classList.toggle("warn", !data.openrouter_key_ready);
+    els.healthBadge.classList.toggle("ready", Boolean(data.ok));
+    els.healthBadge.classList.toggle("warn", !data.ok);
     els.healthBadge.querySelector("span:last-child").textContent =
-      data.openrouter_key_ready ? "已就绪" : "缺少 Key";
+      data.ok ? "服务已连接" : "服务异常";
   } catch {
     els.healthBadge.classList.add("warn");
     els.healthBadge.querySelector("span:last-child").textContent = "未连接";

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from ..http import JsonHttpClient, UrllibJsonClient
+from ..http import HttpClientError, JsonHttpClient, UrllibJsonClient
 from ._coerce import _coerce_float
 from .base import ProviderParseError, SignalProvider
 
@@ -36,6 +36,14 @@ class FedMeetingProbability:
     probabilities: tuple[FedRateProb, ...]
 
 
+@dataclass(frozen=True)
+class FedWatchUnavailable:
+    available: bool
+    provider_id: str
+    reason: str
+    source_url: str
+
+
 class CMEFedWatchProvider(SignalProvider):
     provider_id = "cme_fedwatch"
     display_name = "CME FedWatch (implied from futures)"
@@ -44,8 +52,18 @@ class CMEFedWatchProvider(SignalProvider):
     def __init__(self, http_client: JsonHttpClient | None = None) -> None:
         self.http_client = http_client or UrllibJsonClient()
 
-    def get_probabilities(self) -> list[FedMeetingProbability]:
-        data = self.http_client.get_json(_URL)
+    def get_probabilities(self) -> list[FedMeetingProbability] | FedWatchUnavailable:
+        try:
+            data = self.http_client.get_json(_URL)
+        except HttpClientError as exc:
+            if _is_cme_access_blocked(exc) or _is_cme_endpoint_unavailable(exc):
+                return FedWatchUnavailable(
+                    available=False,
+                    provider_id=self.provider_id,
+                    reason=_cme_unavailable_reason(exc),
+                    source_url=_URL,
+                )
+            raise
 
         meetings_raw = self._extract_meetings(data)
         if meetings_raw is None:
@@ -127,3 +145,30 @@ class CMEFedWatchProvider(SignalProvider):
             current_target_high=current_high,
             probabilities=tuple(probs),
         )
+
+
+def _is_cme_access_blocked(exc: Exception) -> bool:
+    text = str(exc).lower()
+    return "http 403" in text and (
+        "blocked" in text
+        or "suspected web scraping" in text
+        or "automated" in text
+        or "cmegroup.com" in text
+    )
+
+
+def _is_cme_endpoint_unavailable(exc: Exception) -> bool:
+    text = str(exc).lower()
+    return "http 404" in text and "cmegroup.com" in text
+
+
+def _cme_unavailable_reason(exc: Exception) -> str:
+    if _is_cme_access_blocked(exc):
+        return (
+            "CME blocked automated access from this IP. "
+            "Use an authorized CME FedWatch API subscription for live data."
+        )
+    return (
+        "The CME FedWatch public JSON endpoint is unavailable. "
+        "Use an authorized CME FedWatch API subscription for live data."
+    )

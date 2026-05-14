@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import json
-import os
 import time
 import warnings
 from pathlib import Path
@@ -27,7 +26,7 @@ warnings.filterwarnings(
 
 from graph.a_share_auto_trade_graph import build_a_share_auto_trade_graph
 from graph.stock_graph import DEFAULT_AGENT_CONFIGS, build_common_analysis_graph
-from main import load_agent_configs, parse_symbols
+from main import inject_openrouter_api_key, load_agent_configs, parse_symbols
 
 
 PROJECT_ROOT = Path(__file__).resolve().parent
@@ -42,9 +41,10 @@ app = FastAPI(title="Stock Decision System")
 
 
 class DecisionRequest(BaseModel):
-    task: str = Field(default="筛选未来 1-3 个月的候选股票")
-    symbols: str = Field(default="AAPL,MSFT,NVDA")
+    task: str = Field(default="分析宏观与市场信息，输出信息分析报告")
+    symbols: str = Field(default="")
     sectors: str = Field(default="")
+    openrouter_api_key: str = Field(default="", repr=False)
     mode: Literal["openrouter", "mock", "a_share_daily", "a_share_sector", "a_share_deep"] = "openrouter"
     risk_tolerance: Literal["conservative", "moderate", "aggressive"] = "moderate"
     capital: float = Field(default=1_000_000)
@@ -135,7 +135,6 @@ def health() -> dict[str, Any]:
     return {
         "ok": True,
         "config_exists": DEFAULT_CONFIG_PATH.exists(),
-        "openrouter_key_ready": bool(os.getenv("OPENROUTER_API_KEY")),
         "stages": ordered_stage_list(COMMON_STAGES, COMMON_STAGE_ORDER),
         "stage_sets": {
             "common": ordered_stage_list(COMMON_STAGES, COMMON_STAGE_ORDER),
@@ -236,12 +235,13 @@ def stream_decision(request: DecisionRequest):
                         },
                     )
     except Exception as exc:
+        message = format_web_error_message(exc)
         yield event(
             "error",
             {
                 "elapsed_ms": elapsed_ms(started_at),
-                "message": str(exc),
-                "hint": "检查 OPENROUTER_API_KEY、config.yaml 模型名和网络代理设置。",
+                "message": message,
+                "hint": "请在前端填写 OpenRouter API Key，并检查 config.yaml 模型名和网络代理设置。",
             },
         )
 
@@ -262,7 +262,31 @@ def resolve_agent_configs(request: DecisionRequest):
     config_path = Path(request.config_path)
     if not config_path.is_absolute():
         config_path = PROJECT_ROOT / config_path
-    return load_agent_configs(config_path)
+    configs = load_agent_configs(config_path)
+    api_key = request.openrouter_api_key.strip()
+    if not api_key:
+        raise RuntimeError("请先填写 OpenRouter API Key。")
+    inject_openrouter_api_key(configs, api_key)
+    return configs
+
+
+def format_web_error_message(exc: Exception) -> str:
+    message = str(exc)
+    lowered = message.lower()
+    if "请先填写 openrouter api key" in lowered or "missing openrouter api key" in lowered:
+        return "请先填写 OpenRouter API Key。"
+    auth_markers = (
+        "api key",
+        "unauthorized",
+        "forbidden",
+        "invalid key",
+        "invalid_api_key",
+        "401",
+        "403",
+    )
+    if any(marker in lowered for marker in auth_markers):
+        return f"OpenRouter API Key 无效或已被拒绝，请检查前端填写的 Key。原始错误：{message}"
+    return message
 
 
 def build_graph_inputs(

@@ -36,6 +36,7 @@ export interface AppState {
   modelMode: ModelMode;
   symbols: string;
   sectors: string;
+  openrouterApiKey: string;
   riskTolerance: RiskTolerance;
   capital: number;
   task: string;
@@ -57,6 +58,7 @@ export type AppAction =
   | { type: "SET_MODEL_MODE"; payload: ModelMode }
   | { type: "SET_SYMBOLS"; payload: string }
   | { type: "SET_SECTORS"; payload: string }
+  | { type: "SET_OPENROUTER_API_KEY"; payload: string }
   | { type: "SET_TASK"; payload: string }
   | { type: "SET_RISK"; payload: RiskTolerance }
   | { type: "SET_CAPITAL"; payload: number }
