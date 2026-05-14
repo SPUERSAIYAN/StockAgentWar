@@ -57,7 +57,7 @@ python -m uvicorn server:app --host 127.0.0.1 --port 8000
 http://127.0.0.1:8000
 ```
 
-页面支持输入股票代码和决策任务，并实时展示信息分析、多头、空头、裁判、风控的输出。
+页面支持输入股票代码和决策任务，并实时展示问题规划、信息分析、多头、空头、裁判、风控、总经理和交易计划报告。结构化多空、结构化裁判和结构化交易决策只作为内部图节点，不作为前端阶段输出。
 
 ## 命令行运行
 
@@ -108,13 +108,20 @@ $env:OPENROUTER_API_KEY="你的 OpenRouter API Key"
 
 ```mermaid
 flowchart TD
-    START([START]) --> INFO[信息收集 Agent]
+    START([START]) --> PLAN[问题规划 Agent]
+    PLAN --> INFO[信息分析 Agent]
     INFO --> BULL[多头 Agent]
     INFO --> BEAR[空头 Agent]
-    BULL --> JUDGE[裁判 Agent]
-    BEAR --> JUDGE
-    JUDGE --> RISK[风控 Agent]
-    RISK --> OUTPUT[输出候选股票]
+    BULL --> BULL_STRUCT[多头结构化]
+    BEAR --> BEAR_STRUCT[空头结构化]
+    BULL_STRUCT --> JUDGE[裁判 Agent]
+    BEAR_STRUCT --> JUDGE
+    JUDGE --> JUDGE_STRUCT[裁判结构化]
+    JUDGE_STRUCT --> RISK[风控 Agent]
+    RISK --> MANAGER[总经理 Agent]
+    MANAGER --> DECISION[总经理结构化决策]
+    DECISION --> SAVE[交易计划保存]
+    SAVE --> OUTPUT[最终输出]
     OUTPUT --> END([END])
 ```
 
@@ -187,16 +194,15 @@ Agent 初始化时会读取对应 `.md` 文件，运行时再填充 state 变量
 
 ## Agent terminal trace
 
-The project prints agent interaction logs to the terminal by default. The trace includes:
+The project prints compact data-source logs to the terminal by default. The default trace includes:
 
-- each agent's state input summary
-- LLM system/user messages
-- model output
-- information-agent workflow/provider selection
-- data-source task building and provider calls
-- per-source elapsed time, success summaries, exception type/message, and traceback
-- collector source/error summary
-- handoff previews between agents
+- collector enabled status, timeout, worker count, and enabled provider groups
+- data-source task plan
+- per-source START / OK / FAIL status
+- elapsed time and a short result summary
+- exception type and message for failed sources
+
+LLM prompts, LLM outputs, and agent-to-agent handoffs are quiet by default.
 
 Controls:
 
@@ -207,8 +213,14 @@ $env:AGENT_TRACE="0"
 # Re-enable terminal trace
 $env:AGENT_TRACE="1"
 
-# Increase or decrease per-section output length
-$env:AGENT_TRACE_MAX_CHARS="8000"
+# Optional: show agent and LLM prompt/output trace
+$env:AGENT_TRACE_AGENTS="1"
+
+# Optional: show successful task-build logs
+$env:AGENT_TRACE_TASK_BUILD="1"
+
+# Optional: include Python tracebacks for failed sources
+$env:AGENT_TRACE_TRACEBACK="1"
 ```
 
 Logs are written to stderr, so API responses and CLI final output remain on stdout.

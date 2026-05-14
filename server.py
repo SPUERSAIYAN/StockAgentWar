@@ -9,7 +9,7 @@ from typing import Any, Literal
 
 from dotenv import load_dotenv
 from fastapi import FastAPI
-from fastapi.responses import StreamingResponse
+from fastapi.responses import Response, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
@@ -26,7 +26,7 @@ warnings.filterwarnings(
 )
 
 from graph.a_share_auto_trade_graph import build_a_share_auto_trade_graph
-from graph.stock_graph import DEFAULT_AGENT_CONFIGS, build_stock_graph
+from graph.stock_graph import DEFAULT_AGENT_CONFIGS, build_common_analysis_graph
 from main import load_agent_configs, parse_symbols
 
 
@@ -55,7 +55,7 @@ COMMON_STAGES: dict[str, dict[str, str]] = {
     "question_planning": {
         "id": "question_planning",
         "agent": "问题理解",
-        "title": "意图与信号规划",
+        "title": "意图与数据源规划",
         "output_key": "question_plan_report",
         "color": "#38BDF8",
     },
@@ -94,17 +94,6 @@ COMMON_STAGES: dict[str, dict[str, str]] = {
         "output_key": "risk_report",
         "color": "#F59E0B",
     },
-}
-
-A_SHARE_STAGES: dict[str, dict[str, str]] = {
-    **COMMON_STAGES,
-    "a_share_context": {
-        "id": "a_share_context",
-        "agent": "A 股上下文",
-        "title": "股票池与板块",
-        "output_key": "a_share_context_report",
-        "color": "#06B6D4",
-    },
     "portfolio_manager": {
         "id": "portfolio_manager",
         "agent": "总经理",
@@ -121,10 +110,9 @@ A_SHARE_STAGES: dict[str, dict[str, str]] = {
     },
 }
 
-A_SHARE_STAGE_ORDER = [
+DOCUMENTED_STAGE_ORDER = [
     "question_planning",
     "information_analysis",
-    "a_share_context",
     "bull_debate",
     "bear_debate",
     "judge_decision",
@@ -133,13 +121,12 @@ A_SHARE_STAGE_ORDER = [
     "save_trade_plan",
 ]
 
+INTERNAL_GRAPH_NODES = {"bull_cases", "bear_cases", "judge_rulings", "portfolio_decision"}
+A_SHARE_STAGES = COMMON_STAGES
+A_SHARE_STAGE_ORDER = DOCUMENTED_STAGE_ORDER
 COMMON_STAGE_ORDER = [
     "question_planning",
     "information_analysis",
-    "bull_debate",
-    "bear_debate",
-    "judge_decision",
-    "risk_review",
 ]
 
 
@@ -149,12 +136,17 @@ def health() -> dict[str, Any]:
         "ok": True,
         "config_exists": DEFAULT_CONFIG_PATH.exists(),
         "openrouter_key_ready": bool(os.getenv("OPENROUTER_API_KEY")),
-        "stages": list(COMMON_STAGES.values()),
+        "stages": ordered_stage_list(COMMON_STAGES, COMMON_STAGE_ORDER),
         "stage_sets": {
             "common": ordered_stage_list(COMMON_STAGES, COMMON_STAGE_ORDER),
             "a_share": ordered_stage_list(A_SHARE_STAGES, A_SHARE_STAGE_ORDER),
         },
     }
+
+
+@app.get("/favicon.ico", include_in_schema=False)
+def favicon() -> Response:
+    return Response(status_code=204)
 
 
 @app.post("/api/decide/stream")
@@ -188,7 +180,11 @@ def stream_decision(request: DecisionRequest):
 
     try:
         agent_configs = resolve_agent_configs(request)
-        graph = build_a_share_auto_trade_graph(agent_configs=agent_configs) if is_a_share else build_stock_graph(agent_configs=agent_configs)
+        graph = (
+            build_a_share_auto_trade_graph(agent_configs=agent_configs)
+            if is_a_share
+            else build_common_analysis_graph(agent_configs=agent_configs)
+        )
         inputs = build_graph_inputs(request, agent_configs)
 
         for update in graph.stream(inputs, stream_mode="updates"):
@@ -196,10 +192,10 @@ def stream_decision(request: DecisionRequest):
                 if not isinstance(node_update, dict):
                     continue
                 state.update(node_update)
+                completed.add(node)
 
                 visible_node = visible_stage_node(node, is_a_share)
                 if visible_node in stages:
-                    completed.add(node)
                     output_key = stages[visible_node]["output_key"]
                     content = stage_content(visible_node, node_update, state, output_key)
                     payload: dict[str, Any] = {
@@ -216,9 +212,21 @@ def stream_decision(request: DecisionRequest):
                             node_update
                         )
                     yield event("stage", payload)
-                    yield from emit_next_statuses(node, completed, started_at, is_a_share)
 
-                if node == "format_output":
+                yield from emit_next_statuses(node, completed, started_at, is_a_share)
+
+                if not is_a_share and node == "information_analysis":
+                    final_output = node_update.get("info_report", "")
+                    state["final_output"] = final_output
+                    yield event(
+                        "complete",
+                        {
+                            "elapsed_ms": elapsed_ms(started_at),
+                            "final_output": final_output,
+                            "state": public_state(state),
+                        },
+                    )
+                elif node == "final_output":
                     yield event(
                         "complete",
                         {
@@ -241,6 +249,10 @@ def stream_decision(request: DecisionRequest):
 def resolve_agent_configs(request: DecisionRequest):
     if request.mode == "mock":
         configs = {key: dict(value) for key, value in DEFAULT_AGENT_CONFIGS.items()}
+        configs["question_planning"] = {
+            **configs["question_planning"],
+            "model": {"provider": "mock", "model": "mock-question-planning", "temperature": 0.0},
+        }
         configs["information"] = {
             **configs["information"],
             "collector": {"enabled": False},
@@ -287,22 +299,16 @@ def build_graph_inputs(
 def emit_next_statuses(node: str, completed: set[str], started_at: float, is_a_share: bool):
     if node == "question_planning":
         yield stage_status("information_analysis", "running", started_at)
-    elif node == "information_analysis":
-        if is_a_share:
-            yield stage_status("a_share_context", "running", started_at)
-            return
+    elif node == "information_analysis" and is_a_share:
         yield stage_status("bull_debate", "running", started_at)
         yield stage_status("bear_debate", "running", started_at)
-    elif is_a_share and node == "a_share_context":
-        yield stage_status("bull_debate", "running", started_at)
-        yield stage_status("bear_debate", "running", started_at)
-    elif {"bull_debate", "bear_debate"}.issubset(completed) and "judge_decision" not in completed:
+    elif {"bull_cases", "bear_cases"}.issubset(completed) and "judge_decision" not in completed:
         yield stage_status("judge_decision", "running", started_at)
-    elif node == "judge_decision":
+    elif node == "judge_rulings":
         yield stage_status("risk_review", "running", started_at)
-    elif is_a_share and node == "risk_review":
+    elif node == "risk_review":
         yield stage_status("portfolio_manager", "running", started_at)
-    elif is_a_share and node == "portfolio_manager":
+    elif node == "portfolio_decision":
         yield stage_status("save_trade_plan", "running", started_at)
 
 
@@ -319,36 +325,21 @@ def stage_status(node: str, status: str, started_at: float) -> str:
 
 def public_state(state: dict[str, Any]) -> dict[str, Any]:
     keys = [
-        "question_understanding",
-        "signal_plan",
         "question_plan_report",
-        "information_workflow",
-        "provider_selection",
-        "signal_reasoning",
-        "raw_market_data",
         "info_report",
         "bull_case",
         "bear_case",
         "judge_decision",
         "risk_report",
-        "stock_pool",
-        "sector_summary",
-        "confidence_level",
-        "data_gaps",
-        "bull_cases",
-        "bear_cases",
-        "judge_rulings",
-        "judge_report",
-        "overall_market_view",
-        "final_decision",
-        "trade_plan",
-        "alternative_scenarios",
         "manager_report",
         "manager_confidence",
-        "portfolio_context",
         "final_output",
     ]
-    return {key: state[key] for key in keys if key in state}
+    public = {key: state[key] for key in keys if key in state}
+    metadata = dict(state.get("metadata", {}) or {})
+    if "trade_plan_file" in metadata:
+        public["metadata"] = {"trade_plan_file": metadata.get("trade_plan_file")}
+    return public
 
 
 def ordered_stage_list(stages: dict[str, dict[str, str]], order: list[str]) -> list[dict[str, str]]:
@@ -364,8 +355,9 @@ def parse_csv(raw: str) -> list[str]:
 
 
 def visible_stage_node(node: str, is_a_share: bool) -> str:
-    if is_a_share and node == "skip_trade_plan":
-        return "save_trade_plan"
+    del is_a_share
+    if node in INTERNAL_GRAPH_NODES:
+        return ""
     return node
 
 
@@ -375,47 +367,12 @@ def stage_content(
     state: dict[str, Any],
     output_key: str,
 ) -> str:
-    if visible_node == "a_share_context":
-        return render_a_share_context_report(node_update)
     if visible_node == "save_trade_plan":
         return render_trade_plan_report(node_update, state)
     content = node_update.get(output_key)
     if isinstance(content, str) and content:
         return content
     return render_structured_stage_report(visible_node, node_update)
-
-
-def render_a_share_context_report(node_update: dict[str, Any]) -> str:
-    stock_pool = list(node_update.get("stock_pool", []) or [])
-    sector_summary = list(node_update.get("sector_summary", []) or [])
-    data_gaps = list(node_update.get("data_gaps", []) or [])
-    lines = [
-        "## A 股上下文",
-        "",
-        f"- 股票池数量：{len(stock_pool)}",
-        f"- 板块数量：{len(sector_summary)}",
-        f"- 置信度：{node_update.get('confidence_level', 'N/A')}",
-        "",
-        "### 股票池",
-        "| 股票 | 名称 | 板块 | 价格 | 信息评分 | 技术信号 |",
-        "|---|---|---|---:|---:|---|",
-    ]
-    for stock in stock_pool[:12]:
-        lines.append(
-            "| {symbol} | {name} | {sector} | {price} | {score} | {signal} |".format(
-                symbol=stock.get("symbol", ""),
-                name=stock.get("name", ""),
-                sector=stock.get("sector", ""),
-                price=stock.get("price", ""),
-                score=stock.get("information_score", ""),
-                signal=stock.get("technical_signal", ""),
-            )
-        )
-    if not stock_pool:
-        lines.append("| 暂无 | 暂无 | 暂无 |  |  |  |")
-    if data_gaps:
-        lines.extend(["", "### 数据缺口", *[f"- {item}" for item in data_gaps]])
-    return "\n".join(lines)
 
 
 def render_trade_plan_report(node_update: dict[str, Any], state: dict[str, Any]) -> str:

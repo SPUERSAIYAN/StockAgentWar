@@ -1,6 +1,6 @@
 # Provider API 速查
 
-所有 provider 零 API key。YahooPriceProvider 和 YFinanceProvider 需要 `pip install yfinance`；MootdxProvider 需要 `pip install mootdx`。
+Provider 默认零 API key。YahooPriceProvider 和 YFinanceProvider 需要 `pip install yfinance`；MootdxProvider 需要 `pip install mootdx`。
 
 ```python
 from collectors.digital_oracle import (
@@ -21,7 +21,7 @@ from collectors.digital_oracle import (
     MootdxProvider, MootdxBarQuery, MootdxIntradayQuery,
     MootdxTransactionQuery, MootdxDateRangeQuery, MootdxLocalDataQuery,
     MootdxCompanyProfileQuery,   # pip install mootdx
-    TencentFinanceProvider, TencentStockMetricsQuery, TencentBoardQuery,
+    TencentFinanceProvider, TencentStockMetricsQuery,
 )
 ```
 
@@ -187,7 +187,7 @@ profile = mootdx.get_company_profile(MootdxCompanyProfileQuery(
 腾讯财经 A 股实时估值/交易指标。覆盖 PE、PB、市值、换手率，同时附带当前价、涨跌幅、成交量/成交额。无需外部依赖。
 
 ```python
-from collectors.digital_oracle import TencentFinanceProvider, TencentStockMetricsQuery, TencentBoardQuery
+from collectors.digital_oracle import TencentFinanceProvider, TencentStockMetricsQuery
 
 tencent = TencentFinanceProvider()
 
@@ -202,12 +202,6 @@ metrics = tencent.get_stock_metrics(TencentStockMetricsQuery(
 indices = tencent.get_index_metrics(("sh000001", "sz399001", "sz399006"))
 hk = tencent.get_hk_metrics("00700.HK")
 us = tencent.get_us_metrics("AAPL.US")
-
-# 腾讯 appstock 板块/列表接口变化较多，保留原始结构化入口，调用方显式传 path 和 params
-raw_board = tencent.fetch_board_json_like(TencentBoardQuery(
-    path="rank/sector",
-    params={"type": "industry", "page": 1},
-))
 ```
 
 **字段单位：**
@@ -217,7 +211,7 @@ raw_board = tencent.fetch_board_json_like(TencentBoardQuery(
 - `float_market_cap_cny_100m`, `total_market_cap_cny_100m`：亿元人民币
 
 **边界：**
-- TencentFinanceProvider 只接结构化行情、估值、市值、成交活跃度和板块原始数据接口。
+- TencentFinanceProvider 只接结构化行情、估值、市值和成交活跃度接口。
 - 不抓取腾讯新闻、资讯流、研报或网页正文。
 
 ## DeribitProvider

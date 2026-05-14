@@ -1,4 +1,16 @@
 agents:
+  question_planning:
+    name: question_planning
+    role: 问题理解 Agent
+    prompt_file: question_planning_agent.md
+    model:
+      provider: openrouter
+      model: qwen/qwen3.5-plus-20260420
+      temperature: 0.1
+      api_key_env: OPENROUTER_API_KEY
+      site_url: http://localhost
+      app_title: multi-Agent-Inv
+
   information:
     collector:
       enabled: true
@@ -47,7 +59,6 @@ agents:
             - sz399001
             - sz399006
             - sh000300
-          tencent_board_queries: []
           mootdx: true
           mootdx_frequencies:
             - day
@@ -168,7 +179,7 @@ agents:
           max_page_chars: 8000
     model:
       provider: openrouter
-      model: qwen/qwen3.5-plus-20260420
+      model: deepseek/deepseek-v4-pro
       temperature: 0.2
       api_key_env: OPENROUTER_API_KEY
       site_url: http://localhost
@@ -213,7 +224,7 @@ agents:
   portfolio_manager:
     model:
       provider: openrouter
-      model: qwen/qwen3.5-plus-20260420
+      model: deepseek/deepseek-v4-pro
       temperature: 0.1
       api_key_env: OPENROUTER_API_KEY
       site_url: http://localhost

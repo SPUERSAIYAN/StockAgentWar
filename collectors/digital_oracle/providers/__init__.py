@@ -81,7 +81,6 @@ from .polymarket import (
 from .prices import PriceBar, PriceHistory, PriceHistoryQuery
 from .stooq import StooqProvider
 from .tencent_finance import (
-    TencentBoardQuery,
     TencentFinanceProvider,
     TencentStockMetrics,
     TencentStockMetricsQuery,
@@ -206,7 +205,6 @@ __all__ = [
     "SignalProvider",
     "StooqProvider",
     "TencentFinanceProvider",
-    "TencentBoardQuery",
     "TencentStockMetrics",
     "TencentStockMetricsQuery",
     "YahooPriceProvider",

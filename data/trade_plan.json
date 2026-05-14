@@ -1,87 +1,143 @@
 {
-  "generated_at": "2026-05-12 23:06:55",
+  "generated_at": "2026-05-13 22:07:27",
   "monitored_stocks": [
     {
-      "symbol": "600667.SH",
-      "name": "太极实业",
-      "allocation_pct": 20.0,
-      "allocation_amount": 200000.0,
-      "quantity": 16200,
-      "buy_trigger_price": 12.15,
-      "sell_trigger_price": 13.74,
-      "stop_loss_price": 11.29,
-      "take_profit_price": 13.74,
-      "valid_from": "2026-05-12",
-      "valid_until": "2026-06-11",
+      "symbol": "688257.SH",
+      "name": "新锐股份",
+      "allocation_pct": 16.0,
+      "allocation_amount": 160000.0,
+      "quantity": 1900,
+      "buy_trigger_price": 83.01,
+      "sell_trigger_price": 93.91,
+      "stop_loss_price": 77.14,
+      "take_profit_price": 93.91,
+      "valid_from": "2026-05-13",
+      "valid_until": "2026-06-12",
       "expiry_action": "REVIEW",
       "conditions": [
         {
           "type": "PRICE_BELOW",
-          "price": 12.15,
+          "price": 83.01,
           "action": "BUY",
-          "quantity": 16200
+          "quantity": 1900
         },
         {
           "type": "PRICE_ABOVE",
-          "price": 13.74,
+          "price": 93.91,
           "action": "SELL",
-          "quantity": 16200
+          "quantity": 1900
         }
       ]
     },
     {
-      "symbol": "688213.SH",
-      "name": "思特威-W",
-      "allocation_pct": 20.0,
-      "allocation_amount": 200000.0,
-      "quantity": 2000,
-      "buy_trigger_price": 98.5,
-      "sell_trigger_price": 111.44,
-      "stop_loss_price": 91.54,
-      "take_profit_price": 111.44,
-      "valid_from": "2026-05-12",
-      "valid_until": "2026-06-11",
+      "symbol": "301155.SZ",
+      "name": "海力风电",
+      "allocation_pct": 16.0,
+      "allocation_amount": 160000.0,
+      "quantity": 2200,
+      "buy_trigger_price": 69.56,
+      "sell_trigger_price": 78.69,
+      "stop_loss_price": 64.64,
+      "take_profit_price": 78.69,
+      "valid_from": "2026-05-13",
+      "valid_until": "2026-06-12",
       "expiry_action": "REVIEW",
       "conditions": [
         {
           "type": "PRICE_BELOW",
-          "price": 98.5,
+          "price": 69.56,
           "action": "BUY",
-          "quantity": 2000
+          "quantity": 2200
         },
         {
           "type": "PRICE_ABOVE",
-          "price": 111.44,
+          "price": 78.69,
           "action": "SELL",
-          "quantity": 2000
+          "quantity": 2200
         }
       ]
     },
     {
-      "symbol": "300001.SZ",
-      "name": "特锐德",
-      "allocation_pct": 20.0,
-      "allocation_amount": 200000.0,
-      "quantity": 6000,
-      "buy_trigger_price": 32.52,
-      "sell_trigger_price": 36.79,
-      "stop_loss_price": 30.22,
-      "take_profit_price": 36.79,
-      "valid_from": "2026-05-12",
-      "valid_until": "2026-06-11",
+      "symbol": "002034.SZ",
+      "name": "旺能环境",
+      "allocation_pct": 16.0,
+      "allocation_amount": 160000.0,
+      "quantity": 7400,
+      "buy_trigger_price": 21.26,
+      "sell_trigger_price": 24.05,
+      "stop_loss_price": 19.75,
+      "take_profit_price": 24.05,
+      "valid_from": "2026-05-13",
+      "valid_until": "2026-06-12",
       "expiry_action": "REVIEW",
       "conditions": [
         {
           "type": "PRICE_BELOW",
-          "price": 32.52,
+          "price": 21.26,
           "action": "BUY",
-          "quantity": 6000
+          "quantity": 7400
         },
         {
           "type": "PRICE_ABOVE",
-          "price": 36.79,
+          "price": 24.05,
           "action": "SELL",
-          "quantity": 6000
+          "quantity": 7400
+        }
+      ]
+    },
+    {
+      "symbol": "002560.SZ",
+      "name": "通达股份",
+      "allocation_pct": 16.0,
+      "allocation_amount": 160000.0,
+      "quantity": 12400,
+      "buy_trigger_price": 12.77,
+      "sell_trigger_price": 14.45,
+      "stop_loss_price": 11.87,
+      "take_profit_price": 14.45,
+      "valid_from": "2026-05-13",
+      "valid_until": "2026-06-12",
+      "expiry_action": "REVIEW",
+      "conditions": [
+        {
+          "type": "PRICE_BELOW",
+          "price": 12.77,
+          "action": "BUY",
+          "quantity": 12400
+        },
+        {
+          "type": "PRICE_ABOVE",
+          "price": 14.45,
+          "action": "SELL",
+          "quantity": 12400
+        }
+      ]
+    },
+    {
+      "symbol": "000591.SZ",
+      "name": "太阳能",
+      "allocation_pct": 16.0,
+      "allocation_amount": 160000.0,
+      "quantity": 26000,
+      "buy_trigger_price": 6.09,
+      "sell_trigger_price": 6.89,
+      "stop_loss_price": 5.66,
+      "take_profit_price": 6.89,
+      "valid_from": "2026-05-13",
+      "valid_until": "2026-06-12",
+      "expiry_action": "REVIEW",
+      "conditions": [
+        {
+          "type": "PRICE_BELOW",
+          "price": 6.09,
+          "action": "BUY",
+          "quantity": 26000
+        },
+        {
+          "type": "PRICE_ABOVE",
+          "price": 6.89,
+          "action": "SELL",
+          "quantity": 26000
         }
       ]
     }

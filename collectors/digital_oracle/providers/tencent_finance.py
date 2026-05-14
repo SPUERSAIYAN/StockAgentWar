@@ -1,11 +1,9 @@
 from __future__ import annotations
 
 import re
-import json
 import time
 from dataclasses import dataclass, field
 from typing import Any, Mapping, Protocol, Sequence
-from urllib.parse import urlencode
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
@@ -15,7 +13,6 @@ from .base import ProviderParseError, SignalProvider
 
 
 TENCENT_FINANCE_QUOTE_URL = "https://qt.gtimg.cn/q="
-TENCENT_STOCK_APP_URL = "https://web.ifzq.gtimg.cn/appstock/app"
 _QUOTE_RE = re.compile(r'v_([^=]+)="(.*)";?')
 
 
@@ -58,12 +55,6 @@ class TencentGbkTextClient:
 @dataclass(frozen=True)
 class TencentStockMetricsQuery:
     symbols: tuple[str, ...]
-
-
-@dataclass(frozen=True)
-class TencentBoardQuery:
-    path: str
-    params: Mapping[str, object] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -190,18 +181,6 @@ def _normalize_tencent_symbol(symbol: str) -> str:
     return normalize_tencent_a_share_symbol(normalized)
 
 
-def _build_url(url: str, params: Mapping[str, object] | None) -> str:
-    if not params:
-        return url
-    query = urlencode(
-        [(key, str(value)) for key, value in params.items() if value is not None]
-    )
-    if not query:
-        return url
-    joiner = "&" if "?" in url else "?"
-    return f"{url}{joiner}{query}"
-
-
 class TencentFinanceProvider(SignalProvider):
     provider_id = "tencent_finance"
     display_name = "Tencent Finance A-Share"
@@ -214,7 +193,6 @@ class TencentFinanceProvider(SignalProvider):
         "index_quotes",
         "hk_quotes",
         "us_quotes",
-        "board_raw_data",
     )
 
     def __init__(self, http_client: TencentTextClient | None = None) -> None:
@@ -267,15 +245,3 @@ class TencentFinanceProvider(SignalProvider):
         symbols: str | Sequence[str],
     ) -> tuple[TencentStockMetrics, ...]:
         return self.get_stock_metrics(symbols)
-
-    def fetch_board_raw(self, query: TencentBoardQuery) -> str:
-        path = query.path.strip()
-        url = path if path.startswith(("http://", "https://")) else f"{TENCENT_STOCK_APP_URL}/{path.lstrip('/')}"
-        return self.http_client.get_text(_build_url(url, query.params))
-
-    def fetch_board_json_like(self, query: TencentBoardQuery) -> Any:
-        text = self.fetch_board_raw(query)
-        try:
-            return json.loads(text)
-        except json.JSONDecodeError:
-            return text

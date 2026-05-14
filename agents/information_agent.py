@@ -40,7 +40,7 @@ class MockChatModel:
         user_message = messages[-1]["content"] if messages else ""
         model_name = self.name.lower()
         if "question" in model_name or "planning" in model_name:
-            return mock_question_plan(user_message)
+            return mock_question_planning_report(user_message)
         if "information" in model_name or "info" in model_name:
             return mock_information_report(user_message)
         if "bull" in model_name:
@@ -69,7 +69,6 @@ class InformationCollectionAgent:
 
     def __call__(self, state: MarketDecisionState) -> dict[str, Any]:
         agent_name = self.config.get("name") or "information"
-        state, candidate_discovery = information_workflow.prepare_information_state(state, self.config)
         log_agent_start(agent_name, state, {"role": self.config.get("role")})
         workflow = information_workflow.build_information_workflow(state)
         provider_selection = information_workflow.select_information_providers(state, workflow, self.config)
@@ -96,15 +95,34 @@ class InformationCollectionAgent:
         log_trace(agent_name, "COLLECTOR OUTPUT", summarize_collected_data(collected))
         if not collected:
             report = render_no_data_information_report(state, workflow, provider_selection)
+            empty_data = {
+                "collection_status": "empty",
+                "sources": {},
+                "errors": {},
+                "source_count": 0,
+                "error_count": 0,
+                "workflow_plan": workflow,
+                "provider_selection": provider_selection,
+                "signal_reasoning": {},
+            }
+            structured_context = build_structured_information_context(state, empty_data)
+            structured_metadata = dict(structured_context.pop("metadata", {}) or {})
+            metadata = {
+                **dict(state.get("metadata", {}) or {}),
+                "information_source": "digital_oracle",
+                "information_prompt": "prompts/information_agent.md",
+                "information_context": structured_metadata.get("information_context", {}),
+            }
             log_agent_output(agent_name, "info_report", report)
             output: dict[str, Any] = {
                 "info_report": report,
                 "information_workflow": workflow,
                 "provider_selection": provider_selection,
+                "raw_market_data": empty_data,
+                "signal_reasoning": {},
+                **structured_context,
+                "metadata": metadata,
             }
-            if candidate_discovery:
-                output["candidates"] = state.get("candidates", [])
-                output["metadata"] = state.get("metadata", {})
             return output
 
         signal_reasoning = infer_trading_signals(collected)
@@ -125,24 +143,52 @@ class InformationCollectionAgent:
             signal_reasoning=signal_reasoning,
         )
         log_agent_output(agent_name, "info_report", report)
+        output_candidates = None
+        metadata = {
+            **state.get("metadata", {}),
+            "information_source": "digital_oracle",
+            "information_prompt": "prompts/information_agent.md",
+            "information_prompt_references": [
+                f"prompts/{file_name}" for file_name in self.prompt_files[1:]
+            ],
+        }
+        if enriched_data.get("candidate_discovery"):
+            output_candidates = [
+                {
+                    "symbol": item.get("symbol"),
+                    "name": item.get("name", ""),
+                    "market": item.get("market", ""),
+                    "reason": item.get("reason", ""),
+                    "score": item.get("score"),
+                    "metadata": item.get("metadata", {}),
+                }
+                for item in enriched_data["candidate_discovery"].get("candidates", [])
+                if isinstance(item, dict) and item.get("symbol")
+            ]
+            metadata["auto_candidate_discovery"] = enriched_data["candidate_discovery"]
+
+        context_state: MarketDecisionState = {
+            **state,
+            "raw_market_data": enriched_data,
+        }
+        if output_candidates is not None:
+            context_state["candidates"] = output_candidates
+        structured_context = build_structured_information_context(context_state, enriched_data)
+        structured_metadata = dict(structured_context.pop("metadata", {}) or {})
+        if "information_context" in structured_metadata:
+            metadata["information_context"] = structured_metadata["information_context"]
+
         output = {
             "info_report": report,
             "information_workflow": workflow,
             "provider_selection": provider_selection,
             "signal_reasoning": signal_reasoning,
             "raw_market_data": enriched_data,
-            "metadata": {
-                **state.get("metadata", {}),
-                "information_source": "digital_oracle",
-                "information_prompt": "prompts/information_agent.md",
-                "information_prompt_references": [
-                    f"prompts/{file_name}" for file_name in self.prompt_files[1:]
-                ],
-            },
+            **structured_context,
+            "metadata": metadata,
         }
-        if candidate_discovery:
-            output["candidates"] = state.get("candidates", [])
-            output["metadata"]["auto_candidate_discovery"] = candidate_discovery
+        if output_candidates is not None:
+            output["candidates"] = output_candidates
         return output
 
 def run_prompt_agent(
@@ -288,6 +334,271 @@ def prompt_vars(state: MarketDecisionState) -> dict[str, str]:
         "portfolio_context": compact_json(state.get("portfolio_context", {}), 1600),
         "data_gaps": compact_json(state.get("data_gaps", []), 1200),
     }
+
+
+def build_structured_information_context(
+    state: MarketDecisionState,
+    raw_data: dict[str, Any],
+) -> dict[str, Any]:
+    sources = dict(raw_data.get("sources", {}) or {})
+    if not sources:
+        data_gaps = infer_information_data_gaps(raw_data, [], [])
+        if "未获取到可用 provider 数据。" not in data_gaps:
+            data_gaps.insert(0, "未获取到可用 provider 数据。")
+        return {
+            "stock_pool": [],
+            "sector_summary": [],
+            "confidence_level": infer_information_confidence(raw_data, [], data_gaps),
+            "data_gaps": data_gaps,
+            "macro_context": {},
+            "metadata": {
+                **dict(state.get("metadata", {}) or {}),
+                "information_context": {
+                    "stock_pool_size": 0,
+                    "sector_count": 0,
+                },
+            },
+        }
+
+    metrics_by_symbol = extract_symbol_metrics(sources)
+    stock_pool = build_information_stock_pool(state, raw_data, metrics_by_symbol)
+    sector_summary = build_information_sector_summary(stock_pool)
+    data_gaps = infer_information_data_gaps(raw_data, stock_pool, sector_summary)
+    macro_context = extract_information_macro_context(sources)
+    return {
+        "stock_pool": stock_pool,
+        "sector_summary": sector_summary,
+        "confidence_level": infer_information_confidence(raw_data, stock_pool, data_gaps),
+        "data_gaps": data_gaps,
+        "macro_context": macro_context,
+        "metadata": {
+            **dict(state.get("metadata", {}) or {}),
+            "information_context": {
+                "stock_pool_size": len(stock_pool),
+                "sector_count": len(sector_summary),
+            },
+        },
+    }
+
+
+def extract_symbol_metrics(sources: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    metrics: dict[str, dict[str, Any]] = {}
+    for label, value in sources.items():
+        if not label.startswith("equity.") or not isinstance(value, dict):
+            continue
+        parts = label.split(".")
+        if len(parts) < 3:
+            continue
+        symbol = normalize_symbol(parts[1])
+        row = metrics.setdefault(symbol, {})
+        data_key = ".".join(parts[2:])
+        if data_key == "tencent_metrics":
+            for item in value.get("items", []) or []:
+                if not isinstance(item, dict):
+                    continue
+                item_symbol = normalize_symbol(str(item.get("symbol") or symbol))
+                metrics[item_symbol] = {**metrics.get(item_symbol, {}), **item}
+        elif data_key in {"price_daily", "stooq_price_daily"}:
+            latest = dict(value.get("latest", {}) or {})
+            row.update(
+                {
+                    "price": latest.get("close"),
+                    "change_pct_20d": value.get("return_20_bar_pct"),
+                    "avg_volume_20": value.get("avg_volume_20"),
+                    "realized_vol_20_annualized": value.get("realized_vol_20_annualized"),
+                }
+            )
+        elif data_key == "options_nearest":
+            row["price"] = row.get("price") or value.get("underlying_price")
+            row["put_call_oi_ratio"] = value.get("put_call_oi_ratio")
+            row["atm_iv"] = value.get("atm_iv")
+        elif data_key in {"edgar_form4", "edgar_filings"}:
+            row["name"] = row.get("name") or value.get("company_name")
+    return metrics
+
+
+def build_information_stock_pool(
+    state: MarketDecisionState,
+    raw_data: dict[str, Any],
+    metrics_by_symbol: dict[str, dict[str, Any]],
+) -> list[dict[str, Any]]:
+    candidates = list(state.get("candidates", []) or [])
+    if not candidates:
+        candidates = [{"symbol": symbol} for symbol in raw_data.get("symbols", []) or []]
+
+    stock_pool: list[dict[str, Any]] = []
+    for candidate in candidates:
+        symbol = normalize_symbol(str(candidate.get("symbol", "")))
+        if not symbol:
+            continue
+        metadata = dict(candidate.get("metadata", {}) or {})
+        metric = dict(metrics_by_symbol.get(symbol, {}))
+        merged = {**metadata, **metric}
+        price = to_float(merged.get("price"))
+        score = normalized_information_score(candidate.get("score"), merged)
+        stock_pool.append(
+            {
+                "symbol": symbol,
+                "name": candidate.get("name") or merged.get("name") or "",
+                "sector": merged.get("sector") or merged.get("industry") or "未分类板块",
+                "price": price,
+                "pe_ratio": to_float(merged.get("pe")),
+                "pb_ratio": to_float(merged.get("pb")),
+                "roe": to_float(merged.get("roe")),
+                "revenue_growth_yoy": to_float(merged.get("revenue_growth_yoy")),
+                "net_profit_growth_yoy": to_float(merged.get("net_profit_growth_yoy")),
+                "market_cap_yi": to_float(merged.get("total_market_cap_cny_100m")),
+                "turnover_rate": to_float(merged.get("turnover_rate")),
+                "north_net_flow_5d": to_float(merged.get("north_net_flow_5d")),
+                "technical_signal": infer_information_technical_signal(merged),
+                "information_score": score,
+                "preliminary_reason": candidate.get("reason") or "候选标的来自信息分析流程。",
+            }
+        )
+    return sorted(stock_pool, key=lambda item: item.get("information_score") or 0, reverse=True)
+
+
+def build_information_sector_summary(stock_pool: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    sectors: dict[str, list[dict[str, Any]]] = {}
+    for stock in stock_pool:
+        sectors.setdefault(str(stock.get("sector") or "未分类板块"), []).append(stock)
+
+    summary = []
+    for sector_name, rows in sectors.items():
+        pe_values = [to_float(row.get("pe_ratio")) for row in rows]
+        turnover_values = [to_float(row.get("turnover_rate")) for row in rows]
+        change_values = [to_float(row.get("change_pct_20d")) for row in rows]
+        avg_turnover = average([item for item in turnover_values if item is not None])
+        summary.append(
+            {
+                "sector_name": sector_name,
+                "change_pct_5d": None,
+                "change_pct_20d": average([item for item in change_values if item is not None]),
+                "avg_pe": average([item for item in pe_values if item is not None]),
+                "money_flow_signal": infer_money_flow_signal(avg_turnover),
+                "policy_catalyst": "未接入政策事件结构化数据",
+            }
+        )
+    return summary
+
+
+def infer_information_data_gaps(
+    raw_data: dict[str, Any],
+    stock_pool: list[dict[str, Any]],
+    sector_summary: list[dict[str, Any]],
+) -> list[str]:
+    gaps: list[str] = []
+    errors = dict(raw_data.get("errors", {}) or {})
+    if errors:
+        gaps.append(f"{len(errors)} 个数据源采集失败，需降低置信度。")
+    discovery = dict(raw_data.get("candidate_discovery", {}) or {})
+    if discovery.get("mode") == "provider_sector_discovery" and not discovery.get("candidates"):
+        gaps.append(
+            "当前未接入板块成分股数据源，无法按板块限定候选："
+            f"{discovery.get('requested_sectors', [])}。"
+        )
+    if not stock_pool:
+        gaps.append("未形成结构化股票池。")
+    if stock_pool and any(stock.get("price") is None for stock in stock_pool):
+        gaps.append("部分候选标的缺少可用价格数据。")
+    if not sector_summary or any(item.get("sector_name") == "未分类板块" for item in sector_summary):
+        gaps.append("行业/板块分类数据不足。")
+    if any(stock.get("roe") is None for stock in stock_pool):
+        gaps.append("ROE、营收增速、净利润增速等财务增强字段不足。")
+    return gaps
+
+
+def infer_information_confidence(
+    raw_data: dict[str, Any],
+    stock_pool: list[dict[str, Any]],
+    data_gaps: list[str],
+) -> float:
+    source_count = int(raw_data.get("source_count") or 0)
+    error_count = int(raw_data.get("error_count") or len(dict(raw_data.get("errors", {}) or {})))
+    score = 0.35
+    if stock_pool:
+        score += 0.25
+    if source_count:
+        score += min(source_count / 20, 0.25)
+    if error_count:
+        score -= min(error_count / 20, 0.2)
+    score -= min(len(data_gaps) * 0.04, 0.2)
+    return round(max(min(score, 0.9), 0.1), 2)
+
+
+def extract_information_macro_context(sources: dict[str, Any]) -> dict[str, Any]:
+    return {
+        label: value
+        for label, value in sources.items()
+        if label.startswith("macro.") or label.startswith("prediction.") or label.startswith("crypto.")
+    }
+
+
+def normalized_information_score(candidate_score: Any, metrics: dict[str, Any]) -> float:
+    score = to_float(candidate_score)
+    if score is None:
+        score = 50.0
+    elif score <= 10:
+        score = score * 12
+
+    change_pct = to_float(metrics.get("change_pct") or metrics.get("change_pct_20d"))
+    if change_pct is not None:
+        score += max(min(change_pct, 12), -12)
+
+    pe = to_float(metrics.get("pe"))
+    pb = to_float(metrics.get("pb"))
+    if pe and pe > 100:
+        score -= 8
+    if pb and pb > 15:
+        score -= 5
+    return round(max(min(score, 100), 0), 2)
+
+
+def infer_information_technical_signal(metrics: dict[str, Any]) -> str:
+    change_pct = to_float(metrics.get("change_pct") or metrics.get("change_pct_20d"))
+    volume_ratio = to_float(metrics.get("volume_ratio"))
+    if change_pct is not None and volume_ratio is not None:
+        if change_pct > 0 and volume_ratio >= 1.2:
+            return "放量上涨"
+        if change_pct < 0 and volume_ratio >= 1.2:
+            return "放量下跌"
+    if change_pct is not None:
+        if change_pct > 3:
+            return "价格转强"
+        if change_pct < -3:
+            return "价格转弱"
+    return "待补充均线/MACD/KDJ"
+
+
+def infer_money_flow_signal(avg_turnover: float | None) -> str:
+    if avg_turnover is None:
+        return "资金面数据不足"
+    if avg_turnover >= 5:
+        return "成交活跃"
+    if avg_turnover >= 2:
+        return "成交温和"
+    return "成交偏弱"
+
+
+def normalize_symbol(symbol: str) -> str:
+    normalized = symbol.strip().upper()
+    if re.fullmatch(r"SH\d{6}", normalized):
+        return f"{normalized[2:]}.SH"
+    if re.fullmatch(r"SZ\d{6}", normalized):
+        return f"{normalized[2:]}.SZ"
+    if re.fullmatch(r"\d{6}\.(SH|SZ)", normalized):
+        return normalized
+    if re.fullmatch(r"\d{6}", normalized):
+        if normalized.startswith(("600", "601", "603", "605", "688")):
+            return f"{normalized}.SH"
+        return f"{normalized}.SZ"
+    return normalized
+
+
+def average(values: list[float]) -> float | None:
+    if not values:
+        return None
+    return round(sum(values) / len(values), 4)
 
 
 def format_candidates(candidates: list[dict[str, Any]]) -> str:
@@ -989,6 +1300,67 @@ def render_deterministic_report(
 
 def mock_information_report(user_message: str) -> str:
     return f"## 信息分析 Mock 输出\n\n{user_message[:900]}"
+
+
+def mock_question_planning_report(user_message: str) -> str:
+    planning_input = user_message.split("Data-source reference document:", 1)[0]
+    lowered = planning_input.lower()
+    is_china = any(
+        token in lowered
+        for token in (
+            "a股",
+            "a-share",
+            "china",
+            "沪深",
+            "大a",
+            "板块",
+            "行业",
+            "概念",
+            "地域",
+            "通达信",
+        )
+    )
+    if is_china:
+        selected_groups = ["china_equity", "macro"]
+        market_scope = "China A-share"
+    else:
+        selected_groups = ["us_equity", "macro"]
+        market_scope = "US/global listed assets"
+    providers = {
+        group: {
+            "enabled": group in selected_groups,
+            "reason": (
+                "Mock planner selected this provider group."
+                if group in selected_groups
+                else "Mock planner rejected this provider group."
+            ),
+        }
+        for group in (
+            "us_equity",
+            "china_equity",
+            "macro",
+            "prediction_markets",
+            "crypto",
+            "web_search",
+        )
+    }
+    return json.dumps(
+        {
+            "question_understanding": {
+                "rewritten_question": "Mock question planning result",
+                "core_intent": "Select provider groups before information collection",
+                "market_scope": market_scope,
+                "time_window": "short_to_medium_term",
+                "candidate_scope": "User supplied or provider discovered candidates",
+            },
+            "provider_selection": {
+                "selected_groups": selected_groups,
+                "providers": providers,
+                "rejected_groups": [group for group in providers if group not in selected_groups],
+            },
+        },
+        ensure_ascii=False,
+    )
 
 
 def mock_bull_case(user_message: str) -> str:
