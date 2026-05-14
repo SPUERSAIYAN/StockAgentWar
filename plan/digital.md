@@ -12,7 +12,7 @@
 | `BisProvider`            | BIS 国际清算银行                      | 央行政策利率、Credit-to-GDP gap                                                                 | 政策利率比较、信用周期、金融过热指标   | 无额外依赖   | 无      |
 | `WorldBankProvider`      | 世界银行                              | GDP、人口、通胀、贸易、经常账户等宏观指标                                                       | 国家宏观基本面、长期经济趋势           | 无额外依赖   | 无      |
 | `MootdxProvider`         | 中国 A 股 / 通达信                    | 日/周/月/分钟 K、实时行情、分时、分笔、五档盘口、指数 K、本地通达信文件、财务摘要、F10 公司概况 | A 股行情、盘口、财务摘要、本地数据读取 | `mootdx`   | 无      |
-| `TencentFinanceProvider` | 腾讯财经 / A 股、指数、港股、美股快照 | PE、PB、市值、换手率、涨跌幅、成交量、成交额、板块原始数据                                      | A 股估值、实时交易指标、板块监控       | 无额外依赖   | 无      |
+| `TencentFinanceProvider` | 腾讯财经 / A 股、指数、港股、美股快照 | PE、PB、市值、换手率、涨跌幅、成交量、成交额                                                     | A 股估值、实时交易指标、指数快照       | 无额外依赖   | 无      |
 | `FearGreedProvider`      | CNN Fear & Greed Index                | 恐惧贪婪指数、评级、历史对比值                                                                  | 美股市场情绪、风险偏好判断             | 无额外依赖   | 无      |
 | `CMEFedWatchProvider`    | CME FedWatch                          | FOMC 会议目标利率概率                                                                           | 市场隐含加息/降息概率                  | 无额外依赖   | 无      |
 | `WebSearchProvider`      | DuckDuckGo / 网页                     | 搜索摘要、网页正文抓取                                                                          | 补充非结构化公开信息                   | 无额外依赖   | 无      |

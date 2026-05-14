@@ -7,3 +7,4 @@ uvicorn[standard]>=0.34.0
 python-dotenv>=1.0.0
 yfinance>=0.2.65
 mootdx>=0.11.7,<0.12.0
+pandas>=2.2.0

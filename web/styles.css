@@ -623,7 +623,6 @@ input:disabled, textarea:disabled {
 .pipeline-node[data-node="bear_debate"]          { --node-brand: var(--brand-bear); }
 .pipeline-node[data-node="judge_decision"]       { --node-brand: var(--brand-judge); }
 .pipeline-node[data-node="risk_review"]          { --node-brand: var(--brand-risk); }
-.pipeline-node[data-node="a_share_context"]      { --node-brand: var(--brand-ashare); }
 .pipeline-node[data-node="portfolio_manager"]    { --node-brand: var(--brand-manager); }
 .pipeline-node[data-node="save_trade_plan"]      { --node-brand: var(--brand-plan); }
 
@@ -721,7 +720,6 @@ input:disabled, textarea:disabled {
 .stage-card[data-node="bear_debate"]          { --card-brand: var(--brand-bear); }
 .stage-card[data-node="judge_decision"]       { --card-brand: var(--brand-judge); }
 .stage-card[data-node="risk_review"]          { --card-brand: var(--brand-risk); }
-.stage-card[data-node="a_share_context"]      { --card-brand: var(--brand-ashare); }
 .stage-card[data-node="portfolio_manager"]    { --card-brand: var(--brand-manager); }
 .stage-card[data-node="save_trade_plan"]      { --card-brand: var(--brand-plan); }
 
@@ -1088,7 +1086,6 @@ input:disabled, textarea:disabled {
 .rtab[data-node="bear_debate"]          { --tab-brand: var(--brand-bear); }
 .rtab[data-node="judge_decision"]       { --tab-brand: var(--brand-judge); }
 .rtab[data-node="risk_review"]          { --tab-brand: var(--brand-risk); }
-.rtab[data-node="a_share_context"]      { --tab-brand: var(--brand-ashare); }
 .rtab[data-node="portfolio_manager"]    { --tab-brand: var(--brand-manager); }
 .rtab[data-node="save_trade_plan"]      { --tab-brand: var(--brand-plan); }
 
