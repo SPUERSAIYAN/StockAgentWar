@@ -17,7 +17,9 @@ from collectors.connectors.macro import build_macro_tasks
 from collectors.connectors.prediction import build_prediction_market_tasks
 from collectors.connectors.web_search import build_web_search_tasks
 from agents.trace_logger import (
+    log_collector_summary,
     log_data_source_error,
+    log_data_source_plan,
     log_data_source_start,
     log_data_source_success,
     log_trace,
@@ -51,7 +53,6 @@ DEFAULT_COLLECTOR_CONFIG: dict[str, Any] = {
             "tencent": True,
             "tencent_index_metrics": True,
             "tencent_index_symbols": ("sh000001", "sz399001", "sz399006"),
-            "tencent_board_queries": (),
             "mootdx": False,
             "mootdx_frequencies": ("day",),
             "mootdx_minute_bar_offset": 240,
@@ -116,16 +117,11 @@ def collect_market_information(
 ) -> dict[str, Any] | None:
     collector_config = merge_dicts(DEFAULT_COLLECTOR_CONFIG, dict(config.get("collector", {})))
     collector_name = config.get("name", "information")
-    log_trace(
-        collector_name,
-        "COLLECTOR CONFIG",
-        {
-            "enabled": collector_config.get("enabled"),
-            "timeout_seconds": collector_config.get("timeout_seconds"),
-            "max_workers": collector_config.get("max_workers"),
-            "providers": collector_config.get("providers", {}),
-            "candidate_discovery": collector_config.get("candidate_discovery", {}),
-        },
+    log_collector_summary(
+        enabled=collector_config.get("enabled", False) is not False,
+        timeout_seconds=collector_config.get("timeout_seconds"),
+        max_workers=collector_config.get("max_workers"),
+        providers=dict(collector_config.get("providers", {})),
     )
     if collector_config.get("enabled", False) is False:
         log_trace(collector_name, "COLLECTOR SKIP", {"reason": "collector disabled"})
@@ -142,7 +138,11 @@ def collect_market_information(
             "errors": {"digital_oracle_import": f"{type(exc).__name__}: {exc}"},
         }
 
-    discovery = discover_candidate_universe(state, collector_config)
+    discovery = (
+        discover_candidate_universe(state, collector_config)
+        if is_provider_enabled(collector_config, "china_equity")
+        else None
+    )
     if discovery:
         state = {
             **state,
@@ -154,8 +154,8 @@ def collect_market_information(
         }
 
     symbols = extract_candidate_symbols(state)
-    if not symbols:
-        return {
+    if not symbols and not can_collect_without_symbols(collector_config):
+        raw_summary: dict[str, Any] = {
             "collection_status": "empty",
             "generated_at": now_iso(),
             "sources": {},
@@ -166,6 +166,9 @@ def collect_market_information(
                 )
             },
         }
+        if discovery:
+            raw_summary["candidate_discovery"] = render_candidate_discovery(discovery)
+        return raw_summary
 
     timeout_seconds = float(collector_config.get("timeout_seconds", 35))
     max_workers = int(collector_config.get("max_workers", 12))
@@ -224,21 +227,13 @@ def collect_market_information(
             config=collector_config,
         ),
     )
-    log_trace(
-        collector_name,
-        "DATA SOURCE TASKS",
-        {
-            "symbols": symbols,
-            "a_share_symbols": a_share_symbols,
-            "global_symbols": global_symbols,
-            "task_count": len(tasks),
-            "tasks": sorted(tasks.keys()),
-            "task_build_errors": {
-                label: f"{type(exc).__name__}: {exc}"
-                for label, exc in task_build_errors.items()
-            },
-            "timeout_seconds": timeout_seconds,
-            "max_workers": max_workers,
+    log_data_source_plan(
+        task_count=len(tasks),
+        symbols=symbols,
+        tasks=sorted(tasks.keys()),
+        task_build_errors={
+            label: f"{type(exc).__name__}: {exc}"
+            for label, exc in task_build_errors.items()
         },
     )
 
@@ -371,6 +366,22 @@ def merge_dicts(base: dict[str, Any], override: dict[str, Any]) -> dict[str, Any
     return merged
 
 
+def is_provider_enabled(config: dict[str, Any], group: str) -> bool:
+    provider_config = dict(config.get("providers", {}).get(group, {}) or {})
+    return provider_config.get("enabled", True) is not False
+
+
+def can_collect_without_symbols(config: dict[str, Any]) -> bool:
+    return any(
+        is_provider_enabled(config, group)
+        for group in ("macro", "prediction_markets", "crypto", "web_search")
+    ) or can_collect_china_without_symbols(config)
+
+
+def can_collect_china_without_symbols(config: dict[str, Any]) -> bool:
+    return False
+
+
 def extract_candidate_symbols(state: MarketDecisionState) -> list[str]:
     seen: set[str] = set()
     symbols: list[str] = []
@@ -396,6 +407,27 @@ def discover_candidate_universe(
     if discovery_config.get("enabled", True) is False:
         return None
 
+    requested_sectors = extract_requested_sectors(state)
+    if requested_sectors:
+        return {
+            "mode": "provider_sector_discovery",
+            "universe": "china_a_share_sector",
+            "method": "sector_constituent_source_unavailable",
+            "reason": (
+                "当前未接入外部股票板块列表或板块成分股数据源，"
+                "无法按用户指定板块限定候选。"
+            ),
+            "requested_sectors": requested_sectors,
+            "matched_sectors": [],
+            "sources": {},
+            "errors": {
+                "candidate_discovery.board_membership": RuntimeError(
+                    "当前未接入板块成分股数据源，无法按板块限定候选。"
+                )
+            },
+            "candidates": [],
+        }
+
     universe_name = infer_auto_candidate_universe(state.get("task", ""))
     if not universe_name:
         return None
@@ -417,6 +449,14 @@ def discover_candidate_universe(
         "candidates": candidates,
         **discovery,
     }
+
+
+def extract_requested_sectors(state: MarketDecisionState) -> list[str]:
+    scan_scope = dict(state.get("scan_scope", {}) or {})
+    sectors = scan_scope.get("sectors") or []
+    if not isinstance(sectors, list):
+        return []
+    return [str(item).strip() for item in sectors if str(item).strip()]
 
 
 def infer_auto_candidate_universe(task: str) -> str | None:
@@ -747,15 +787,20 @@ def summarize_gathered_market_data(
     discovery: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     sources: dict[str, Any] = {}
+    discovery_source_values = dict(discovery.get("sources", {}) if discovery else {})
+    for label, value in discovery_source_values.items():
+        sources[label] = summarize_provider_value(value)
     for label, value in results.items():
         sources[label] = summarize_provider_value(value)
 
+    discovery_errors = dict(discovery.get("errors", {}) if discovery else {})
     rendered_errors = {
-        label: f"{type(exc).__name__}: {exc}" for label, exc in errors.items()
+        label: f"{type(exc).__name__}: {exc}"
+        for label, exc in {**discovery_errors, **errors}.items()
     }
-    if results and rendered_errors:
+    if sources and rendered_errors:
         status = "partial"
-    elif results:
+    elif sources:
         status = "ok"
     else:
         status = "failed"
@@ -765,14 +810,27 @@ def summarize_gathered_market_data(
         "generated_at": now_iso(),
         "task": task,
         "symbols": symbols,
-        "source_count": len(results),
+        "source_count": len(sources),
         "error_count": len(rendered_errors),
         "sources": sources,
         "errors": rendered_errors,
     }
     if discovery:
-        summary["candidate_discovery"] = discovery
+        summary["candidate_discovery"] = render_candidate_discovery(discovery)
     return summary
+
+
+def render_candidate_discovery(discovery: dict[str, Any]) -> dict[str, Any]:
+    rendered = dict(discovery)
+    sources = dict(rendered.pop("sources", {}) or {})
+    errors = dict(rendered.pop("errors", {}) or {})
+    if sources:
+        rendered["source_labels"] = sorted(sources.keys())
+    if errors:
+        rendered["errors"] = {
+            label: f"{type(exc).__name__}: {exc}" for label, exc in errors.items()
+        }
+    return rendered
 
 
 def summarize_provider_value(value: Any) -> Any:

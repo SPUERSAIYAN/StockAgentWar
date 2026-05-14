@@ -12,7 +12,7 @@
       <header class="topbar">
         <div>
           <p class="eyebrow">Multi-Agent Decision Engine</p>
-          <h1>股票决策工作台</h1>
+          <h1>股票策略计划</h1>
         </div>
         <div class="topbar-right">
           <div class="health" id="healthBadge">
@@ -47,9 +47,9 @@
             </div>
           </div>
 
-          <div class="field" data-field="symbols">
+          <div class="field hidden" data-field="symbols">
             <label for="symbols">股票代码</label>
-            <input id="symbols" value="AAPL,MSFT,NVDA" autocomplete="off" placeholder="逗号分隔，如 AAPL,MSFT" />
+            <input id="symbols" value="" autocomplete="off" placeholder="可选，逗号分隔，如 AAPL,MSFT 或 600519" />
           </div>
 
           <div class="field hidden" data-field="sectors">
@@ -73,7 +73,7 @@
 
           <div class="field">
             <label for="task">任务描述</label>
-            <textarea id="task" rows="5">筛选未来 1-3 个月的候选股票，输出做多/观望/回避建议，并说明风险控制条件。</textarea>
+            <textarea id="task" rows="5">分析用户问题相关的宏观、市场和数据源信息，只输出信息分析报告，不生成股票交易决策。</textarea>
           </div>
 
           <div class="action-row">

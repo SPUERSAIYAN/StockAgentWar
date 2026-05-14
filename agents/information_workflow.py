@@ -3,7 +3,6 @@ from __future__ import annotations
 import re
 from typing import Any
 
-from collectors.digital_oracle_collector import discover_candidate_universe
 from schemas.state import AgentRuntimeConfig, MarketDecisionState
 
 
@@ -17,6 +16,15 @@ WORKFLOW_STEPS = [
 ]
 
 ROUTING_CRITERIA = ["relevance", "time_match", "information_increment"]
+PROVIDER_GROUPS = (
+    "us_equity",
+    "china_equity",
+    "macro",
+    "prediction_markets",
+    "crypto",
+    "web_search",
+)
+PROVIDER_GROUP_SET = set(PROVIDER_GROUPS)
 
 
 def signal(signal_id: str, provider_group: str, horizon: str, description: str) -> dict[str, Any]:
@@ -85,32 +93,26 @@ def prepare_information_state(
     state: MarketDecisionState,
     config: AgentRuntimeConfig,
 ) -> tuple[MarketDecisionState, dict[str, Any] | None]:
-    discovery = discover_candidate_universe(state, dict(config.get("collector", {})))
-    if not discovery:
-        return state, None
-
-    enriched_state: MarketDecisionState = {
-        **state,
-        "candidates": discovery["candidates"],
-        "metadata": {
-            **dict(state.get("metadata", {})),
-            "auto_candidate_discovery": discovery,
-        },
-    }
-    return enriched_state, discovery
+    del config
+    return state, None
 
 
 def build_information_workflow(state: MarketDecisionState) -> dict[str, Any]:
     task = state.get("task", "")
     symbols = [str(item.get("symbol", "")).upper() for item in state.get("candidates", []) if item.get("symbol")]
     discovery = dict(state.get("metadata", {}).get("auto_candidate_discovery", {}) or {})
-    question_type = infer_question_type(task, symbols)
-    time_window = infer_time_window(task)
+    question_understanding = dict(state.get("question_understanding", {}) or {})
+    provider_selection = require_state_provider_selection(state)
+    selected_groups = set(provider_selection["selected_groups"])
+    question_type = infer_question_type_from_understanding(task, symbols, question_understanding)
+    time_window = infer_time_window_from_understanding(task, question_understanding)
     selected_signals = select_signal_specs(question_type, task, symbols)
+    selected_signals = filter_signals_to_provider_groups(selected_signals, selected_groups)
     routed_signals = route_signal_specs(selected_signals, question_type, time_window, task)
     return {
         "instruction_file": "prompts/information_agent.md",
         "workflow_steps": WORKFLOW_STEPS,
+        "question_understanding": question_understanding,
         "question_decomposition": {
             "core_variable": infer_core_variable(task, symbols),
             "time_window": time_window,
@@ -164,6 +166,48 @@ def infer_question_type(task: str, symbols: list[str]) -> str:
     if any(token in lowered for token in ("bubble", "industry", "sector", "泡沫", "行业")):
         return "industry_cycle_or_bubble_assessment"
     return "asset_pricing_or_stock_selection"
+
+
+def infer_question_type_from_understanding(
+    task: str,
+    symbols: list[str],
+    question_understanding: dict[str, Any],
+) -> str:
+    scope = str(question_understanding.get("market_scope") or "").lower()
+    rewritten = str(question_understanding.get("rewritten_question") or "").lower()
+    if any(token in scope or token in rewritten for token in ("a-share", "ashare", "a股", "china a-share")):
+        return "china_a_share_analysis"
+    return infer_question_type(task, symbols)
+
+
+def infer_time_window_from_understanding(task: str, question_understanding: dict[str, Any]) -> str:
+    window_text = str(question_understanding.get("time_window") or "").lower()
+    if not window_text:
+        return infer_time_window(task)
+    if any(token in window_text for token in ("1-5", "trading day", "tomorrow", "明天", "交易日")):
+        return "very_short_term_1_to_5_trading_days"
+    return infer_time_window(window_text)
+
+
+def filter_signals_to_provider_groups(
+    selected_signals: list[dict[str, Any]],
+    selected_groups: set[str],
+) -> list[dict[str, Any]]:
+    filtered = [dict(item) for item in selected_signals if item.get("provider_group") in selected_groups]
+    existing_groups = {item["provider_group"] for item in filtered}
+    for group in PROVIDER_GROUPS:
+        if group not in selected_groups or group in existing_groups:
+            continue
+        filtered.append(
+            signal(
+                f"{group}.planner_selected",
+                group,
+                "short_term",
+                "Provider group selected by QuestionPlanningAgent.",
+            )
+        )
+        existing_groups.add(group)
+    return filtered
 
 
 def select_signal_specs(
@@ -252,51 +296,65 @@ def select_information_providers(
     workflow: dict[str, Any],
     config: AgentRuntimeConfig,
 ) -> dict[str, Any]:
-    task = state.get("task", "")
-    symbols = workflow["question_decomposition"]["candidates"]
-    routed = workflow.get("signal_routing", {}).get("routed_signals", [])
-    kept_groups = {item["provider_group"] for item in routed if item.get("decision") == "keep"}
-
-    has_a_share = any(is_a_share_symbol_text(symbol) for symbol in symbols)
-    has_global_symbol = any(not is_a_share_symbol_text(symbol) for symbol in symbols)
-    provider_rows: dict[str, dict[str, Any]] = {
-        "us_equity": provider_row(
-            enabled=has_global_symbol or "us_equity" in kept_groups,
-            reason="US/global symbols or leader/ETF/options/EDGAR signals were routed in Step 3.",
-        ),
-        "china_equity": provider_row(
-            enabled=has_a_share or "china_equity" in kept_groups,
-            reason="A-share candidate discovery, realtime metrics, K-lines, valuation or fundamentals were routed in Step 3.",
-        ),
-        "macro": provider_row(
-            enabled="macro" in kept_groups,
-            reason="Macro, risk-free-rate, risk-appetite, China risk-pricing or CFTC signals were routed in Step 3.",
-        ),
-        "prediction_markets": provider_row(
-            enabled="prediction_markets" in kept_groups,
-            reason="Prediction-market event probability signals were routed in Step 3.",
-        ),
-        "crypto": provider_row(
-            enabled="crypto" in kept_groups,
-            reason="Crypto spot or derivatives were routed as risk-appetite or asset-specific signals.",
-        ),
-        "web_search": provider_row(
-            enabled=("web_search" in kept_groups) or should_enable_web_search(task, config),
-            reason="Structured-data gaps such as MOVE, OAS, CDS, BDI or sector market data require web search.",
-        ),
+    del config
+    provider_selection = require_state_provider_selection(state)
+    basis = {
+        **dict(provider_selection.get("basis", {}) or {}),
+        "question_type": workflow["question_decomposition"]["question_type"],
+        "time_window": workflow["question_decomposition"]["time_window"],
+    }
+    return {
+        **provider_selection,
+        "basis": basis,
     }
 
-    selected_groups = [group for group, item in provider_rows.items() if item["enabled"]]
+
+def require_state_provider_selection(state: MarketDecisionState) -> dict[str, Any]:
+    provider_selection = state.get("provider_selection")
+    if not isinstance(provider_selection, dict):
+        raise ValueError("Information analysis requires provider_selection from QuestionPlanningAgent.")
+
+    selected_groups = provider_selection.get("selected_groups")
+    if not isinstance(selected_groups, list):
+        raise ValueError("provider_selection.selected_groups must be a list.")
+    selected = []
+    for group in selected_groups:
+        group_text = str(group).strip()
+        if group_text not in PROVIDER_GROUP_SET:
+            raise ValueError(f"Unknown provider group: {group_text}")
+        if group_text not in selected:
+            selected.append(group_text)
+    if not selected:
+        raise ValueError("provider_selection.selected_groups must not be empty.")
+
+    raw_providers = provider_selection.get("providers")
+    if not isinstance(raw_providers, dict):
+        raise ValueError("provider_selection.providers must be a mapping.")
+    unknown_provider_keys = sorted(set(str(key) for key in raw_providers) - PROVIDER_GROUP_SET)
+    if unknown_provider_keys:
+        raise ValueError(f"Unknown provider group(s): {', '.join(unknown_provider_keys)}")
+
+    providers: dict[str, dict[str, Any]] = {}
+    for group in PROVIDER_GROUPS:
+        row = raw_providers.get(group, {})
+        if row is None:
+            row = {}
+        if not isinstance(row, dict):
+            raise ValueError(f"provider_selection.providers.{group} must be a mapping.")
+        enabled = group in selected
+        providers[group] = {
+            "enabled": enabled,
+            "reason": str(
+                row.get("reason")
+                or ("Selected by QuestionPlanningAgent." if enabled else "Rejected by QuestionPlanningAgent.")
+            ),
+        }
+
     return {
-        "selected_groups": selected_groups,
-        "providers": provider_rows,
-        "rejected_groups": [group for group in provider_rows if group not in selected_groups],
-        "basis": {
-            "question_type": workflow["question_decomposition"]["question_type"],
-            "time_window": workflow["question_decomposition"]["time_window"],
-            "minimum_independent_dimensions": 3,
-            "kept_signal_count": sum(1 for item in routed if item.get("decision") == "keep"),
-        },
+        "selected_groups": selected,
+        "providers": providers,
+        "rejected_groups": [group for group in PROVIDER_GROUPS if group not in selected],
+        "basis": dict(provider_selection.get("basis", {}) or {}),
     }
 
 

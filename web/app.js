@@ -14,20 +14,19 @@ const ICONS = {
 };
 
 const STAGE_META = {
+  question_planning: { agent: "问题理解", title: "数据源规划", color: "#38BDF8", icon: ICONS.radar },
   information_analysis: { agent: "信息分析", title: "市场数据汇总", color: "#3B82F6", icon: ICONS.radar },
-  a_share_context: { agent: "A 股上下文", title: "股票池与板块", color: "#06B6D4", icon: ICONS.bank },
-  bull_debate: { agent: "多头", title: "看涨逻辑", color: "#22C55E", icon: ICONS.up },
-  bear_debate: { agent: "空头", title: "看跌反驳", color: "#EF4444", icon: ICONS.down },
+  bull_debate: { agent: "多头", title: "看多逻辑", color: "#22C55E", icon: ICONS.up },
+  bear_debate: { agent: "空头", title: "风险反驳", color: "#EF4444", icon: ICONS.down },
   judge_decision: { agent: "裁判", title: "综合裁决", color: "#A78BFA", icon: ICONS.scale },
   risk_review: { agent: "风控", title: "风险复核", color: "#F59E0B", icon: ICONS.shield },
-  portfolio_manager: { agent: "总经理", title: "最终决策", color: "#EC4899", icon: ICONS.briefcase },
+  portfolio_manager: { agent: "总经理", title: "最终建议", color: "#EC4899", icon: ICONS.briefcase },
   save_trade_plan: { agent: "交易计划", title: "计划落盘", color: "#14B8A6", icon: ICONS.clipboard },
 };
 
-const COMMON_STAGE_ORDER = ["information_analysis", "bull_debate", "bear_debate", "judge_decision", "risk_review"];
-const A_SHARE_STAGE_ORDER = [
+const DOCUMENTED_STAGE_ORDER = [
+  "question_planning",
   "information_analysis",
-  "a_share_context",
   "bull_debate",
   "bear_debate",
   "judge_decision",
@@ -35,6 +34,11 @@ const A_SHARE_STAGE_ORDER = [
   "portfolio_manager",
   "save_trade_plan",
 ];
+const COMMON_STAGE_ORDER = [
+  "question_planning",
+  "information_analysis",
+];
+const A_SHARE_STAGE_ORDER = [...DOCUMENTED_STAGE_ORDER];
 
 /* ============================================================
    App state
@@ -174,7 +178,7 @@ function updateVisibleFields() {
   setFieldVisible("riskTolerance", isAShare);
   setFieldVisible("capital", isAShare);
   setFieldVisible("sectors", state.runMode === "a_share_sector");
-  setFieldVisible("symbols", !isAShare || state.runMode === "a_share_deep");
+  setFieldVisible("symbols", state.runMode === "a_share_deep");
 }
 
 function setFieldVisible(name, visible) {
@@ -184,10 +188,8 @@ function setFieldVisible(name, visible) {
 
 function applyModeDefaults() {
   if (state.runMode === "common") {
-    if (!els.symbols.value.trim() || isLikelyAShareSymbolList(els.symbols.value)) {
-      els.symbols.value = "AAPL,MSFT,NVDA";
-    }
-    els.task.value = "筛选未来 1-3 个月的候选股票，输出做多/观望/回避建议，并说明风险控制条件。";
+    els.symbols.value = "";
+    els.task.value = "分析用户问题相关的宏观、市场和数据源信息，只输出信息分析报告，不生成股票交易决策。";
     return;
   }
   if (state.runMode === "a_share_daily") {
@@ -399,7 +401,7 @@ function buildRequestPayload() {
   const mode = state.runMode === "common" ? state.modelMode : state.runMode;
   return {
     task: els.task.value.trim(),
-    symbols: state.runMode === "a_share_daily" || state.runMode === "a_share_sector" ? "" : els.symbols.value.trim(),
+    symbols: state.runMode === "a_share_deep" ? els.symbols.value.trim() : "",
     sectors: state.runMode === "a_share_sector" ? els.sectors.value.trim() : "",
     mode,
     risk_tolerance: state.riskTolerance,
@@ -622,59 +624,18 @@ function renderSourceRow(item) {
    ============================================================ */
 
 function renderTradePlanPanel() {
-  const decision = state.completeState.final_decision || {};
-  const tradePlan = state.completeState.trade_plan || {};
-  const stocks = Array.isArray(tradePlan.monitored_stocks) ? tradePlan.monitored_stocks : [];
-  const confidence = state.completeState.manager_confidence;
-  const isBuy = decision.action === "BUY" && stocks.length > 0;
-
-  if (!isBuy) {
-    els.tradePlanPanel.className = "trade-plan-panel compact";
-    els.tradePlanPanel.innerHTML = `
-      <div class="trade-plan-head">
-        <strong>交易计划</strong>
-        <span>${escapeHtml(decision.action || "WAIT")}</span>
-      </div>
-      <p>${escapeHtml(decision.reasoning || "未生成交易计划。")}</p>`;
+  const content = state.stageContent.save_trade_plan || "";
+  if (!content) {
+    resetTradePlanPanel();
     return;
   }
-
-  els.tradePlanPanel.className = "trade-plan-panel";
+  els.tradePlanPanel.className = "trade-plan-panel compact";
   els.tradePlanPanel.innerHTML = `
     <div class="trade-plan-head">
       <strong>交易计划</strong>
-      <span>决策 ${escapeHtml(decision.action)} · 置信度 ${formatConfidence(confidence)}</span>
+      <span>报告</span>
     </div>
-    <div class="trade-plan-reason">${escapeHtml(decision.reasoning || "")}</div>
-    <div class="trade-plan-table">
-      ${stocks.map(renderTradePlanStock).join("")}
-    </div>
-    <div class="trade-plan-note">${escapeHtml(tradePlan.position_sizing_rationale || "")}</div>`;
-}
-
-function renderTradePlanStock(stock) {
-  return `
-    <article class="trade-stock">
-      <div class="trade-stock-title">
-        <strong>${escapeHtml(stock.name || stock.symbol || "标的")}</strong>
-        <span>${escapeHtml(stock.symbol || "")}</span>
-      </div>
-      <dl>
-        <div><dt>仓位</dt><dd>${escapeHtml(stock.allocation_pct ?? "")}%</dd></div>
-        <div><dt>数量</dt><dd>${escapeHtml(stock.quantity ?? "")}</dd></div>
-        <div><dt>买入触发</dt><dd>${escapeHtml(stock.buy_trigger_price ?? "")}</dd></div>
-        <div><dt>卖出触发</dt><dd>${escapeHtml(stock.sell_trigger_price ?? "")}</dd></div>
-        <div><dt>止损</dt><dd>${escapeHtml(stock.stop_loss_price ?? "")}</dd></div>
-        <div><dt>止盈</dt><dd>${escapeHtml(stock.take_profit_price ?? "")}</dd></div>
-        <div><dt>有效期</dt><dd>${escapeHtml(stock.valid_from || "")} 至 ${escapeHtml(stock.valid_until || "")}</dd></div>
-      </dl>
-    </article>`;
-}
-
-function formatConfidence(value) {
-  const numeric = Number(value);
-  if (!Number.isFinite(numeric)) return "N/A";
-  return `${Math.round(numeric * 100)}%`;
+    <div class="markdown">${renderMarkdown(content)}</div>`;
 }
 
 /* ============================================================

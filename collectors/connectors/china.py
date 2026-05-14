@@ -16,7 +16,7 @@ def build_china_equity_tasks(*, symbols: list[str], config: dict[str, Any]) -> T
     include_mootdx = bool(provider_config.get("mootdx", False))
 
     if include_tencent:
-        from collectors.digital_oracle import TencentBoardQuery, TencentFinanceProvider, TencentStockMetricsQuery
+        from collectors.digital_oracle import TencentFinanceProvider, TencentStockMetricsQuery
 
         for symbol in symbols:
             tasks[f"equity.{symbol}.tencent_metrics"] = (
@@ -28,16 +28,6 @@ def build_china_equity_tasks(*, symbols: list[str], config: dict[str, Any]) -> T
             index_symbols = tuple(provider_config.get("tencent_index_symbols", ("sh000001", "sz399001", "sz399006")))
             tasks["china.tencent.index_metrics"] = (
                 lambda s=index_symbols: TencentFinanceProvider().get_index_metrics(s)
-            )
-        for index, query_config in enumerate(provider_config.get("tencent_board_queries", ()), 1):
-            if not isinstance(query_config, dict) or not query_config.get("path"):
-                continue
-            label = safe_task_label(query_config.get("label", index))
-            params = dict(query_config.get("params", {}) or {})
-            tasks[f"china.tencent.board.{label}"] = (
-                lambda path=str(query_config["path"]), p=params: TencentFinanceProvider().fetch_board_json_like(
-                    TencentBoardQuery(path=path, params=p)
-                )
             )
 
     if include_mootdx:
@@ -132,3 +122,4 @@ def build_china_equity_tasks(*, symbols: list[str], config: dict[str, Any]) -> T
 
 def safe_task_label(value: object) -> str:
     return str(value).replace(" ", "_").replace("/", "_").replace(".", "_")[:80]
+

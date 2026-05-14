@@ -15,14 +15,12 @@ class PortfolioManagerAgent:
         self.prompt = load_agent_prompt("portfolio_manager_agent.md")
 
     def __call__(self, state: dict[str, Any]) -> dict[str, Any]:
-        report = run_prompt_agent(
+        return run_prompt_agent(
             config=self.config,
             state=state,
             output_key="manager_report",
             prompt_template=self.prompt,
         )
-        structured = build_portfolio_decision(state, self.config)
-        return {**report, **structured}
 
 
 def build_portfolio_decision(
