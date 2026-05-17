@@ -1355,22 +1355,34 @@ def mock_question_planning_report(user_message: str) -> str:
             "web_search",
         )
     }
-    return json.dumps(
-        {
-            "question_understanding": {
-                "rewritten_question": "Mock question planning result",
-                "core_intent": "Select provider groups before information collection",
-                "market_scope": market_scope,
-                "time_window": "short_to_medium_term",
-                "candidate_scope": "User supplied or provider discovered candidates",
-                "sector_terms": sector_terms,
-            },
-            "provider_selection": {
-                "selected_groups": selected_groups,
-                "providers": providers,
-                "rejected_groups": [group for group in providers if group not in selected_groups],
-            },
+    plan = {
+        "question_understanding": {
+            "rewritten_question": "Mock question planning result",
+            "core_intent": "Select provider groups before information collection",
+            "market_scope": market_scope,
+            "time_window": "short_to_medium_term",
+            "candidate_scope": "User supplied or provider discovered candidates",
+            "sector_terms": sector_terms,
         },
+        "provider_selection": {
+            "selected_groups": selected_groups,
+            "providers": providers,
+            "rejected_groups": [group for group in providers if group not in selected_groups],
+        },
+        "data_collection_actions": [],
+    }
+    if sector_terms and "china_equity" in selected_groups:
+        plan["data_collection_actions"].append(
+            {
+                "action": "CALL_LOCAL_CONCEPT_BOARD",
+                "provider_group": "china_equity",
+                "source": "astockdate/全部A股20264.xlsx",
+                "input_terms": sector_terms,
+                "expected_output": "A-share candidate stock symbols and metadata for the Python collector",
+            }
+        )
+    return json.dumps(
+        plan,
         ensure_ascii=False,
     )
 

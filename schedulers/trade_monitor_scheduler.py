@@ -203,8 +203,6 @@ def load_scheduler_from_config(
 ) -> TradeMonitorScheduler:
     config = yaml.safe_load(config_path.read_text(encoding="utf-8")) if config_path.exists() else {}
     monitor_config = dict((config or {}).get("trade_monitor", {}) or {})
-    trader_config = dict((config or {}).get("agents", {}).get("trader", {}) or {})
-    simulated_config = dict(trader_config.get("simulated", {}) or {})
 
     resolved_plan_file = PROJECT_ROOT / (plan_file or monitor_config.get("plan_file", "data/trade_plan.json"))
     order_log_file = PROJECT_ROOT / monitor_config.get("order_log_file", "data/order_log.json")
@@ -213,8 +211,8 @@ def load_scheduler_from_config(
         order_log_file=order_log_file,
         interval_seconds=int(interval or monitor_config.get("interval_seconds", 60)),
         mode=mode or monitor_config.get("mode", "SIMULATED"),
-        commission_rate=float(simulated_config.get("commission_rate", 0.0003)),
-        stamp_tax_rate=float(simulated_config.get("stamp_tax_rate", 0.0005)),
+        commission_rate=float(monitor_config.get("commission_rate", 0.0003)),
+        stamp_tax_rate=float(monitor_config.get("stamp_tax_rate", 0.0005)),
     )
 
 

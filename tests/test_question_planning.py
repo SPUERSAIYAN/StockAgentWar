@@ -54,6 +54,8 @@ class QuestionPlanningTests(unittest.TestCase):
         self.assertTrue(result["provider_selection"]["providers"]["china_equity"]["enabled"])
         self.assertFalse(result["provider_selection"]["providers"]["us_equity"]["enabled"])
         self.assertEqual(result["question_understanding"]["sector_terms"], ["半导体"])
+        self.assertEqual(result["data_collection_actions"][0]["action"], "CALL_LOCAL_CONCEPT_BOARD")
+        self.assertEqual(result["data_collection_actions"][0]["input_terms"], ["半导体"])
 
     def test_parse_json_from_markdown_fence(self) -> None:
         parsed = parse_planner_json(
@@ -79,6 +81,8 @@ class QuestionPlanningTests(unittest.TestCase):
         )
 
         self.assertEqual(result["question_understanding"]["sector_terms"], ["半导体", "白酒", "人工智能"])
+        self.assertEqual(result["data_collection_actions"][0]["action"], "CALL_LOCAL_CONCEPT_BOARD")
+        self.assertEqual(result["data_collection_actions"][0]["input_terms"], ["半导体", "白酒", "人工智能"])
 
     def test_invalid_json_fails(self) -> None:
         with self.assertRaises(ValueError):

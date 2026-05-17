@@ -158,6 +158,33 @@ class ServerVisibilityTests(unittest.TestCase):
         self.assertEqual(status_nodes, A_SHARE_VISIBLE_ORDER)
         self.assertEqual(complete_events[-1]["final_output"], "final")
 
+    def test_trade_plan_report_displays_without_plan_file(self) -> None:
+        report = server.render_trade_plan_report(
+            {"metadata": {"trade_plan_file": None}},
+            {
+                "final_decision": {"action": "BUY", "reasoning": "test buy"},
+                "trade_plan": {
+                    "monitored_stocks": [
+                        {
+                            "symbol": "600000.SH",
+                            "name": "浦发银行",
+                            "quantity": 100,
+                            "allocation_pct": 10,
+                            "buy_trigger_price": 9.8,
+                            "sell_trigger_price": 11,
+                            "stop_loss_price": 9,
+                            "take_profit_price": 11,
+                            "valid_from": "2026-05-17",
+                            "valid_until": "2026-06-16",
+                        }
+                    ]
+                },
+            },
+        )
+
+        self.assertIn("仅展示，不写入交易计划 JSON 文件", report)
+        self.assertNotIn("计划文件", report)
+
 
 class FakeAshareGraph:
     def stream(self, inputs, stream_mode):

@@ -103,8 +103,8 @@ COMMON_STAGES: dict[str, dict[str, str]] = {
     },
     "save_trade_plan": {
         "id": "save_trade_plan",
-        "agent": "交易计划",
-        "title": "计划落盘",
+        "agent": "交易决策",
+        "title": "决策展示",
         "output_key": "trade_plan_report",
         "color": "#14B8A6",
     },
@@ -400,25 +400,25 @@ def stage_content(
 
 
 def render_trade_plan_report(node_update: dict[str, Any], state: dict[str, Any]) -> str:
-    metadata = dict(node_update.get("metadata", {}) or state.get("metadata", {}) or {})
+    del node_update
     plan = dict(state.get("trade_plan", {}) or {})
     decision = dict(state.get("final_decision", {}) or {})
     stocks = list(plan.get("monitored_stocks", []) or [])
     if not stocks:
         return "\n".join(
             [
-                "## 交易计划",
+                "## 交易决策展示",
                 "",
                 f"- 最终动作：{decision.get('action', 'WAIT')}",
-                f"- 原因：{decision.get('reasoning', '未生成交易计划。')}",
-                "- 状态：未写入交易计划文件",
+                f"- 原因：{decision.get('reasoning', '未生成交易决策展示。')}",
+                "- 状态：仅展示，不写入交易计划 JSON 文件",
             ]
         )
     lines = [
-        "## 交易计划",
+        "## 交易决策展示",
         "",
         f"- 最终动作：{decision.get('action', 'BUY')}",
-        f"- 计划文件：`{metadata.get('trade_plan_file', 'data/trade_plan.json')}`",
+        "- 状态：仅展示，不写入交易计划 JSON 文件",
         "",
         "| 标的 | 数量 | 仓位 | 买入触发 | 卖出触发 | 止损 | 止盈 | 有效期 |",
         "|---|---:|---:|---:|---:|---:|---:|---|",

@@ -16,7 +16,9 @@ Key points to focus on:
 
 For China A-share auto-purchase workflows, keep the same bullish role but adapt the evidence to A-share rules: valuation, turnover, market-cap liquidity, price trigger levels, T+1 constraints, limit-up/limit-down risk, and missing northbound/margin/sector data. Do not invent unprovided policy or capital-flow data.
 
-输出语言：最终回答必须使用中文。
+## Output language
+
+The final answer must be in Chinese.
 
 ## User
 

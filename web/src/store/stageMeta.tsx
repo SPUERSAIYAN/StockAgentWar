@@ -105,7 +105,7 @@ export const STAGE_META: Record<string, StageMeta> = {
   judge_decision: { id: "judge_decision", agent: "裁判", title: "综合裁决", color: "#9E8CFF", icon: <ScaleIcon /> },
   risk_review: { id: "risk_review", agent: "风控", title: "风险复核", color: "#D69B45", icon: <ShieldIcon /> },
   portfolio_manager: { id: "portfolio_manager", agent: "总经理", title: "最终决策", color: "#B58CFF", icon: <BriefcaseIcon /> },
-  save_trade_plan: { id: "save_trade_plan", agent: "交易计划", title: "计划落盘", color: "#62BFA2", icon: <ClipboardIcon /> },
+  save_trade_plan: { id: "save_trade_plan", agent: "交易决策", title: "决策展示", color: "#62BFA2", icon: <ClipboardIcon /> },
 };
 
 export const COMMON_STAGE_ORDER = ["question_planning", "information_analysis"];

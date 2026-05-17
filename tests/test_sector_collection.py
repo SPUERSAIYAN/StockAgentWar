@@ -82,6 +82,31 @@ class SectorCollectionTests(unittest.TestCase):
         self.assertEqual(result["requested_sectors"], ["半导体"])
         self.assertTrue(result["candidates"])
 
+    def test_data_collection_action_terms_are_sector_fallback(self) -> None:
+        result = digital_oracle_collector.discover_candidate_universe(
+            {
+                "task": "分析 A 股板块",
+                "scan_scope": {"sectors": []},
+                "question_understanding": {"sector_terms": []},
+                "data_collection_actions": [
+                    {
+                        "action": "CALL_LOCAL_CONCEPT_BOARD",
+                        "provider_group": "china_equity",
+                        "source": "astockdate/全部A股20264.xlsx",
+                        "input_terms": ["半导体"],
+                    }
+                ],
+            },
+            {
+                "providers": {"china_equity": {"enabled": True}},
+                "candidate_discovery": {"enabled": True, "max_candidates": 5},
+            },
+        )
+
+        self.assertEqual(result["method"], "local_excel_concept_board")
+        self.assertEqual(result["requested_sectors"], ["半导体"])
+        self.assertTrue(result["candidates"])
+
     def test_missing_local_concept_file_returns_gap_without_fabricating_candidates(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
             missing_path = Path(temp_dir) / "missing.xlsx"
@@ -183,6 +208,101 @@ class SectorCollectionTests(unittest.TestCase):
             "local_excel_concept_board",
         )
 
+    def test_sector_profile_covers_more_candidates_with_shallow_stock_tasks(self) -> None:
+        config, profile = digital_oracle_collector.apply_a_share_collection_profile(
+            {
+                "task": "分析半导体板块",
+                "scan_scope": {"sectors": ["半导体"]},
+                "metadata": {"ui_mode": "a_share_sector"},
+            },
+            full_depth_collector_config(),
+        )
+
+        self.assertEqual(profile, "sector_shallow")
+        self.assertEqual(config["candidate_discovery"]["max_candidates"], 60)
+        self.assertFalse(config["providers"]["macro"]["enabled"])
+        self.assertEqual(tuple(config["providers"]["china_equity"]["mootdx_frequencies"]), ("day",))
+        self.assertEqual(tuple(config["providers"]["china_equity"]["mootdx_index_frequencies"]), ("day",))
+
+        tasks = build_china_equity_tasks(symbols=["600000.SH"], config=config)
+
+        self.assertIn("equity.600000.SH.tencent_metrics", tasks)
+        self.assertIn("equity.600000.SH.mootdx_bars", tasks)
+        self.assertIn("equity.600000.SH.mootdx_financial_summary", tasks)
+        self.assertIn("china.tencent.index_metrics", tasks)
+        self.assertIn("equity.sh000001.mootdx_index_day", tasks)
+        self.assertNotIn("equity.600000.SH.mootdx_bars_1m", tasks)
+        self.assertNotIn("equity.600000.SH.mootdx_realtime", tasks)
+        self.assertNotIn("equity.600000.SH.mootdx_order_book", tasks)
+        self.assertNotIn("equity.600000.SH.mootdx_shareholders", tasks)
+        self.assertNotIn("equity.600000.SH.mootdx_company_profile", tasks)
+        self.assertNotIn("equity.600000.SH.mootdx_transactions", tasks)
+
+    def test_explicit_a_share_symbol_uses_stock_deep_profile_even_with_sector(self) -> None:
+        config, profile = digital_oracle_collector.apply_a_share_collection_profile(
+            {
+                "task": "分析半导体里的浦发银行",
+                "candidates": [{"symbol": "600000.SH"}],
+                "scan_scope": {"sectors": ["半导体"]},
+                "metadata": {"ui_mode": "a_share_sector"},
+            },
+            full_depth_collector_config(),
+        )
+
+        self.assertEqual(profile, "stock_deep")
+        self.assertEqual(config["candidate_discovery"]["max_candidates"], 15)
+        self.assertTrue(config["providers"]["macro"]["enabled"])
+        self.assertIn("1m", config["providers"]["china_equity"]["mootdx_frequencies"])
+        self.assertTrue(config["providers"]["china_equity"]["mootdx_order_book"])
+
+        tasks = build_china_equity_tasks(symbols=["600000.SH"], config=config)
+
+        self.assertIn("equity.600000.SH.mootdx_bars_1m", tasks)
+        self.assertIn("equity.600000.SH.mootdx_order_book", tasks)
+        self.assertIn("equity.600000.SH.mootdx_company_profile", tasks)
+        self.assertIn("equity.600000.SH.mootdx_transactions", tasks)
+
+    def test_sector_profile_can_collect_china_index_without_candidate_symbols(self) -> None:
+        original = digital_oracle_collector.build_china_equity_tasks
+
+        def fake_china_tasks(*, symbols, config):  # type: ignore[no-untyped-def]
+            self.assertEqual(symbols, [])
+            return {"china.tencent.index_metrics": lambda: {"ok": True}}
+
+        digital_oracle_collector.build_china_equity_tasks = fake_china_tasks
+        try:
+            output = digital_oracle_collector.collect_market_information(
+                {
+                    "task": "分析一个没有识别出名称的板块",
+                    "candidates": [],
+                    "metadata": {"ui_mode": "a_share_sector"},
+                },
+                {
+                    "collector": {
+                        "enabled": True,
+                        "providers": {
+                            "us_equity": {"enabled": False},
+                            "china_equity": {
+                                "enabled": True,
+                                "tencent": True,
+                                "tencent_index_metrics": True,
+                                "mootdx": False,
+                            },
+                            "macro": {"enabled": False},
+                            "prediction_markets": {"enabled": False},
+                            "crypto": {"enabled": False},
+                            "web_search": {"enabled": False},
+                        },
+                    },
+                },
+            )
+        finally:
+            digital_oracle_collector.build_china_equity_tasks = original
+
+        self.assertEqual(output["a_share_collection_profile"], "sector_shallow")
+        self.assertEqual(output["collection_status"], "ok")
+        self.assertIn("china.tencent.index_metrics", output["sources"])
+
 
 def build_test_concept_workbook(path: Path) -> Path:
     rows = [
@@ -234,6 +354,32 @@ def build_test_concept_workbook(path: Path) -> Path:
         )
         archive.writestr("xl/worksheets/sheet1.xml", build_sheet_xml(rows))
     return path
+
+
+def full_depth_collector_config() -> dict:
+    return {
+        "candidate_discovery": {"enabled": True, "max_candidates": 15},
+        "providers": {
+            "macro": {"enabled": True},
+            "china_equity": {
+                "enabled": True,
+                "tencent": True,
+                "tencent_index_metrics": True,
+                "tencent_index_symbols": ("sh000001",),
+                "mootdx": True,
+                "mootdx_frequencies": ("day", "week", "month", "1m", "5m", "15m", "30m", "1h"),
+                "mootdx_realtime": True,
+                "mootdx_intraday": True,
+                "mootdx_order_book": True,
+                "mootdx_financials": True,
+                "mootdx_shareholders": True,
+                "mootdx_company_profile": True,
+                "mootdx_index_symbols": ("sh000001",),
+                "mootdx_index_frequencies": ("day", "week", "month", "1m"),
+                "mootdx_transactions": True,
+            },
+        },
+    }
 
 
 def build_sheet_xml(rows: list[list[object]]) -> str:

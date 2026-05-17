@@ -12,7 +12,6 @@
 | JudgeAgent | `agents/judge_agent.py` | 已实现 |
 | RiskAgent | `agents/risk_agent.py` | 已实现 |
 | PortfolioManagerAgent | 提示词存在 `prompts/portfolio_manager_agent.md` | Agent 代码未实现 |
-| TraderAgent | 提示词存在 `prompts/trader_agent.md` | Agent 代码未实现 |
 
 ### 数据源现状
 

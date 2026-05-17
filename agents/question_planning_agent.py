@@ -68,6 +68,7 @@ class QuestionPlanningAgent:
         return {
             "question_understanding": plan["question_understanding"],
             "provider_selection": plan["provider_selection"],
+            "data_collection_actions": plan["data_collection_actions"],
             "question_plan_report": report,
             "metadata": {
                 **dict(state.get("metadata", {}) or {}),
@@ -120,9 +121,15 @@ def parse_planner_json(content: str) -> dict[str, Any]:
 def normalize_question_plan(plan: dict[str, Any]) -> dict[str, Any]:
     understanding = normalize_question_understanding(plan.get("question_understanding"))
     provider_selection = normalize_provider_selection(plan.get("provider_selection"))
+    data_collection_actions = normalize_data_collection_actions(
+        plan.get("data_collection_actions"),
+        understanding,
+        provider_selection,
+    )
     return {
         "question_understanding": understanding,
         "provider_selection": provider_selection,
+        "data_collection_actions": data_collection_actions,
     }
 
 
@@ -210,6 +217,47 @@ def normalize_text_terms(value: Any) -> list[str]:
     return terms
 
 
+def normalize_data_collection_actions(
+    value: Any,
+    understanding: dict[str, Any],
+    provider_selection: dict[str, Any],
+) -> list[dict[str, Any]]:
+    actions: list[dict[str, Any]] = []
+    raw_actions = value if isinstance(value, list) else []
+    for item in raw_actions:
+        if not isinstance(item, dict):
+            continue
+        action = str(item.get("action") or "").strip().upper()
+        if not action:
+            continue
+        actions.append(
+            {
+                "action": action,
+                "provider_group": str(item.get("provider_group") or "").strip(),
+                "source": str(item.get("source") or "").strip(),
+                "input_terms": normalize_text_terms(item.get("input_terms")),
+                "expected_output": str(item.get("expected_output") or "").strip(),
+            }
+        )
+
+    sector_terms = normalize_text_terms(understanding.get("sector_terms"))
+    selected_groups = set(provider_selection.get("selected_groups", []))
+    has_local_concept_action = any(
+        item.get("action") == "CALL_LOCAL_CONCEPT_BOARD" for item in actions
+    )
+    if sector_terms and "china_equity" in selected_groups and not has_local_concept_action:
+        actions.append(
+            {
+                "action": "CALL_LOCAL_CONCEPT_BOARD",
+                "provider_group": "china_equity",
+                "source": "astockdate/全部A股20264.xlsx",
+                "input_terms": sector_terms,
+                "expected_output": "A-share candidate stock symbols and metadata for the Python collector",
+            }
+        )
+    return actions
+
+
 def default_provider_reason(group: str, enabled: bool) -> str:
     action = "Selected" if enabled else "Rejected"
     return f"{action} by QuestionPlanningAgent."
@@ -229,14 +277,27 @@ def render_question_plan_report(plan: dict[str, Any]) -> str:
         f"- 时间窗口：{understanding.get('time_window', '')}",
         f"- 候选范围：{understanding.get('candidate_scope', '')}",
         f"- 板块/概念词：{', '.join(understanding.get('sector_terms', [])) or '无'}",
-        "",
-        "## 数据源选择",
-        "",
-        f"- 启用数据源：{', '.join(selection.get('selected_groups', []))}",
-        "",
-        "| Provider group | Status | Reason |",
-        "|---|---|---|",
     ]
+    actions = plan.get("data_collection_actions", [])
+    if actions:
+        lines.extend(["", "## 数据采集动作", ""])
+        for item in actions:
+            input_terms = ", ".join(item.get("input_terms", [])) or "无"
+            lines.append(
+                f"- `{item.get('action', '')}`：source=`{item.get('source', '')}`，"
+                f"input_terms={input_terms}，expected_output={item.get('expected_output', '')}"
+            )
+    lines.extend(
+        [
+            "",
+            "## 数据源选择",
+            "",
+            f"- 启用数据源：{', '.join(selection.get('selected_groups', []))}",
+            "",
+            "| Provider group | Status | Reason |",
+            "|---|---|---|",
+        ]
+    )
     providers = dict(selection.get("providers", {}) or {})
     for group in ALLOWED_PROVIDER_GROUPS:
         row = dict(providers.get(group, {}) or {})

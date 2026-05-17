@@ -5,7 +5,7 @@ export const commonTask =
   "分析宏观与市场信息，输出信息分析报告。";
 
 export const dailyTask =
-  "扫描市场，找出未来1个月最具投资价值的A股标的，并生成价格触发式交易计划。";
+  "扫描市场，找出未来1个月最具投资价值的A股标的，并生成价格触发式交易决策展示。";
 
 export const sectorTask = "分析指定 A 股板块并给出买入建议。";
 

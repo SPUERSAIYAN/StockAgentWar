@@ -33,14 +33,23 @@ Use exactly this top-level shape:
       "web_search": {{"enabled": false, "reason": ""}}
     }},
     "rejected_groups": []
-  }}
+  }},
+  "data_collection_actions": [
+    {{
+      "action": "CALL_LOCAL_CONCEPT_BOARD",
+      "provider_group": "china_equity",
+      "source": "astockdate/全部A股20264.xlsx",
+      "input_terms": [],
+      "expected_output": "A-share candidate stock symbols and metadata for the Python collector"
+    }}
+  ]
 }}
 ```
 
 Allowed provider groups:
 
 - `us_equity`: US stocks, ETFs, Yahoo-compatible tickers, price history, options, EDGAR filings and insider activity.
-- `china_equity`: China A-share tasks, local Excel concept-board membership, Tencent realtime metrics, PE/PB, market cap, turnover, volume ratio, Mootdx bars, intraday, order book, financial summaries and company profile.
+- `china_equity`: China A-share tasks, local Excel concept-board membership from `astockdate/全部A股20264.xlsx`, Tencent realtime metrics, PE/PB, market cap, turnover, volume ratio, Mootdx bars, intraday, order book, financial summaries and company profile.
 - `macro`: rates, yield curves, exchange rates, USDCNY, SPY, QQQ, VIX, gold, Fear & Greed, FedWatch, CFTC, broad risk appetite and liquidity context.
 - `prediction_markets`: Kalshi and Polymarket event probabilities, policy-event pricing, geopolitical event risk and real-money expectation checks.
 - `crypto`: crypto assets, BTC/ETH spot, Deribit derivatives, futures curves, options and crypto-linked risk appetite.
@@ -52,12 +61,17 @@ Planning rules:
 2. Read the data-source reference before selecting groups; use its market ownership and provider role descriptions in your reasons.
 3. For China A-share questions, select `china_equity`; usually also select `macro` for risk-pricing context.
 4. For A-share sector, industry, concept, region, Tongdaxin board, or sector-rotation questions, select `china_equity`; usually also select `macro`; write the extracted board/concept names into `question_understanding.sector_terms` so the collector can use the local Excel concept-board source when the UI did not pass sectors.
-5. For US/global ticker questions, select `us_equity`; usually also select `macro`.
-6. Select `prediction_markets` only when event probabilities are directly relevant.
-7. Select `crypto` only for crypto assets or explicitly crypto-linked risk appetite.
-8. Select `web_search` only for concrete structured-data gaps identified by the task or the data-source reference.
-9. Keep `selected_groups`, each provider row's `enabled` flag, and `rejected_groups` consistent.
-10. This is research support only; do not provide personalized investment advice.
+5. The local Excel concept-board source is `astockdate/全部A股20264.xlsx`. You do not open that file yourself and you must not invent stock codes from it. Your action that triggers it is selecting `china_equity`, outputting the relevant `sector_terms`, and adding a `data_collection_actions` item with `action: "CALL_LOCAL_CONCEPT_BOARD"`, `provider_group: "china_equity"`, `source: "astockdate/全部A股20264.xlsx"`, and `input_terms` equal to the extracted sector/concept terms. The Python collector reads the Excel file and produces the actual stock symbols.
+6. For US/global ticker questions, select `us_equity`; usually also select `macro`.
+7. Select `prediction_markets` only when event probabilities are directly relevant.
+8. Select `crypto` only for crypto assets or explicitly crypto-linked risk appetite.
+9. Select `web_search` only for concrete structured-data gaps identified by the task or the data-source reference.
+10. Keep `selected_groups`, each provider row's `enabled` flag, and `rejected_groups` consistent.
+11. This is research support only; do not provide personalized investment advice.
+
+## Output language
+
+The final answer must be in Chinese.
 
 ## User
 
@@ -70,6 +84,7 @@ Run metadata:
 {metadata}
 
 Data-source reference document:
+
 ```markdown
 {data_sources}
 ```

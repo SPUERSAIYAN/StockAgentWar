@@ -189,7 +189,7 @@ agents:
     model:
       provider: openrouter
       model: qwen/qwen3.5-plus-20260420
-      temperature: 0.5
+      temperature: 0.3
       site_url: http://localhost
       app_title: multi-Agent-Inv
 
@@ -197,7 +197,7 @@ agents:
     model:
       provider: openrouter
       model: qwen/qwen3.5-plus-20260420
-      temperature: 0.5
+      temperature: 0.3
       site_url: http://localhost
       app_title: multi-Agent-Inv
 
@@ -233,20 +233,8 @@ agents:
       stop_loss_pct: 8
       take_profit_pct: 20
 
-  trader:
-    mode: SIMULATED
-    simulated:
-      initial_capital: 1000000
-      commission_rate: 0.0003
-      stamp_tax_rate: 0.0005
-    paper:
-      broker: ""
-    live:
-      broker: ""
-      enabled: false
-
 trade_monitor:
-  enabled: true
+  enabled: false
   interval_seconds: 60
   mode: SIMULATED
   plan_file: data/trade_plan.json

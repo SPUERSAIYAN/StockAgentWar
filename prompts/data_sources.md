@@ -12,6 +12,7 @@
 | `us_equity` | 未启用 | Stooq 兼容层 | 全球价格兼容符号 | 旧 Stooq 符号到 Yahoo 符号的兼容转发 |
 | `china_equity` | 启用 | Tencent Finance | A 股、A 股指数；接口也支持港股/美股快照 | 实时价格、估值、市值、换手率、量比、指数快照 |
 | `china_equity` | 启用 | MooTDX | A 股、沪深指数、本地通达信数据 | K 线、实时行情、分时、盘口、分笔、财务摘要、股本/股东、F10 |
+| `china_equity` | 启用 | 本地 Excel 概念板块表 `astockdate/全部A股20264.xlsx` | A 股概念板块成分股 | 指定板块/概念任务的候选发现和静态评分 |
 | `macro` | 启用 | U.S. Treasury | 美国利率与财政汇率数据 | 国债收益率曲线、实际利率、短债、长期利率、财政部汇率 |
 | `macro` | 启用 | CNN Fear & Greed | 美股情绪 | 风险偏好/恐慌情绪快照 |
 | `macro` | 启用 | CME FedWatch | 美国利率期货 | FOMC 目标利率隐含概率 |
@@ -30,6 +31,7 @@
 
 - 非 A 股候选标的走 `us_equity` 分组；A 股候选标的走 `china_equity` 分组。
 - A 股板块、行业、概念、地域、通达信板块或板块轮动任务仍走 `china_equity` 分组；指定概念板块成分股优先从本地 Excel `astockdate/全部A股20264.xlsx` 的 `Sheet1.概念板块` 获取，后续实时行情和估值继续由 Tencent/MooTDX 等 A 股行情源补充。
+- 问题规划 Agent 决定是否触发这个本地 Excel 的方式是：对 A 股板块/概念/行业/地域/通达信板块任务选择 `china_equity`，并把识别出的板块或概念写入 `question_understanding.sector_terms`。Python collector 会据此调用 `candidate_discovery.local_concept_board`，读取 `astockdate/全部A股20264.xlsx`；LLM 不直接打开文件。
 - A 股任务没有显式候选股票时，会启用自动候选发现：`MooTDX.list_stocks()` 扫描沪深 A 股列表，再用 `TencentFinanceProvider.get_stock_metrics()` 批量拉取实时指标并排序。
 - A 股指定板块任务没有显式候选股票时，前端 `sectors` 优先；若前端未传，问题规划 Agent 应把自然语言中识别出的板块/概念写入 `question_understanding.sector_terms`，供本地 Excel 概念板块源使用。
 - 当前 A 股自动候选发现配置：最多输出 15 个候选，扫描上限 5000，批量大小 80，过滤 ST、停牌、低于 50 亿市值、PE 高于 80 的标的。
@@ -97,6 +99,19 @@
 - 典型输出：K 线、实时行情、分时点、五档盘口、财务摘要、股东/股本快照、F10 公司资料、分笔交易。
 - 当前启用项：实时行情、分时、盘口、财务摘要、股东、F10 公司资料、分笔交易。
 - 未启用项：`mootdx_local_tdxdir` 为空，因此本地通达信文件读取不会主动执行。
+
+### 本地 Excel 概念板块表
+
+- 文件路径：`astockdate/全部A股20264.xlsx`
+- 代码入口：`collectors/local_a_share_concepts.py`
+- 调用位置：`collectors/digital_oracle_collector.py` 的 A 股候选发现流程。
+- 当前状态：启用，配置项为 `candidate_discovery.local_concept_board_path`。
+- 所属市场：中国 A 股概念板块成分股与静态基本面表。
+- 主要作用：当任务要求分析指定 A 股板块、行业、概念、地域、通达信板块或板块轮动，且没有显式股票代码时，用本地 Excel 生成候选股票池。
+- 触发条件：`provider_selection.selected_groups` 包含 `china_equity`，并且前端 `scan_scope.sectors` 或 `question_understanding.sector_terms` 提供了板块/概念词。
+- 问题规划动作：如果任务中出现“半导体板块”“白酒概念”“机器人行业”等 A 股板块/概念表达，输出 `sector_terms`，并在 `china_equity.reason` 中说明需要使用本地 Excel 概念板块表。
+- 典型输出：`candidate_discovery.local_concept_board` source label、匹配板块、候选股票、Excel 静态评分、行业/概念、ROE、营收增速、归母净利润增速、PE、总市值等 metadata。
+- 限制：只匹配 `Sheet1` 的 `概念板块` 列，不把 `行业` 列当作板块匹配源；Excel 只做候选发现和静态评分，不替代 Tencent/MooTDX 的实时行情与估值补充。
 
 ### U.S. Treasury
 

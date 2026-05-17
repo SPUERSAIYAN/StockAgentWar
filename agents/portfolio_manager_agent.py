@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+import re
 from datetime import datetime, timedelta
 from math import floor
 from typing import Any
@@ -7,6 +9,11 @@ from typing import Any
 from agents.information_agent import run_prompt_agent
 from agents.prompt_loader import load_agent_prompt
 from schemas.state import AgentRuntimeConfig
+
+
+TRADE_PLAN_BEGIN = "BEGIN_TRADE_PLAN_JSON"
+TRADE_PLAN_END = "END_TRADE_PLAN_JSON"
+VALID_FINAL_ACTIONS = {"BUY", "HOLD", "WAIT", "NO_TRADE"}
 
 
 class PortfolioManagerAgent:
@@ -27,9 +34,9 @@ def build_portfolio_decision(
     state: dict[str, Any],
     config: AgentRuntimeConfig,
 ) -> dict[str, Any]:
+    manager_report = str(state.get("manager_report") or "")
     portfolio_context = dict(state.get("portfolio_context", {}) or {})
     sizing = dict(config.get("position_sizing", {}) or {})
-    risk_control = dict(config.get("risk_control", {}) or {})
 
     available_capital = float(portfolio_context.get("available_capital") or 0)
     if available_capital <= 0:
@@ -41,144 +48,240 @@ def build_portfolio_decision(
         or 20
     )
     max_total_pct = float(sizing.get("max_total_exposure_pct") or 80)
-    stop_loss_pct = float(risk_control.get("stop_loss_pct") or 8)
-    take_profit_pct = float(risk_control.get("take_profit_pct") or 20)
 
-    stock_pool = list(state.get("stock_pool", []) or [])
-    bull_by_symbol = index_by_symbol(state.get("bull_cases", []))
-    bear_by_symbol = index_by_symbol(state.get("bear_cases", []))
-    selected = select_purchase_candidates(stock_pool, state.get("judge_rulings", []))
+    payload = extract_trade_plan_payload(manager_report)
+    if payload is None:
+        return build_wait_decision("总经理报告未提供有效交易计划结构块。")
+
+    final_decision = as_dict(payload.get("final_decision"))
+    requested_action = normalize_action(final_decision.get("action"))
+    reasoning = str(final_decision.get("reasoning") or "总经理报告未提供明确决策理由。")
+    stock_pool_by_symbol = index_by_symbol(state.get("stock_pool", []))
 
     monitored_stocks: list[dict[str, Any]] = []
-    per_stock_pct = min(max_single_pct, max_total_pct / max(len(selected), 1))
+    if requested_action == "BUY":
+        plan = as_dict(payload.get("trade_plan"))
+        monitored_stocks = normalize_monitored_stocks(
+            plan.get("monitored_stocks", []),
+            stock_pool_by_symbol=stock_pool_by_symbol,
+            available_capital=available_capital,
+            max_single_pct=max_single_pct,
+            max_total_pct=max_total_pct,
+        )
+        if not monitored_stocks:
+            requested_action = "WAIT"
+            reasoning = "总经理报告提出 BUY，但未提供有效交易计划结构块标的。"
+
+    plan_payload = as_dict(payload.get("trade_plan"))
+    trade_plan = {
+        "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "monitored_stocks": monitored_stocks,
+        "position_sizing_rationale": str(
+            plan_payload.get("position_sizing_rationale")
+            or (
+                f"单只仓位不超过 {max_single_pct:.0f}%，总仓位不超过 {max_total_pct:.0f}%；"
+                "数量按 A 股 100 股整数倍取整。"
+            )
+        ),
+    }
+    confidence = clamp_confidence(payload.get("manager_confidence"))
+
+    return {
+        "final_decision": {
+            "action": requested_action,
+            "reasoning": reasoning,
+        },
+        "trade_plan": trade_plan,
+        "alternative_scenarios": normalize_alternative_scenarios(payload.get("alternative_scenarios")),
+        "manager_confidence": round(confidence, 2),
+    }
+
+
+def extract_trade_plan_payload(manager_report: str) -> dict[str, Any] | None:
+    match = re.search(
+        rf"{TRADE_PLAN_BEGIN}\s*(.*?)\s*{TRADE_PLAN_END}",
+        manager_report,
+        flags=re.DOTALL,
+    )
+    if not match:
+        return None
+    block = match.group(1).strip()
+    if block.startswith("```"):
+        block = re.sub(r"^```(?:json)?\s*", "", block, flags=re.IGNORECASE)
+        block = re.sub(r"\s*```$", "", block)
+    try:
+        payload = json.loads(block)
+    except json.JSONDecodeError:
+        return None
+    return payload if isinstance(payload, dict) else None
+
+
+def normalize_monitored_stocks(
+    items: Any,
+    *,
+    stock_pool_by_symbol: dict[str, dict[str, Any]],
+    available_capital: float,
+    max_single_pct: float,
+    max_total_pct: float,
+) -> list[dict[str, Any]]:
+    rows = [item for item in items if isinstance(item, dict)] if isinstance(items, list) else []
+    prepared: list[dict[str, Any]] = []
     today = datetime.now().date()
-    valid_until = today + timedelta(days=30)
+    default_valid_until = today + timedelta(days=30)
 
-    for candidate in selected:
-        price = to_float(candidate.get("price"))
-        if not price or price <= 0:
+    for item in rows:
+        symbol = str(item.get("symbol") or "").strip()
+        if not symbol:
             continue
+        stock = stock_pool_by_symbol.get(symbol, {})
+        price = first_float(item, "price", "current_price", "latest_price") or to_float(stock.get("price"))
+        buy_trigger = first_float(item, "buy_trigger_price", "entry_price")
+        take_profit = first_float(item, "take_profit_price", "sell_trigger_price", "target_price")
+        sell_trigger = first_float(item, "sell_trigger_price", "take_profit_price", "target_price")
+        stop_loss = first_float(item, "stop_loss_price", "stop_loss")
+        allocation_pct = first_float(item, "allocation_pct", "weight_pct", "position_pct")
+        allocation_amount = first_float(item, "allocation_amount")
+        if allocation_pct is None and allocation_amount is not None and available_capital > 0:
+            allocation_pct = allocation_amount / available_capital * 100
+        if not all(
+            value is not None and value > 0
+            for value in (price, buy_trigger, take_profit, sell_trigger, stop_loss, allocation_pct)
+        ):
+            continue
+        allocation_pct = min(float(allocation_pct), max_single_pct)
+        prepared.append(
+            {
+                "raw": item,
+                "stock": stock,
+                "symbol": symbol,
+                "price": float(price),
+                "allocation_pct": allocation_pct,
+                "buy_trigger_price": float(buy_trigger),
+                "sell_trigger_price": float(sell_trigger),
+                "stop_loss_price": float(stop_loss),
+                "take_profit_price": float(take_profit),
+                "valid_from": str(item.get("valid_from") or today.isoformat()),
+                "valid_until": str(item.get("valid_until") or default_valid_until.isoformat()),
+                "expiry_action": str(item.get("expiry_action") or "REVIEW"),
+            }
+        )
 
-        symbol = str(candidate.get("symbol", ""))
-        allocation_pct = per_stock_pct
+    total_pct = sum(row["allocation_pct"] for row in prepared)
+    if total_pct > max_total_pct and total_pct > 0:
+        scale = max_total_pct / total_pct
+        for row in prepared:
+            row["allocation_pct"] *= scale
+
+    normalized: list[dict[str, Any]] = []
+    for row in prepared:
+        item = row["raw"]
+        allocation_pct = round(row["allocation_pct"], 2)
         allocation_amount = round(available_capital * allocation_pct / 100, 2)
-        quantity = int(floor(allocation_amount / price / 100) * 100)
+        max_quantity = int(floor(allocation_amount / row["price"] / 100) * 100)
+        requested_quantity = to_float(item.get("quantity"))
+        quantity = (
+            int(floor(requested_quantity / 100) * 100)
+            if requested_quantity is not None
+            else max_quantity
+        )
+        quantity = min(quantity, max_quantity)
         if quantity <= 0:
             continue
-
-        bull_case = bull_by_symbol.get(symbol, {})
-        bear_case = bear_by_symbol.get(symbol, {})
-        buy_trigger = to_float(bull_case.get("buy_trigger_price")) or round(price * 0.99, 2)
-        target_price = to_float(bull_case.get("target_price")) or round(price * (1 + take_profit_pct / 100), 2)
-        stop_loss = to_float(bear_case.get("downside_price")) or round(price * (1 - stop_loss_pct / 100), 2)
-
-        monitored_stocks.append(
+        normalized.append(
             {
-                "symbol": symbol,
-                "name": candidate.get("name", ""),
-                "allocation_pct": round(allocation_pct, 2),
+                "symbol": row["symbol"],
+                "name": item.get("name") or row["stock"].get("name", ""),
+                "allocation_pct": allocation_pct,
                 "allocation_amount": allocation_amount,
                 "quantity": quantity,
-                "buy_trigger_price": round(buy_trigger, 2),
-                "sell_trigger_price": round(target_price, 2),
-                "stop_loss_price": round(stop_loss, 2),
-                "take_profit_price": round(target_price, 2),
-                "valid_from": today.isoformat(),
-                "valid_until": valid_until.isoformat(),
-                "expiry_action": "REVIEW",
+                "buy_trigger_price": round(row["buy_trigger_price"], 2),
+                "sell_trigger_price": round(row["sell_trigger_price"], 2),
+                "stop_loss_price": round(row["stop_loss_price"], 2),
+                "take_profit_price": round(row["take_profit_price"], 2),
+                "valid_from": row["valid_from"],
+                "valid_until": row["valid_until"],
+                "expiry_action": row["expiry_action"],
                 "conditions": [
                     {
                         "type": "PRICE_BELOW",
-                        "price": round(buy_trigger, 2),
+                        "price": round(row["buy_trigger_price"], 2),
                         "action": "BUY",
                         "quantity": quantity,
                     },
                     {
                         "type": "PRICE_ABOVE",
-                        "price": round(target_price, 2),
+                        "price": round(row["sell_trigger_price"], 2),
                         "action": "SELL",
                         "quantity": quantity,
                     },
                 ],
             }
         )
+    return normalized
 
-    data_gaps = list(state.get("data_gaps", []) or [])
-    action = "BUY" if monitored_stocks else ("WAIT" if stock_pool else "NO_TRADE")
-    reasoning = build_decision_reason(action, monitored_stocks, data_gaps)
-    trade_plan = {
-        "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        "monitored_stocks": monitored_stocks,
-        "position_sizing_rationale": (
-            f"单只仓位不超过 {max_single_pct:.0f}%，总仓位不超过 {max_total_pct:.0f}%；"
-            "数量按 A 股 100 股整数倍取整。"
-        ),
-    }
-    confidence = 0.72 if monitored_stocks else 0.35
-    if data_gaps:
-        confidence = max(confidence - 0.15, 0.2)
 
+def build_wait_decision(reasoning: str) -> dict[str, Any]:
     return {
         "final_decision": {
-            "action": action,
+            "action": "WAIT",
             "reasoning": reasoning,
         },
-        "trade_plan": trade_plan,
-        "alternative_scenarios": [
-            {
-                "scenario": "大盘突发利空或流动性急剧收缩",
-                "action": "暂停新买入，已触发订单按止损规则处理。",
-            },
-            {
-                "scenario": "关键数据源不可用",
-                "action": "交易计划保持观察状态，待数据恢复后重新生成。",
-            },
-        ],
-        "manager_confidence": round(confidence, 2),
+        "trade_plan": {
+            "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "monitored_stocks": [],
+            "position_sizing_rationale": "总经理报告未提供可解析的交易计划结构块。",
+        },
+        "alternative_scenarios": normalize_alternative_scenarios(None),
+        "manager_confidence": 0.2,
     }
 
 
-def select_purchase_candidates(
-    stock_pool: list[dict[str, Any]],
-    judge_rulings: list[dict[str, Any]] | None,
-) -> list[dict[str, Any]]:
-    if not stock_pool:
-        return []
-    allowed = {"STRONG_BUY", "BUY"}
-    rulings = {
-        str(item.get("symbol", "")): item
-        for item in (judge_rulings or [])
-        if item.get("symbol")
-    }
-    selected = [
-        item
-        for item in stock_pool
-        if rulings.get(str(item.get("symbol", "")), {}).get("ruling") in allowed
-    ]
-    if selected:
-        return selected[:5]
+def normalize_action(value: Any) -> str:
+    action = str(value or "WAIT").upper()
+    return action if action in VALID_FINAL_ACTIONS else "WAIT"
+
+
+def as_dict(value: Any) -> dict[str, Any]:
+    return value if isinstance(value, dict) else {}
+
+
+def normalize_alternative_scenarios(value: Any) -> list[dict[str, str]]:
+    if isinstance(value, list):
+        scenarios = [
+            {
+                "scenario": str(item.get("scenario") or ""),
+                "action": str(item.get("action") or ""),
+            }
+            for item in value
+            if isinstance(item, dict) and (item.get("scenario") or item.get("action"))
+        ]
+        if scenarios:
+            return scenarios
     return [
-        item
-        for item in sorted(
-            stock_pool,
-            key=lambda row: float(row.get("information_score") or 0),
-            reverse=True,
-        )
-        if float(item.get("information_score") or 0) >= 70
-    ][:3]
+        {
+            "scenario": "大盘突发利空或流动性急剧收缩",
+            "action": "暂停新买入，按总经理报告的暂停条件重新评估。",
+        },
+        {
+            "scenario": "关键数据源不可用",
+            "action": "保持观察状态，待数据恢复后重新生成总经理交易计划。",
+        },
+    ]
 
 
-def build_decision_reason(
-    action: str,
-    monitored_stocks: list[dict[str, Any]],
-    data_gaps: list[str],
-) -> str:
-    if action == "BUY":
-        suffix = "；但存在数据缺口，需降仓执行。" if data_gaps else "。"
-        return f"裁判和风控后仍有 {len(monitored_stocks)} 个标的满足价格触发式买入条件{suffix}"
-    if action == "WAIT":
-        return "已有候选股票，但缺少足够价格、裁决或仓位条件，先观察不落交易计划。"
-    return "没有可执行候选股票，不生成自动购买计划。"
+def clamp_confidence(value: Any) -> float:
+    confidence = to_float(value)
+    if confidence is None:
+        return 0.35
+    return max(0.0, min(confidence, 1.0))
+
+
+def first_float(item: dict[str, Any], *keys: str) -> float | None:
+    for key in keys:
+        value = to_float(item.get(key))
+        if value is not None:
+            return value
+    return None
 
 
 def index_by_symbol(items: Any) -> dict[str, dict[str, Any]]:

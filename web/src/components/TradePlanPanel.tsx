@@ -65,10 +65,10 @@ export function TradePlanPanel() {
     return (
       <div className="trade-plan-panel compact">
         <div className="trade-plan-head">
-          <strong>交易计划</strong>
+          <strong>交易决策</strong>
           <span>{action}</span>
         </div>
-        <p>{asString(decision.reasoning, "未生成交易计划。")}</p>
+        <p>{asString(decision.reasoning, "未生成交易决策展示。")}</p>
       </div>
     );
   }
@@ -76,7 +76,7 @@ export function TradePlanPanel() {
   return (
     <div className="trade-plan-panel">
       <div className="trade-plan-head">
-        <strong>交易计划</strong>
+        <strong>交易决策</strong>
         <span>
           决策 {action} · 置信度 {formatConfidence(confidence)} · 资金 {asNumber(state.completeState.capital, state.capital).toLocaleString("zh-CN")}
         </span>

@@ -4,6 +4,7 @@ import copy
 import unittest
 
 from agents.information_agent import build_structured_information_context
+from graph.decision_nodes import format_final_output, save_trade_plan
 from graph.a_share_auto_trade_graph import build_a_share_auto_trade_graph
 from graph.stock_graph import DEFAULT_AGENT_CONFIGS, build_common_analysis_graph, build_stock_graph
 
@@ -56,7 +57,7 @@ class DocumentedChainTests(unittest.TestCase):
             }.isdisjoint(node_names)
         )
 
-    def test_stock_graph_runs_through_final_output_with_no_trade_plan(self) -> None:
+    def test_stock_graph_waits_when_manager_report_has_no_trade_plan_block(self) -> None:
         graph = build_stock_graph(agent_configs=mock_configs())
         result = graph.invoke(
             {
@@ -66,10 +67,29 @@ class DocumentedChainTests(unittest.TestCase):
             }
         )
 
-        self.assertEqual(result["final_decision"]["action"], "NO_TRADE")
+        self.assertEqual(result["final_decision"]["action"], "WAIT")
         self.assertIsNone(result["metadata"]["trade_plan_file"])
         self.assertIn("final_output", result)
         self.assertNotIn("a_share_context", result)
+
+    def test_trade_plan_stage_is_display_only_even_when_buyable(self) -> None:
+        state = {
+            "metadata": {},
+            "final_decision": {"action": "BUY", "reasoning": "test buy"},
+            "trade_plan": {
+                "monitored_stocks": [
+                    {"symbol": "600000.SH", "quantity": 100},
+                ],
+            },
+            "manager_report": "manager",
+        }
+
+        output = save_trade_plan(state)
+        final = format_final_output({**state, **output})
+
+        self.assertIsNone(output["metadata"]["trade_plan_file"])
+        self.assertEqual(output["metadata"]["trade_plan_persistence"], "display_only")
+        self.assertIn("未写入交易计划 JSON 文件", final["final_output"])
 
     def test_information_context_is_structured_from_provider_data(self) -> None:
         output = build_structured_information_context(

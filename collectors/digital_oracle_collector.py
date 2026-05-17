@@ -119,6 +119,7 @@ def collect_market_information(
     config: AgentRuntimeConfig,
 ) -> dict[str, Any] | None:
     collector_config = merge_dicts(DEFAULT_COLLECTOR_CONFIG, dict(config.get("collector", {})))
+    collector_config, collection_profile = apply_a_share_collection_profile(state, collector_config)
     collector_name = config.get("name", "information")
     log_collector_summary(
         enabled=collector_config.get("enabled", False) is not False,
@@ -126,6 +127,11 @@ def collect_market_information(
         max_workers=collector_config.get("max_workers"),
         yahoo_max_workers=collector_config.get("yahoo_max_workers"),
         providers=dict(collector_config.get("providers", {})),
+    )
+    log_trace(
+        collector_name,
+        "COLLECTOR PROFILE",
+        {"a_share_collection_profile": collection_profile},
     )
     if collector_config.get("enabled", False) is False:
         log_trace(collector_name, "COLLECTOR SKIP", {"reason": "collector disabled"})
@@ -138,6 +144,7 @@ def collect_market_information(
         return {
             "collection_status": "unavailable",
             "generated_at": now_iso(),
+            "a_share_collection_profile": collection_profile,
             "sources": {},
             "errors": {"digital_oracle_import": f"{type(exc).__name__}: {exc}"},
         }
@@ -162,6 +169,7 @@ def collect_market_information(
         raw_summary: dict[str, Any] = {
             "collection_status": "empty",
             "generated_at": now_iso(),
+            "a_share_collection_profile": collection_profile,
             "sources": {},
             "errors": {
                 "symbols": (
@@ -276,6 +284,7 @@ def collect_market_information(
         results=gathered_results,
         errors={**task_build_errors, **gathered_errors},
         discovery=discovery,
+        collection_profile=collection_profile,
     )
 
 
@@ -452,6 +461,55 @@ def is_provider_enabled(config: dict[str, Any], group: str) -> bool:
     return provider_config.get("enabled", True) is not False
 
 
+def apply_a_share_collection_profile(
+    state: MarketDecisionState,
+    config: dict[str, Any],
+) -> tuple[dict[str, Any], str]:
+    profile = resolve_a_share_collection_profile(state)
+    if profile != "sector_shallow":
+        return config, profile
+
+    overrides = {
+        "include_macro": False,
+        "candidate_discovery": {
+            "max_candidates": 60,
+        },
+        "providers": {
+            "macro": {
+                "enabled": False,
+            },
+            "china_equity": {
+                "tencent_index_metrics": True,
+                "mootdx_frequencies": ("day",),
+                "mootdx_realtime": False,
+                "mootdx_intraday": False,
+                "mootdx_order_book": False,
+                "mootdx_financials": True,
+                "mootdx_shareholders": False,
+                "mootdx_company_profile": False,
+                "mootdx_transactions": False,
+                "mootdx_index_frequencies": ("day",),
+            },
+        },
+    }
+    return merge_dicts(config, overrides), profile
+
+
+def resolve_a_share_collection_profile(state: MarketDecisionState) -> str:
+    explicit_a_share_symbols = [
+        symbol for symbol in extract_candidate_symbols(state) if is_a_share_symbol(symbol)
+    ]
+    if explicit_a_share_symbols:
+        return "stock_deep"
+
+    metadata = dict(state.get("metadata", {}) or {})
+    mode = str(metadata.get("mode") or metadata.get("ui_mode") or "")
+    if mode == "a_share_sector" or extract_requested_sectors(state):
+        return "sector_shallow"
+
+    return "default"
+
+
 def can_collect_without_symbols(config: dict[str, Any]) -> bool:
     return any(
         is_provider_enabled(config, group)
@@ -460,7 +518,17 @@ def can_collect_without_symbols(config: dict[str, Any]) -> bool:
 
 
 def can_collect_china_without_symbols(config: dict[str, Any]) -> bool:
-    return False
+    provider_config = dict(config.get("providers", {}).get("china_equity", {}) or {})
+    if provider_config.get("enabled", True) is False:
+        return False
+
+    include_tencent = bool(provider_config.get("tencent", config.get("include_a_share_metrics", True)))
+    if include_tencent and bool(provider_config.get("tencent_index_metrics", True)):
+        return True
+
+    include_mootdx = bool(provider_config.get("mootdx", False))
+    index_symbols = tuple(provider_config.get("mootdx_index_symbols", ()))
+    return include_mootdx and bool(index_symbols)
 
 
 def extract_candidate_symbols(state: MarketDecisionState) -> list[str]:
@@ -542,9 +610,31 @@ def extract_requested_sectors(state: MarketDecisionState) -> list[str]:
     sector_terms = question_understanding.get("sector_terms") or []
     if isinstance(sector_terms, str):
         sector_terms = re.split(r"[,，、]", sector_terms)
-    if not isinstance(sector_terms, list):
-        return []
-    return [str(item).strip() for item in sector_terms if str(item).strip()]
+    normalized_terms = (
+        [str(item).strip() for item in sector_terms if str(item).strip()]
+        if isinstance(sector_terms, list)
+        else []
+    )
+    if normalized_terms:
+        return normalized_terms
+
+    actions = state.get("data_collection_actions", []) or []
+    action_terms: list[str] = []
+    if isinstance(actions, list):
+        for item in actions:
+            if not isinstance(item, dict):
+                continue
+            if str(item.get("action") or "").upper() != "CALL_LOCAL_CONCEPT_BOARD":
+                continue
+            raw_terms = item.get("input_terms") or []
+            if isinstance(raw_terms, str):
+                raw_terms = re.split(r"[,，、]", raw_terms)
+            if isinstance(raw_terms, list):
+                for term in raw_terms:
+                    text = str(term).strip()
+                    if text and text not in action_terms:
+                        action_terms.append(text)
+    return action_terms
 
 
 def infer_auto_candidate_universe(task: str) -> str | None:
@@ -875,6 +965,7 @@ def summarize_gathered_market_data(
     results: dict[str, Any],
     errors: dict[str, BaseException],
     discovery: dict[str, Any] | None = None,
+    collection_profile: str = "default",
 ) -> dict[str, Any]:
     sources: dict[str, Any] = {}
     discovery_source_values = dict(discovery.get("sources", {}) if discovery else {})
@@ -898,6 +989,7 @@ def summarize_gathered_market_data(
     summary = {
         "collection_status": status,
         "generated_at": now_iso(),
+        "a_share_collection_profile": collection_profile,
         "task": task,
         "symbols": symbols,
         "source_count": len(sources),

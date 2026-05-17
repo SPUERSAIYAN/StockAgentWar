@@ -9,7 +9,7 @@
 - 新增本地板块目录加载器：读取 `Sheet1`，只匹配 `概念板块` 列，不用 `行业` 列做板块匹配；股票代码规范化为 `.SH`、`.SZ`、`.BJ`。
 - 更新 `discover_candidate_universe()`：当发现请求板块时，不再返回“板块数据源缺失”，改为从 Excel 匹配概念板块并生成 `candidates`。
 - 板块匹配规则：先做概念名精确匹配；无精确匹配时做概念名包含匹配，例如“半导体”可匹配“半导体概念”。
-- 候选排序规则：用 Excel 静态字段评分后取 `candidate_discovery.max_candidates`，当前默认 15；评分使用 ROE、营收增速、归母净利润增速、预测利润增速、市值、PE 合理性，并应用已有 `exclude_st`、`min_market_cap_yi`、`max_pe` 过滤项。
+- 候选排序规则：用 Excel 静态字段评分后取 `candidate_discovery.max_candidates`；板块浅采集 profile 会把候选上限覆盖为 60。评分使用 ROE、营收增速、归母净利润增速、预测利润增速、市值、PE 合理性，并应用已有 `exclude_st`、`min_market_cap_yi`、`max_pe` 过滤项。
 - QuestionPlanningAgent 的 `question_understanding` 增加可选 `sector_terms: list[str]`；collector 使用 `scan_scope.sectors` 优先，空时使用 `question_understanding.sector_terms`。
 - `stock_pool` 中保留 Excel 静态字段作为候选 metadata：`sector` 用匹配到的概念板块，另带 `industry`、`concepts`、`roe`、`revenue_growth_yoy`、`net_profit_growth_yoy`、`pe`、`total_market_cap_cny_100m` 等；后续实时行情字段仍可覆盖同名字段。
 - 更新文档和 prompt：删除“当前未接入板块成分股数据源”的旧表述，改为说明本地 Excel 概念板块源已接入。

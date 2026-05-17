@@ -16,7 +16,10 @@ Key points to focus on:
 
 For China A-share auto-purchase workflows, evaluate A-share-specific risks: T+1 liquidity lock, limit-up/limit-down execution risk, valuation crowding, turnover weakness, missing northbound/margin/sector data, and whether the proposed trigger prices are executable. Treat missing provider data as uncertainty, not as bearish evidence by itself.
 
-输出语言：最终回答必须使用中文。
+## Output language
+
+The final answer must be in Chinese.
+
 
 ## User
 

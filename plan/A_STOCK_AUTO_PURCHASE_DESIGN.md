@@ -517,23 +517,13 @@ agents:
       stop_loss_pct: 8              # 止损比例 8%
       take_profit_pct: 20           # 止盈比例 20%
 
-  trader:
-    mode: "SIMULATED"               # SIMULATED | PAPER | LIVE
-    simulated:
-      initial_capital: 1000000      # 模拟盘初始资金 100 万
-      commission_rate: 0.0003       # 佣金率 万分之三
-      stamp_tax_rate: 0.0005        # 印花税 千分之零.五
-    paper:
-      broker: ""                    # 券商接口（预留）
-    live:
-      broker: ""                    # 券商接口（预留）
-      enabled: false                # 默认关闭，需手动开启
-
 trade_monitor:
   enabled: true                     # 是否启用定时监控
   interval_seconds: 60              # 轮询间隔（秒）
   mode: "SIMULATED"                 # SIMULATED | PAPER | LIVE
   plan_file: "data/trade_plan.json" # 总经理输出的交易计划路径
+  commission_rate: 0.0003           # 佣金率 万分之三
+  stamp_tax_rate: 0.0005            # 印花税 千分之零.五
   a_share_market_hours:
     morning_start: "09:30"
     morning_end: "11:30"

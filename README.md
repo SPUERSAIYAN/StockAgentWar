@@ -36,7 +36,6 @@ prompts/
   bear_agent.md
   judge_agent.md
   risk_agent.md
-  trader_agent.md
   portfolio_manager_agent.md
 web/
   index.html
@@ -57,7 +56,7 @@ python -m uvicorn server:app --host 127.0.0.1 --port 8000
 http://127.0.0.1:8000
 ```
 
-页面支持输入股票代码和决策任务，并实时展示问题规划、信息分析、多头、空头、裁判、风控、总经理和交易计划报告。结构化多空、结构化裁判和结构化交易决策只作为内部图节点，不作为前端阶段输出。
+页面支持输入股票代码和决策任务，并实时展示问题规划、信息分析、多头、空头、裁判、风控、总经理和交易决策展示。结构化多空、结构化裁判和结构化交易决策只作为内部图节点，不作为前端阶段输出。
 
 ## 命令行运行
 
@@ -76,17 +75,7 @@ python main.py `
   --capital 1000000
 ```
 
-当总经理 Agent 给出 `BUY` 时，A 股图会写入 `data/trade_plan.json`。交易监控是独立程序化调度器：
-
-```powershell
-python -m schedulers.trade_monitor_scheduler `
-  --config .\config.yaml `
-  --plan-file data/trade_plan.json `
-  --interval 60 `
-  --mode SIMULATED
-```
-
-`SIMULATED` 会写入 `data/order_log.json`；`PAPER`/`LIVE` 接口保留但不会真实下单。
+当前 A 股链路只生成交易决策展示：包括最终动作、候选标的、仓位、触发价、止损止盈和有效期。即使总经理 Agent 给出 `BUY`，系统也不会写入 `data/trade_plan.json`，不会把 JSON 交给调度器执行交易。
 
 ## OpenRouter
 
@@ -121,7 +110,7 @@ flowchart TD
     JUDGE_STRUCT --> RISK[风控 Agent]
     RISK --> MANAGER[总经理 Agent]
     MANAGER --> DECISION[总经理结构化决策]
-    DECISION --> SAVE[交易计划保存]
+    DECISION --> SAVE[交易决策展示]
     SAVE --> OUTPUT[最终输出]
     OUTPUT --> END([END])
 ```

@@ -1,17 +1,11 @@
 from __future__ import annotations
 
-import json
-from pathlib import Path
 from statistics import mean
 from typing import Any
 
 from agents.portfolio_manager_agent import build_portfolio_decision
 from agents.trace_logger import log_agent_output, log_agent_start
 from schemas.state import AgentRuntimeConfig, MarketDecisionState
-
-
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-TRADE_PLAN_PATH = PROJECT_ROOT / "data" / "trade_plan.json"
 
 
 class PortfolioDecisionNode:
@@ -119,22 +113,11 @@ def structure_judge_rulings(state: MarketDecisionState) -> dict[str, Any]:
 
 
 def save_trade_plan(state: MarketDecisionState) -> dict[str, Any]:
-    decision = dict(state.get("final_decision", {}) or {})
-    plan = dict(state.get("trade_plan", {}) or {})
-    monitored_stocks = list(plan.get("monitored_stocks", []) or [])
-    if decision.get("action") == "BUY" and monitored_stocks:
-        TRADE_PLAN_PATH.parent.mkdir(parents=True, exist_ok=True)
-        TRADE_PLAN_PATH.write_text(
-            json.dumps(plan, ensure_ascii=False, indent=2),
-            encoding="utf-8",
-        )
-        plan_file: str | None = str(TRADE_PLAN_PATH)
-    else:
-        plan_file = None
     return {
         "metadata": {
             **dict(state.get("metadata", {}) or {}),
-            "trade_plan_file": plan_file,
+            "trade_plan_file": None,
+            "trade_plan_persistence": "display_only",
         }
     }
 
@@ -143,8 +126,7 @@ def format_final_output(state: MarketDecisionState) -> dict[str, str]:
     log_agent_start("final_output", state)
     decision = state.get("final_decision", {})
     action = decision.get("action", "WAIT")
-    plan_file = dict(state.get("metadata", {}) or {}).get("trade_plan_file")
-    plan_note = f"\n\n交易计划文件：`{plan_file}`" if plan_file else "\n\n未生成交易计划文件。"
+    plan_note = "\n\n仅生成交易决策展示，未写入交易计划 JSON 文件。"
     final_output = "\n".join(
         [
             "# 股票自动购买决策",

@@ -21,7 +21,7 @@ const STAGE_META = {
   judge_decision: { agent: "裁判", title: "综合裁决", color: "#A78BFA", icon: ICONS.scale },
   risk_review: { agent: "风控", title: "风险复核", color: "#F59E0B", icon: ICONS.shield },
   portfolio_manager: { agent: "总经理", title: "最终建议", color: "#EC4899", icon: ICONS.briefcase },
-  save_trade_plan: { agent: "交易计划", title: "计划落盘", color: "#14B8A6", icon: ICONS.clipboard },
+  save_trade_plan: { agent: "交易决策", title: "决策展示", color: "#14B8A6", icon: ICONS.clipboard },
 };
 
 const DOCUMENTED_STAGE_ORDER = [
@@ -193,7 +193,7 @@ function applyModeDefaults() {
     return;
   }
   if (state.runMode === "a_share_daily") {
-    els.task.value = "扫描全市场，找出未来1个月最具投资价值的 A 股标的，并生成价格触发式交易计划。";
+    els.task.value = "扫描全市场，找出未来1个月最具投资价值的 A 股标的，并生成价格触发式交易决策展示。";
     return;
   }
   if (state.runMode === "a_share_sector") {
@@ -632,7 +632,7 @@ function renderTradePlanPanel() {
   els.tradePlanPanel.className = "trade-plan-panel compact";
   els.tradePlanPanel.innerHTML = `
     <div class="trade-plan-head">
-      <strong>交易计划</strong>
+      <strong>交易决策</strong>
       <span>报告</span>
     </div>
     <div class="markdown">${renderMarkdown(content)}</div>`;

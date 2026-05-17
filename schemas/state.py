@@ -45,6 +45,7 @@ class MarketDecisionState(TypedDict, total=False):
     task: str
     candidates: list[StockCandidate]
     question_understanding: dict[str, Any]
+    data_collection_actions: list[dict[str, Any]]
     question_plan_report: str
     information_workflow: dict[str, Any]
     provider_selection: dict[str, Any]
