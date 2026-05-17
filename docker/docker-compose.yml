@@ -1,0 +1,13 @@
+services:
+  ai-stock:
+    image: crpi-takoatwvli6uv0zy.cn-hangzhou.personal.cr.aliyuncs.com/supersaiyan1/ai-stock:1.0
+    container_name: ai-stock
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:18080:8000"
+    networks:
+      - npm
+
+networks:
+  npm:
+    external: true

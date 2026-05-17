@@ -1,0 +1,13 @@
+.git
+.gitignore
+.idea
+.claude
+.codex
+.pytest_cache
+__pycache__
+*.pyc
+.env
+Dockerfile
+web/node_modules
+web/.npm-cache
+web/tsconfig.tsbuildinfo
