@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import time
 import unittest
 from unittest.mock import patch
 
@@ -136,6 +137,30 @@ class ServerVisibilityTests(unittest.TestCase):
         for key in INTERNAL_NODES | {"final_decision", "trade_plan", "alternative_scenarios"}:
             self.assertNotIn(key, complete_events[-1]["state"])
 
+    def test_stream_emits_heartbeat_while_waiting_for_graph_updates(self) -> None:
+        request = server.DecisionRequest(
+            task="Analyze market",
+            symbols="",
+            mode="mock",
+            config_path="config.yaml",
+        )
+
+        with (
+            patch.object(server, "resolve_agent_configs", return_value={}),
+            patch.object(server, "build_common_analysis_graph", return_value=FakeSlowCommonGraph()),
+        ):
+            events = [
+                json.loads(line)
+                for line in server.stream_decision(request, heartbeat_interval_seconds=0.01)
+            ]
+
+        heartbeat_events = [event for event in events if event["type"] == "heartbeat"]
+        stage_nodes = [event["node"] for event in events if event["type"] == "stage"]
+
+        self.assertGreaterEqual(len(heartbeat_events), 1)
+        self.assertTrue(all(isinstance(event["elapsed_ms"], int) for event in heartbeat_events))
+        self.assertEqual(stage_nodes, COMMON_VISIBLE_ORDER)
+
     def test_a_share_stream_keeps_full_decision_chain(self) -> None:
         request = server.DecisionRequest(
             task="Scan A-share market",
@@ -203,6 +228,16 @@ class FakeAshareGraph:
         yield {"portfolio_decision": {"final_decision": {"action": "WAIT", "reasoning": "test"}}}
         yield {"save_trade_plan": {"metadata": {"trade_plan_file": None}}}
         yield {"final_output": {"final_output": "final"}}
+
+
+class FakeSlowCommonGraph:
+    def stream(self, inputs, stream_mode):
+        self.inputs = inputs
+        self.stream_mode = stream_mode
+        time.sleep(0.03)
+        yield {"question_planning": {"question_plan_report": "plan"}}
+        time.sleep(0.03)
+        yield {"information_analysis": {"info_report": "info"}}
 
 
 if __name__ == "__main__":

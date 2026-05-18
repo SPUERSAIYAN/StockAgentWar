@@ -51,6 +51,11 @@ export function useDecisionRun(state: AppState, dispatch: Dispatch<AppAction>) {
         return;
       }
 
+      if (event.type === "heartbeat") {
+        dispatch({ type: "TICK", payload: event.elapsed_ms });
+        return;
+      }
+
       if (event.type === "stage_status") {
         dispatch({ type: "STAGE_STATUS", payload: { node: event.node, status: event.status } });
         return;

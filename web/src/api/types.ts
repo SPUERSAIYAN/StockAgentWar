@@ -20,6 +20,7 @@ export interface DecisionRequest {
 
 export type NdjsonEvent =
   | { type: "start"; task: string; symbols: string; sectors: string; mode: string; stages: StageDescriptor[] }
+  | { type: "heartbeat"; elapsed_ms: number }
   | { type: "stage_status"; node: string; status: StageStatus; elapsed_ms?: number }
   | {
       type: "stage";

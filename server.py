@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import json
+import queue
+import threading
 import time
 import warnings
 from pathlib import Path
@@ -27,6 +29,7 @@ warnings.filterwarnings(
 from graph.a_share_auto_trade_graph import build_a_share_auto_trade_graph
 from graph.stock_graph import DEFAULT_AGENT_CONFIGS, build_common_analysis_graph
 from main import inject_openrouter_api_key, load_agent_configs, parse_symbols
+from agents.trace_logger import format_text_status, log_line
 
 
 PROJECT_ROOT = Path(__file__).resolve().parent
@@ -34,6 +37,7 @@ WEB_DIR = PROJECT_ROOT / "web"
 WEB_DIST_DIR = WEB_DIR / "dist"
 STATIC_WEB_DIR = WEB_DIST_DIR if (WEB_DIST_DIR / "index.html").exists() else WEB_DIR
 DEFAULT_CONFIG_PATH = PROJECT_ROOT / "config.yaml"
+HEARTBEAT_INTERVAL_SECONDS = 10.0
 
 load_dotenv(PROJECT_ROOT / ".env")
 
@@ -157,13 +161,20 @@ def decide_stream(request: DecisionRequest) -> StreamingResponse:
     )
 
 
-def stream_decision(request: DecisionRequest):
+def stream_decision(
+    request: DecisionRequest,
+    heartbeat_interval_seconds: float = HEARTBEAT_INTERVAL_SECONDS,
+):
     started_at = time.perf_counter()
     state: dict[str, Any] = {}
     completed: set[str] = set()
     is_a_share = is_a_share_mode(request.mode)
     stages = A_SHARE_STAGES if is_a_share else COMMON_STAGES
     stage_order = A_SHARE_STAGE_ORDER if is_a_share else COMMON_STAGE_ORDER
+    log_line(
+        "STREAM START "
+        f"mode={request.mode} symbols={request.symbols or '(none)'} sectors={request.sectors or '(none)'}"
+    )
 
     yield event(
         "start",
@@ -186,7 +197,15 @@ def stream_decision(request: DecisionRequest):
         )
         inputs = build_graph_inputs(request, agent_configs)
 
-        for update in graph.stream(inputs, stream_mode="updates"):
+        for update in stream_graph_updates(
+            graph,
+            inputs,
+            started_at,
+            heartbeat_interval_seconds,
+        ):
+            if isinstance(update, str):
+                yield update
+                continue
             for node, node_update in update.items():
                 if not isinstance(node_update, dict):
                     continue
@@ -217,6 +236,11 @@ def stream_decision(request: DecisionRequest):
                 if not is_a_share and node == "information_analysis":
                     final_output = node_update.get("info_report", "")
                     state["final_output"] = final_output
+                    log_line(
+                        "STREAM COMPLETE "
+                        f"mode={request.mode} elapsed_ms={elapsed_ms(started_at)} "
+                        f"{format_text_status(final_output)}"
+                    )
                     yield event(
                         "complete",
                         {
@@ -226,16 +250,27 @@ def stream_decision(request: DecisionRequest):
                         },
                     )
                 elif node == "final_output":
+                    final_output = node_update.get("final_output", "")
+                    log_line(
+                        "STREAM COMPLETE "
+                        f"mode={request.mode} elapsed_ms={elapsed_ms(started_at)} "
+                        f"{format_text_status(final_output)}"
+                    )
                     yield event(
                         "complete",
                         {
                             "elapsed_ms": elapsed_ms(started_at),
-                            "final_output": node_update.get("final_output", ""),
+                            "final_output": final_output,
                             "state": public_state(state),
                         },
                     )
     except Exception as exc:
         message = format_web_error_message(exc)
+        log_line(
+            "STREAM FAIL "
+            f"mode={request.mode} elapsed_ms={elapsed_ms(started_at)} "
+            f"error={type(exc).__name__}: {message}"
+        )
         yield event(
             "error",
             {
@@ -244,6 +279,48 @@ def stream_decision(request: DecisionRequest):
                 "hint": "请在前端填写 OpenRouter API Key，并检查 config.yaml 模型名和网络代理设置。",
             },
         )
+
+
+def stream_graph_updates(
+    graph: Any,
+    inputs: dict[str, Any],
+    started_at: float,
+    heartbeat_interval_seconds: float,
+):
+    updates: queue.Queue[tuple[str, Any]] = queue.Queue()
+    stop_updates = threading.Event()
+
+    def consume_updates() -> None:
+        try:
+            for update in graph.stream(inputs, stream_mode="updates"):
+                if stop_updates.is_set():
+                    return
+                updates.put(("update", update))
+        except Exception as exc:
+            if not stop_updates.is_set():
+                updates.put(("error", exc))
+        else:
+            if not stop_updates.is_set():
+                updates.put(("done", None))
+
+    threading.Thread(target=consume_updates, daemon=True).start()
+
+    try:
+        while True:
+            try:
+                kind, value = updates.get(timeout=heartbeat_interval_seconds)
+            except queue.Empty:
+                yield event("heartbeat", {"elapsed_ms": elapsed_ms(started_at)})
+                continue
+
+            if kind == "update":
+                yield value
+            elif kind == "error":
+                raise value
+            else:
+                return
+    finally:
+        stop_updates.set()
 
 
 def resolve_agent_configs(request: DecisionRequest):

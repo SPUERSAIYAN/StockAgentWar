@@ -65,6 +65,11 @@ def log_agent_messages(
 
 
 def log_agent_output(agent_name: str, output_key: str, content: Any) -> None:
+    if trace_enabled():
+        log_line(
+            "AGENT OUTPUT "
+            f"agent={agent_name} key={output_key} {format_text_status(content)}"
+        )
     if not agent_trace_enabled():
         return
     log_block(agent_name, "OUTPUT", [(output_key, content)])
@@ -84,6 +89,47 @@ def log_agent_error(agent_name: str, error: BaseException) -> None:
             )
         ],
     )
+
+
+def log_model_call_start(
+    agent_name: str,
+    model_config: dict[str, Any],
+    message_count: int,
+) -> None:
+    if not trace_enabled():
+        return
+    safe_model_config = redact_model_config(model_config)
+    provider = safe_model_config.get("provider", "unknown")
+    model = safe_model_config.get("model", "unknown")
+    log_line(
+        "MODEL CALL START "
+        f"agent={agent_name} provider={provider} model={model} messages={message_count}"
+    )
+
+
+def log_model_call_success(agent_name: str, elapsed_ms: int, content: Any) -> None:
+    if not trace_enabled():
+        return
+    log_line(
+        "MODEL CALL OK "
+        f"agent={agent_name} elapsed_ms={elapsed_ms} {format_text_status(content)}"
+    )
+
+
+def log_model_call_error(agent_name: str, elapsed_ms: int, error: BaseException) -> None:
+    if not trace_enabled():
+        return
+    log_line(
+        "MODEL CALL FAIL "
+        f"agent={agent_name} elapsed_ms={elapsed_ms} "
+        f"error={type(error).__name__}: {str(error)}"
+    )
+    if traceback_enabled():
+        log_block(
+            f"model:{agent_name}",
+            "TRACEBACK",
+            [("TRACEBACK", "".join(traceback.format_exception(type(error), error, error.__traceback__)))],
+        )
 
 
 def log_trace(agent_name: str, event: str, payload: Any) -> None:
@@ -343,6 +389,13 @@ def format_flat_summary(summary: dict[str, Any]) -> str:
         if key in summary and summary[key] not in (None, ""):
             pieces.append(f"{key}={summary[key]}")
     return " ".join(pieces)
+
+
+def format_text_status(content: Any) -> str:
+    text = content if isinstance(content, str) else str(content)
+    stripped = text.strip()
+    status = "empty" if not stripped else "ok"
+    return f"output_status={status} chars={len(text)} stripped_chars={len(stripped)}"
 
 
 def truncate(text: str, limit: int) -> str:

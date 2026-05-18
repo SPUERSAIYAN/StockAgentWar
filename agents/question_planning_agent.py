@@ -56,7 +56,12 @@ class QuestionPlanningAgent:
         log_agent_messages(agent_name, self.model_config, messages)
 
         try:
-            raw_content = invoke_text(create_chat_model(self.model_config), messages)
+            raw_content = invoke_text(
+                create_chat_model(self.model_config),
+                messages,
+                agent_name=agent_name,
+                model_config=self.model_config,
+            )
             parsed = parse_planner_json(raw_content)
             plan = normalize_question_plan(parsed)
         except Exception as exc:

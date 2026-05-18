@@ -5,6 +5,7 @@ import json
 import math
 import os
 import re
+import time
 from dataclasses import dataclass
 from typing import Any, Protocol
 
@@ -15,6 +16,9 @@ from agents.trace_logger import (
     log_agent_messages,
     log_agent_output,
     log_agent_start,
+    log_model_call_error,
+    log_model_call_start,
+    log_model_call_success,
     log_trace,
 )
 from collectors.digital_oracle_collector import (
@@ -218,7 +222,12 @@ def run_prompt_agent(
     ]
     log_agent_messages(agent_name, config.get("model", {}), messages)
     try:
-        content = invoke_text(model, messages)
+        content = invoke_text(
+            model,
+            messages,
+            agent_name=agent_name,
+            model_config=config.get("model", {}),
+        )
     except Exception as exc:
         log_agent_error(agent_name, exc)
         raise
@@ -239,14 +248,34 @@ def create_chat_model(config: ModelConfig) -> ChatModel:
     raise ValueError(f"Unsupported model provider: {provider}")
 
 
-def invoke_text(model: ChatModel, messages: list[dict[str, str]]) -> str:
-    response = model.invoke(messages)
+def invoke_text(
+    model: ChatModel,
+    messages: list[dict[str, str]],
+    *,
+    agent_name: str = "unknown",
+    model_config: dict[str, Any] | None = None,
+) -> str:
+    started_at = time.perf_counter()
+    log_model_call_start(agent_name, model_config or {}, len(messages))
+    try:
+        response = model.invoke(messages)
+    except Exception as exc:
+        log_model_call_error(agent_name, elapsed_ms_since(started_at), exc)
+        raise
     if isinstance(response, str):
-        return response
-    content = getattr(response, "content", response)
+        content = response
+    else:
+        content = getattr(response, "content", response)
     if isinstance(content, list):
-        return "\n".join(content_part_to_text(part) for part in content)
-    return str(content)
+        text = "\n".join(content_part_to_text(part) for part in content)
+    else:
+        text = str(content)
+    log_model_call_success(agent_name, elapsed_ms_since(started_at), text)
+    return text
+
+
+def elapsed_ms_since(started_at: float) -> int:
+    return int((time.perf_counter() - started_at) * 1000)
 
 
 def create_openai_model(config: ModelConfig) -> ChatModel:
@@ -1163,6 +1192,8 @@ def build_collected_market_report(
                 {"role": "system", "content": instructions},
                 {"role": "user", "content": prompt},
             ],
+            agent_name=config.get("name") or "information",
+            model_config=config.get("model", {}),
         )
     except Exception as exc:
         fallback = render_deterministic_report(
