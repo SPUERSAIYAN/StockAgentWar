@@ -17,6 +17,7 @@ from collectors.connectors.macro import build_macro_tasks
 from collectors.connectors.prediction import build_prediction_market_tasks
 from collectors.connectors.web_search import build_web_search_tasks
 from collectors.local_a_share_concepts import discover_local_concept_board_candidates
+from collectors.tushare import build_tushare_tasks
 from agents.trace_logger import (
     log_collector_summary,
     log_data_source_error,
@@ -97,6 +98,19 @@ DEFAULT_COLLECTOR_CONFIG: dict[str, Any] = {
             "deribit": True,
             "deribit_orderbook_instruments": (),
             "deribit_orderbook_depth": 5,
+        },
+        "tushare": {
+            "enabled": False,
+            "http_url": "http://118.89.66.41:8010/",
+            "china_equity": True,
+            "us_equity": True,
+            "crypto": False,
+            "index_basic": True,
+            "index_daily": True,
+            "us_basic": True,
+            "us_daily": True,
+            "coincap": False,
+            "coin_bar": False,
         },
         "web_search": {
             "enabled": False,
@@ -229,6 +243,16 @@ def collect_market_information(
         task_build_errors,
         "task_build.crypto",
         lambda: build_crypto_tasks(config=collector_config),
+    )
+    add_task_group(
+        tasks,
+        task_build_errors,
+        "task_build.tushare",
+        lambda: build_tushare_tasks(
+            symbols=symbols,
+            config=collector_config,
+            is_a_share_symbol=is_a_share_symbol,
+        ),
     )
     add_task_group(
         tasks,
@@ -433,6 +457,8 @@ def infer_data_source_context(label: str, *, task: str, symbols: list[str]) -> d
         context.update({"group": "prediction_markets", "data_kind": label.removeprefix("prediction.")})
     elif label.startswith("crypto."):
         context.update({"group": "crypto", "data_kind": label.removeprefix("crypto.")})
+    elif label.startswith("tushare."):
+        context.update({"group": "tushare", "data_kind": label.removeprefix("tushare.")})
     elif label.startswith("web.search."):
         context.update({"group": "web_search", "data_kind": "search"})
     elif label.startswith("web.page."):
@@ -466,6 +492,48 @@ def apply_a_share_collection_profile(
     config: dict[str, Any],
 ) -> tuple[dict[str, Any], str]:
     profile = resolve_a_share_collection_profile(state)
+    if profile == "market_macro":
+        overrides = {
+            "candidate_discovery": {
+                "enabled": False,
+            },
+            "providers": {
+                "china_equity": {
+                    "tencent": True,
+                    "tencent_index_metrics": True,
+                    "mootdx": False,
+                },
+                "tushare": {
+                    "china_equity": True,
+                    "stock_basic": False,
+                    "a_share_daily": False,
+                    "a_share_weekly": False,
+                    "daily_basic": False,
+                    "a_share_financials": False,
+                    "moneyflow": False,
+                    "margin_detail": False,
+                    "index_basic": True,
+                    "index_daily": True,
+                    "index_etf": True,
+                    "index_weight": False,
+                    "fund_basic": True,
+                    "fund_daily": True,
+                    "fund_nav": False,
+                    "moneyflow_lhb": True,
+                    "moneyflow_hsgt": True,
+                    "margin": True,
+                    "top_list": False,
+                    "top_inst": False,
+                    "futures_options": True,
+                    "fut_basic": True,
+                    "fut_daily": True,
+                    "fut_mapping": False,
+                    "opt_basic": True,
+                    "opt_daily": False,
+                },
+            },
+        }
+        return merge_dicts(config, overrides), profile
     if profile != "sector_shallow":
         return config, profile
 
@@ -506,15 +574,81 @@ def resolve_a_share_collection_profile(state: MarketDecisionState) -> str:
     mode = str(metadata.get("mode") or metadata.get("ui_mode") or "")
     if mode == "a_share_sector" or extract_requested_sectors(state):
         return "sector_shallow"
+    if is_a_share_market_macro_question(state):
+        return "market_macro"
 
     return "default"
+
+
+def is_a_share_market_macro_question(state: MarketDecisionState) -> bool:
+    text_parts = [
+        str(state.get("task") or ""),
+        str(dict(state.get("question_understanding", {}) or {}).get("rewritten_question") or ""),
+        str(dict(state.get("question_understanding", {}) or {}).get("core_intent") or ""),
+        str(dict(state.get("question_understanding", {}) or {}).get("market_scope") or ""),
+        str(dict(state.get("question_understanding", {}) or {}).get("candidate_scope") or ""),
+    ]
+    text = " ".join(text_parts).casefold()
+    china_market_tokens = (
+        "a股",
+        "a 股",
+        "大a",
+        "大 a",
+        "沪深",
+        "中国股市",
+        "中国股票市场",
+        "a-share",
+        "ashare",
+        "china a-share",
+    )
+    macro_or_market_tokens = (
+        "宏观",
+        "经济",
+        "利率",
+        "流动性",
+        "政策",
+        "货币",
+        "信用",
+        "通胀",
+        "cpi",
+        "pmi",
+        "gdp",
+        "shibor",
+        "指数",
+        "大盘",
+        "市场环境",
+        "市场走势",
+        "市场风险",
+        "上证",
+        "深证",
+        "创业板",
+        "沪深300",
+        "中证",
+    )
+    stock_selection_tokens = (
+        "哪只",
+        "哪一只",
+        "个股",
+        "股票池",
+        "候选",
+        "筛选",
+        "选股",
+        "推荐股票",
+        "买哪",
+        "最有潜力",
+    )
+    return (
+        any(token in text for token in china_market_tokens)
+        and any(token in text for token in macro_or_market_tokens)
+        and not any(token in text for token in stock_selection_tokens)
+    )
 
 
 def can_collect_without_symbols(config: dict[str, Any]) -> bool:
     return any(
         is_provider_enabled(config, group)
         for group in ("macro", "prediction_markets", "crypto", "web_search")
-    ) or can_collect_china_without_symbols(config)
+    ) or can_collect_china_without_symbols(config) or can_collect_tushare_without_symbols(config)
 
 
 def can_collect_china_without_symbols(config: dict[str, Any]) -> bool:
@@ -529,6 +663,27 @@ def can_collect_china_without_symbols(config: dict[str, Any]) -> bool:
     include_mootdx = bool(provider_config.get("mootdx", False))
     index_symbols = tuple(provider_config.get("mootdx_index_symbols", ()))
     return include_mootdx and bool(index_symbols)
+
+
+def can_collect_tushare_without_symbols(config: dict[str, Any]) -> bool:
+    provider_config = dict(config.get("providers", {}).get("tushare", {}) or {})
+    if provider_config.get("enabled", False) is False:
+        return False
+    return any(
+        bool(provider_config.get(key, False))
+        for key in (
+            "index_basic",
+            "index_daily",
+            "us_basic",
+            "coinlist",
+            "coincap",
+            "coin_bar",
+            "moneyflow_lhb",
+            "index_etf",
+            "futures_options",
+            "macro_rates",
+        )
+    )
 
 
 def extract_candidate_symbols(state: MarketDecisionState) -> list[str]:
@@ -639,6 +794,8 @@ def extract_requested_sectors(state: MarketDecisionState) -> list[str]:
 
 def infer_auto_candidate_universe(task: str) -> str | None:
     normalized = task.casefold()
+    if is_a_share_market_macro_question({"task": task}):
+        return None
     china_tokens = (
         "a-share",
         "ashare",

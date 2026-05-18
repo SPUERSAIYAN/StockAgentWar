@@ -284,6 +284,7 @@ class _MootdxClientFactory:
         self,
         *,
         market: str = "std",
+        server: Sequence[object] | None = None,
         multithread: bool = True,
         heartbeat: bool = True,
         bestip: bool = False,
@@ -310,6 +311,7 @@ class _MootdxClientFactory:
 
         self._client = quotes_module.Quotes.factory(
             market=market,
+            server=server,
             multithread=multithread,
             heartbeat=heartbeat,
             bestip=bestip,

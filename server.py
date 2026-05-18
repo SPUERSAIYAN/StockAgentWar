@@ -531,7 +531,19 @@ def describe_source(label: str, value: Any | None = None) -> dict[str, str]:
                 "https://github.com/mootdx/mootdx",
                 f"{symbol} A 股行情与财务数据",
             )
+        if data_key.startswith("tushare"):
+            return source_descriptor(
+                "Tushare Pro",
+                "https://tushare.pro/",
+                f"{symbol} Tushare 行情、估值或基础数据",
+            )
 
+    if label.startswith("tushare."):
+        return source_descriptor(
+            "Tushare Pro",
+            "https://tushare.pro/",
+            f"Tushare 数据接口：{label.removeprefix('tushare.')}",
+        )
     if label.startswith("macro.price."):
         symbol = label.removeprefix("macro.price.")
         return source_descriptor(

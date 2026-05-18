@@ -395,7 +395,26 @@ def extract_symbol_metrics(sources: dict[str, Any]) -> dict[str, dict[str, Any]]
                     continue
                 item_symbol = normalize_symbol(str(item.get("symbol") or symbol))
                 metrics[item_symbol] = {**metrics.get(item_symbol, {}), **item}
-        elif data_key in {"price_daily", "stooq_price_daily"}:
+        elif data_key == "tushare_daily_basic":
+            for item in value.get("items", []) or []:
+                if not isinstance(item, dict):
+                    continue
+                item_symbol = normalize_symbol(str(item.get("ts_code") or symbol))
+                metrics[item_symbol] = {**metrics.get(item_symbol, {}), **item}
+        elif data_key in {
+            "tushare_fina_indicator",
+            "tushare_income",
+            "tushare_balancesheet",
+            "tushare_cashflow",
+            "tushare_moneyflow",
+            "tushare_margin_detail",
+        }:
+            rows = [item for item in value.get("rows", []) or [] if isinstance(item, dict)]
+            if rows:
+                latest = rows[0]
+                item_symbol = normalize_symbol(str(latest.get("ts_code") or symbol))
+                metrics[item_symbol] = {**metrics.get(item_symbol, {}), **latest}
+        elif data_key in {"price_daily", "stooq_price_daily", "tushare_price_daily", "tushare_us_daily"}:
             latest = dict(value.get("latest", {}) or {})
             row.update(
                 {
@@ -536,7 +555,11 @@ def extract_information_macro_context(sources: dict[str, Any]) -> dict[str, Any]
     return {
         label: value
         for label, value in sources.items()
-        if label.startswith("macro.") or label.startswith("prediction.") or label.startswith("crypto.")
+        if label.startswith("macro.")
+        or label.startswith("prediction.")
+        or label.startswith("crypto.")
+        or label.startswith("tushare.macro.")
+        or label.startswith("tushare.market.")
     }
 
 
@@ -907,9 +930,13 @@ def infer_trading_signals(collected: dict[str, Any]) -> dict[str, Any]:
 def build_candidate_comparison(sources: dict[str, Any]) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
     for label, value in sources.items():
-        if not (label.startswith("equity.") and "tencent_metrics" in label):
+        parsed_label = parse_equity_source_label(label)
+        if not parsed_label:
             continue
         if not isinstance(value, dict):
+            continue
+        symbol, data_key = parsed_label
+        if data_key not in {"tencent_metrics", "tushare_daily_basic"}:
             continue
         items = list(value.get("items", []) or [])
         if not items or not isinstance(items[0], dict):
@@ -918,7 +945,7 @@ def build_candidate_comparison(sources: dict[str, Any]) -> list[dict[str, Any]]:
         score, basis = score_tencent_candidate(item)
         rows.append(
             {
-                "symbol": item.get("symbol") or label.split(".")[1],
+                "symbol": item.get("symbol") or item.get("ts_code") or symbol,
                 "name": item.get("name") or "",
                 "score": score,
                 "basis": basis,

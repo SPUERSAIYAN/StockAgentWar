@@ -399,6 +399,47 @@ def apply_provider_selection(
             **dict(providers.get(group, {})),
             "enabled": bool(item.get("enabled", False)),
         }
+    if "tushare" in providers:
+        selected_groups = set(provider_selection.get("selected_groups", []))
+        tushare_config = dict(providers.get("tushare", {}) or {})
+        tushare_config["china_equity"] = "china_equity" in selected_groups
+        tushare_config["us_equity"] = "us_equity" in selected_groups
+        tushare_config["macro_rates"] = "macro" in selected_groups
+        tushare_config["crypto"] = "crypto" in selected_groups and bool(tushare_config.get("crypto", False))
+        if "china_equity" not in selected_groups:
+            for key in (
+                "stock_basic",
+                "index_basic",
+                "index_daily",
+                "a_share_daily",
+                "a_share_weekly",
+                "daily_basic",
+                "a_share_financials",
+                "moneyflow_lhb",
+                "index_etf",
+                "futures_options",
+            ):
+                tushare_config[key] = False
+        if "us_equity" not in selected_groups:
+            for key in ("us_basic", "us_daily"):
+                tushare_config[key] = False
+        if "macro" not in selected_groups:
+            for key in (
+                "shibor",
+                "cn_gdp",
+                "cn_cpi",
+                "cn_pmi",
+                "us_tycr",
+                "us_trycr",
+                "us_tbr",
+                "us_tltr",
+                "us_trltr",
+            ):
+                tushare_config[key] = False
+        elif "china_equity" not in selected_groups:
+            for key in ("shibor", "cn_gdp", "cn_cpi", "cn_pmi"):
+                tushare_config[key] = False
+        providers["tushare"] = tushare_config
     collector_config["providers"] = providers
     selected_config["collector"] = collector_config
     return selected_config

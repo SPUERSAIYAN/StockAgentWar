@@ -33,20 +33,15 @@ agents:
           min_market_cap_yi: 50
           max_pe: 80
           exclude_suspended: true
-      macro_symbols:
-        - SPY
-        - QQQ
-        - ^VIX
-        - GC=F
-        - USDCNY=X
+      macro_symbols: []
       providers:
         us_equity:
-          enabled: true
-          price: true
-          weekly_price: true
-          options: true
-          edgar: true
-          edgar_filings: true
+          enabled: false
+          price: false
+          weekly_price: false
+          options: false
+          edgar: false
+          edgar_filings: false
           edgar_filing_forms: 10-K,10-Q
           edgar_filing_limit: 8
           stooq_compat: false
@@ -103,6 +98,9 @@ agents:
             market: std
             timeout: 15
             heartbeat: false
+            server:
+              - 110.41.147.114
+              - 7709
         macro:
           enabled: true
           treasury: true
@@ -116,8 +114,8 @@ agents:
             - Japan
           treasury_exchange_rate_limit: 12
           fear_greed: true
-          cme_fedwatch: true
-          cftc: true
+          cme_fedwatch: false
+          cftc: false
           cftc_commodities:
             - GOLD
             - CRUDE OIL
@@ -139,8 +137,8 @@ agents:
             - FP.CPI.TOTL.ZG
             - FR.INR.RINR
         prediction_markets:
-          enabled: true
-          kalshi: true
+          enabled: false
+          kalshi: false
           kalshi_limit: 10
           kalshi_status: open
           kalshi_series_ticker:
@@ -149,7 +147,7 @@ agents:
           kalshi_tickers: []
           kalshi_orderbook_tickers: []
           kalshi_orderbook_depth: 10
-          polymarket: true
+          polymarket: false
           polymarket_limit: 10
           polymarket_tag_slugs:
             - economy
@@ -159,19 +157,110 @@ agents:
           polymarket_event_slugs: []
           polymarket_orderbook_token_ids: []
         crypto:
-          enabled: true
-          coingecko: true
+          enabled: false
+          coingecko: false
           coin_ids:
             - bitcoin
             - ethereum
           market_limit: 20
-          deribit: true
+          deribit: false
           deribit_currencies:
             - BTC
             - ETH
-          deribit_options: true
+          deribit_options: false
           deribit_orderbook_instruments: []
           deribit_orderbook_depth: 5
+        tushare:
+          enabled: true
+          token: 42d9c5d09bce973dd2226d7695dc6d24448d61f115f0fea663ed83f2
+          http_url: http://118.89.66.41:8010/
+          china_equity: true
+          us_equity: true
+          crypto: false
+          table_limit: 20
+          price_history_limit: 90
+          stock_basic: false
+          index_basic: true
+          index_daily: true
+          index_symbols:
+            - 000001.SH
+            - 399001.SZ
+            - 399006.SZ
+            - 000300.SH
+          a_share_daily: true
+          a_share_weekly: true
+          daily_basic: true
+          a_share_financials: true
+          financial_period: "20251231"
+          financial_limit: 4
+          forecast: false
+          express: false
+          moneyflow_lhb: true
+          moneyflow: true
+          moneyflow_hsgt: true
+          margin: true
+          margin_detail: true
+          top_list: true
+          top_inst: true
+          trade_date: "20260515"
+          index_etf: true
+          index_weight: true
+          index_weight_trade_date:
+          index_dailybasic: true
+          fund_basic: true
+          fund_daily: true
+          fund_nav: true
+          fund_portfolio: false
+          fund_market: E
+          fund_symbols:
+            - 510300.SH
+            - 159919.SZ
+          futures_options: true
+          fut_basic: true
+          fut_daily: true
+          fut_mapping: true
+          fut_holding: false
+          futures_exchange: CFFEX
+          futures_symbols:
+            - IF.CFX
+          fut_holding_symbol:
+          opt_basic: true
+          opt_daily: false
+          option_exchange: SSE
+          option_symbols: []
+          macro_rates: true
+          macro_start_date: "20240101"
+          macro_end_date: "20260515"
+          macro_start_month: "202401"
+          macro_end_month: "202605"
+          shibor: true
+          cn_gdp: true
+          cn_cpi: true
+          cn_pmi: true
+          us_tycr: true
+          us_trycr: true
+          us_tbr: true
+          us_tltr: true
+          us_trltr: true
+          us_basic: true
+          us_daily: true
+          coinlist: false
+          coinlist_start_date: "20170101"
+          coinlist_end_date: "20171231"
+          coincap: false
+          coincap_trade_date: "20180806"
+          coincap_coins:
+            - BTC
+            - ETH
+          coin_bar: false
+          coin_bar_exchange: okex
+          coin_bar_ts_code: BTC_USDT
+          coin_bar_freq: 1min
+          coin_bar_start_date: "2020-04-01 00:00:01"
+          coin_bar_end_date: "2020-04-04 19:00:00"
+          cftc: false
+          cme_fedwatch: false
+          prediction_markets: false
         web_search:
           enabled: false
           max_results: 5

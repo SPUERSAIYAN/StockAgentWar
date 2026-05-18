@@ -303,6 +303,42 @@ class SectorCollectionTests(unittest.TestCase):
         self.assertEqual(output["collection_status"], "ok")
         self.assertIn("china.tencent.index_metrics", output["sources"])
 
+    def test_a_share_macro_question_does_not_trigger_candidate_discovery(self) -> None:
+        config, profile = digital_oracle_collector.apply_a_share_collection_profile(
+            {
+                "task": "分析 A 股宏观流动性和大盘指数风险",
+                "candidates": [],
+                "question_understanding": {
+                    "market_scope": "China A-share macro market",
+                    "candidate_scope": "No stock candidates requested",
+                },
+            },
+            full_depth_collector_config(),
+        )
+
+        self.assertEqual(profile, "market_macro")
+        self.assertFalse(config["candidate_discovery"]["enabled"])
+        self.assertTrue(config["providers"]["china_equity"]["tencent_index_metrics"])
+        self.assertFalse(config["providers"]["china_equity"]["mootdx"])
+        self.assertFalse(config["providers"]["tushare"]["a_share_financials"])
+        self.assertFalse(config["providers"]["tushare"]["moneyflow"])
+        self.assertTrue(config["providers"]["tushare"]["index_daily"])
+        self.assertTrue(config["providers"]["tushare"]["fund_daily"])
+        self.assertTrue(config["providers"]["tushare"]["moneyflow_hsgt"])
+
+    def test_a_share_macro_question_auto_universe_is_not_stock_selection(self) -> None:
+        self.assertIsNone(
+            digital_oracle_collector.infer_auto_candidate_universe(
+                "分析 A 股宏观流动性和大盘指数风险"
+            )
+        )
+
+    def test_a_share_stock_selection_still_triggers_auto_universe(self) -> None:
+        self.assertEqual(
+            digital_oracle_collector.infer_auto_candidate_universe("A股未来最有潜力的股票"),
+            "china_a_share_core",
+        )
+
 
 def build_test_concept_workbook(path: Path) -> Path:
     rows = [

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from pathlib import Path
 import unittest
 
 from agents import information_workflow
@@ -12,6 +13,14 @@ from collectors import digital_oracle_collector
 
 
 class QuestionPlanningTests(unittest.TestCase):
+    def test_data_source_reference_documents_tushare_routing(self) -> None:
+        text = Path("prompts/data_sources.md").read_text(encoding="utf-8")
+
+        self.assertIn("Tushare", text)
+        self.assertIn("不是 planner 可输出的 provider group", text)
+        self.assertIn("Yahoo/CFTC/CME FedWatch/预测市场/旧 crypto 已在 `config.yaml` 默认关闭", text)
+        self.assertIn("AAPL、MSFT、NVDA、SPY 等美股/ETF", text)
+
     def test_agent_parses_mock_json_provider_selection(self) -> None:
         agent = QuestionPlanningAgent(
             {
@@ -173,6 +182,67 @@ class QuestionPlanningTests(unittest.TestCase):
             digital_oracle_collector.discover_candidate_universe = original
 
         self.assertEqual(result["collection_status"], "empty")
+
+    def test_provider_selection_routes_tushare_subsources(self) -> None:
+        config = {
+            "collector": {
+                "providers": {
+                    "us_equity": {"enabled": False},
+                    "china_equity": {"enabled": True},
+                    "macro": {"enabled": True},
+                    "prediction_markets": {"enabled": False},
+                    "crypto": {"enabled": False},
+                    "web_search": {"enabled": False},
+                    "tushare": {
+                        "enabled": True,
+                        "china_equity": True,
+                        "us_equity": True,
+                        "macro_rates": True,
+                        "index_basic": True,
+                        "index_daily": True,
+                        "a_share_financials": True,
+                        "moneyflow_lhb": True,
+                        "index_etf": True,
+                        "futures_options": True,
+                        "us_basic": True,
+                        "us_daily": True,
+                        "us_tycr": True,
+                    },
+                }
+            }
+        }
+        provider_selection = {
+            "selected_groups": ["us_equity", "macro"],
+            "providers": {
+                "us_equity": {"enabled": True},
+                "china_equity": {"enabled": False},
+                "macro": {"enabled": True},
+                "prediction_markets": {"enabled": False},
+                "crypto": {"enabled": False},
+                "web_search": {"enabled": False},
+            },
+        }
+
+        selected_config = information_workflow.apply_provider_selection(config, provider_selection)
+        tushare = selected_config["collector"]["providers"]["tushare"]
+
+        self.assertTrue(tushare["enabled"])
+        self.assertTrue(tushare["us_equity"])
+        self.assertTrue(tushare["us_basic"])
+        self.assertTrue(tushare["us_daily"])
+        self.assertTrue(tushare["macro_rates"])
+        self.assertTrue(tushare["us_tycr"])
+        self.assertFalse(tushare["shibor"])
+        self.assertFalse(tushare["cn_gdp"])
+        self.assertFalse(tushare["cn_cpi"])
+        self.assertFalse(tushare["cn_pmi"])
+        self.assertFalse(tushare["china_equity"])
+        self.assertFalse(tushare["index_basic"])
+        self.assertFalse(tushare["index_daily"])
+        self.assertFalse(tushare["a_share_financials"])
+        self.assertFalse(tushare["moneyflow_lhb"])
+        self.assertFalse(tushare["index_etf"])
+        self.assertFalse(tushare["futures_options"])
 
 
 if __name__ == "__main__":
