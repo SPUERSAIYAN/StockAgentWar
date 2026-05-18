@@ -1,6 +1,6 @@
 import type { ModelMode, RiskTolerance, RunMode } from "../store/types";
 import { useAppContext } from "../store/context";
-import { formatElapsed } from "../utils";
+import { firstDelimitedValue, formatElapsed } from "../utils";
 import { PauseIcon, PlayIcon } from "./Icons";
 import { Segmented } from "./Segmented";
 
@@ -62,8 +62,8 @@ export function ControlPanel() {
           <input
             id="sectors"
             value={state.sectors}
-            placeholder="例如：半导体,白酒,新能源"
-            onChange={(event) => dispatch({ type: "SET_SECTORS", payload: event.target.value })}
+            placeholder="例如：半导体"
+            onChange={(event) => dispatch({ type: "SET_SECTORS", payload: firstDelimitedValue(event.target.value) })}
           />
         </div>
       )}

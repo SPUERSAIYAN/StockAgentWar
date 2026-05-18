@@ -43,6 +43,10 @@ export function normalizeSources(value: unknown): SourceItem[] {
   });
 }
 
+export function firstDelimitedValue(value: string): string {
+  return value.split(/[,\uFF0C;；、\r\n\t]/)[0]?.trim() || "";
+}
+
 export function isRecord(value: unknown): value is Record<string, unknown> {
   return Boolean(value) && typeof value === "object" && !Array.isArray(value);
 }

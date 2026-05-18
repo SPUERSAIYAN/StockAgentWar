@@ -4,7 +4,7 @@ import { streamDecision } from "../api/client";
 import type { DecisionRequest, NdjsonEvent } from "../api/types";
 import type { AppAction, AppState, RunMode } from "../store/types";
 import { currentStageOrder, normalizeStageOrder } from "../store/stageMeta";
-import { normalizeSources, summarizeMarkdown } from "../utils";
+import { firstDelimitedValue, normalizeSources, summarizeMarkdown } from "../utils";
 
 function backendMode(state: AppState): DecisionRequest["mode"] {
   return state.runMode === "common" ? state.modelMode : state.runMode;
@@ -15,7 +15,7 @@ function buildRequest(state: AppState): DecisionRequest {
   return {
     task: state.task.trim(),
     symbols: !isAShare || state.runMode === "a_share_deep" ? state.symbols.trim() : "",
-    sectors: state.runMode === "a_share_sector" ? state.sectors.trim() : "",
+    sectors: state.runMode === "a_share_sector" ? firstDelimitedValue(state.sectors) : "",
     openrouter_api_key: backendMode(state) === "mock" ? "" : state.openrouterApiKey.trim(),
     mode: backendMode(state),
     risk_tolerance: state.riskTolerance,

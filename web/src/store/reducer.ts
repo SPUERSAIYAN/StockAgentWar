@@ -1,6 +1,7 @@
 import type { AppAction, AppState, StageStatus } from "./types";
 import { commonTask, createStages, dailyTask, deepTask, sectorTask } from "./state";
 import { currentStageOrder } from "./stageMeta";
+import { firstDelimitedValue } from "../utils";
 
 function isLikelyAShareSymbolList(value: string): boolean {
   return value
@@ -55,7 +56,7 @@ export function appReducer(state: AppState, action: AppAction): AppState {
           stageOrder,
           stages: createStages(stageOrder),
           activeStageTab: null,
-          sectors: state.sectors.trim() ? state.sectors : "半导体,白酒,新能源",
+          sectors: firstDelimitedValue(state.sectors) || "半导体",
         };
       }
       return {
@@ -73,7 +74,7 @@ export function appReducer(state: AppState, action: AppAction): AppState {
     case "SET_SYMBOLS":
       return { ...state, symbols: action.payload };
     case "SET_SECTORS":
-      return { ...state, sectors: action.payload };
+      return { ...state, sectors: firstDelimitedValue(action.payload) };
     case "SET_OPENROUTER_API_KEY":
       return { ...state, openrouterApiKey: action.payload };
     case "SET_TASK":
